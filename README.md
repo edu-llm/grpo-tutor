@@ -7,6 +7,88 @@ Runs on 1x H100 with vLLM.
 
 ---
 
+## How one training step works
+
+```mermaid
+flowchart LR
+    P["ZPD problem<br/>(student fails it alone)"] --> T["Teacher LLM + LoRA<br/>K=8 hints per problem"]
+    T --> S["Frozen student<br/>re-answers with each hint"]
+    S --> R{"score each hint"}
+    R -->|"gave the answer away"| N["-1.0"]
+    R -->|"student solved it"| Y["+1.0"]
+    R -->|"student still wrong"| Z["0.0"]
+    N --> A["group-normalized<br/>advantage"]
+    Y --> A
+    Z --> A
+    A --> U["GRPO update<br/>(LoRA only)"]
+    U --> V["sync LoRA into vLLM<br/>(~0.3s, every step)"]
+    V --> T
+```
+
+The student is the **environment**: frozen, never trained. Only the teacher learns.
+
+## The swapped-hint check (specificity)
+
+A hint can raise the student's score two ways. One is teaching. The other is
+generic filler - *"read each option carefully and rule out the silly ones"* -
+which lifts accuracy on **any** question and costs the teacher no understanding
+at all. Both look identical if you only measure "did the student get it right".
+
+The swapped hint separates them: **take a hint and apply it to a different
+question.** A real teaching hint stops working. Filler keeps working.
+
+```mermaid
+flowchart TB
+    subgraph good["specific hint - what we want"]
+        H1["'think about what melts snow'<br/>written for Q1"]
+        H1 --> G1["Q1 - why did the snowman shrink?<br/>student RIGHT"]
+        H1 --> G2["Q2 - what do plants need to grow?<br/>student WRONG"]
+    end
+    subgraph bad["generic filler - the hack"]
+        H2["'read each option carefully'<br/>written for Q1"]
+        H2 --> B1["Q1 - student RIGHT"]
+        H2 --> B2["Q2 - student ALSO RIGHT"]
+    end
+```
+
+`specificity = solved(own hint) - solved(swapped hint)`. High means the gain was
+question-specific; near zero means the hint would have worked on anything.
+
+**Measured on QASC at step 25:** teacher 0.500, swapped 0.400, baseline 0.250 -
+so of the +0.250 gain, only **+0.100 was question-specific** and 60% was generic.
+
+### Which way to swap matters
+
+Two different things get called "swapping", and they measure opposite things:
+
+```mermaid
+flowchart LR
+    subgraph q1["fix the PROBLEM, vary the hint"]
+        X1["my problem + someone else's hint"] --> X2["measures: how easily does<br/>MY PROBLEM yield to any hint?"]
+    end
+    subgraph q2["fix the HINT, vary the problem"]
+        Y1["my hint + someone else's problem"] --> Y2["measures: is MY HINT<br/>generic? &lt;-- what we want"]
+    end
+```
+
+As an aggregate eval statistic either is defensible, and `eval/specificity`
+currently uses the first. As a **per-sample training reward** only the second
+works, because GRPO centers rewards within the group:
+
+```
+advantage_k  ∝  (solved_k - mean solved) - (swapped_k - mean swapped)
+```
+
+Only the *deviation* of the swapped term survives. Make it constant across the
+group and it cancels exactly; make it depend on someone else's hint and it
+becomes noise attributed to the wrong sample. It has to vary **because the
+member's own hint varies**.
+
+> Status: `eval/specificity` (measurement) is implemented. The specificity
+> *reward* is proposed and under review on a fork branch, not merged.
+
+---
+
 ## Biggest things this accomplishes
 
 **1. It proved the reward signal exists before spending any training compute.**
