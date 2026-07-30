@@ -19,6 +19,8 @@ import statistics as st
 import time
 from dataclasses import dataclass, field
 
+import paths
+
 
 # ---------------------------------------------------------------- detectors
 
@@ -81,7 +83,7 @@ DEFAULT_THRESHOLDS = {
 
 @dataclass
 class Monitor:
-    run_dir: str = "runs"
+    run_dir: str = str(paths.RUNS)
     use_wandb: bool = False
     wandb_project: str = "grpo_tutor"
     config: dict = field(default_factory=dict)

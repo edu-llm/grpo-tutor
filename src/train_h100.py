@@ -27,6 +27,7 @@ import time
 import torch
 
 import grpo
+import paths
 import tasks
 from config import Config
 from engine import build_engine
@@ -35,9 +36,10 @@ from interfaces import Trajectory, Turn
 from monitor import Monitor
 from rewards import LeakGuard, SolveReward
 
-def load_fake_topics(path="data/topics.jsonl"):
+def load_fake_topics(path=None):
     """Varied teaching prompts (math/science/english/social studies/logic) for the
     fake-reward pipeline test. Falls back if the file is absent."""
+    path = path or str(paths.DATA / "topics.jsonl")
     if os.path.exists(path):
         with open(path) as f:
             return [json.loads(l)["topic"] for l in f if l.strip()]
@@ -61,7 +63,7 @@ def run_meta(save_dir):
     import uuid
 
     meta = {"run_id": os.environ.get("SLURM_JOB_ID") or uuid.uuid4().hex[:8],
-            "run_dir": os.path.join("runs", time.strftime("%Y%m%d-%H%M%S"))}
+            "run_dir": str(paths.RUNS / time.strftime("%Y%m%d-%H%M%S"))}
     os.makedirs(save_dir, exist_ok=True)
     with open(path, "w") as f:
         json.dump(meta, f)

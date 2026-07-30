@@ -57,10 +57,10 @@ wrapped in `LeakGuard` inherits leak protection for free.
 Everything below assumes **one** H100.
 
 ```bash
-python zpd_filter.py --limit 5000        # 1. build the ZPD set (do this first)
-sbatch train_real.sbatch                 # 2. train (H100, preemptable, auto-resumes)
-python evals.py --teacher-adapter checkpoints/adapter-latest   # 3. evaluate
-python train_h100.py --backend stub --steps 6                  # no-GPU smoke test
+python src/zpd_filter.py --limit 5000    # 1. build the ZPD set (do this first)
+sbatch scripts/train_real.sbatch         # 2. train (H100, preemptable, auto-resumes)
+python src/evals.py --teacher-adapter checkpoints/adapter-latest   # 3. evaluate
+python src/train_h100.py --backend stub --steps 6                  # no-GPU smoke test
 ```
 
 Useful flags: `--turns 3` (multi-turn dialogue), `--hint-probe` (leak probe),
@@ -68,11 +68,20 @@ Useful flags: `--turns 3` (multi-turn dialogue), `--hint-probe` (leak probe),
 
 ## Layout
 
+```
+src/      the code            scripts/  slurm jobs + env.sh
+data/     problems + personas runs/     traces, metrics, samples (gitignored)
+```
+
 `config.py` knobs · `engine.py` vLLM/HF/stub inference + sleep/wake/sync ·
 `grpo.py` the GRPO loss · `tasks.py` problems + prompts · `rewards.py`
 SolveReward + LeakGuard · `zpd_filter.py` ZPD curation + student ·
 `evals.py` held-out eval · `monitor.py` traces + metrics + hack detectors ·
-`train_h100.py` training loop · `interfaces.py` seams
+`train_h100.py` training loop · `interfaces.py` seams · `paths.py` repo-root anchors
+
+Data and output paths are anchored to the repo root, so scripts work from any
+working directory - a requeued job cannot miss `checkpoints/` and silently
+restart from step 0.
 
 ## Watching a run
 

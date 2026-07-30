@@ -24,6 +24,8 @@ import os
 
 import torch
 
+import paths
+
 
 class StubStudent:
     """Deterministic fake student: gets it right only when the hint is present
@@ -124,7 +126,7 @@ def main():
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--student", default="Qwen/Qwen2.5-0.5B-Instruct")
     ap.add_argument("--stub", action="store_true", help="no model; validate the logic")
-    ap.add_argument("--out", default="data/zpd_problems.jsonl")
+    ap.add_argument("--out", default=str(paths.DATA / "zpd_problems.jsonl"))
     args = ap.parse_args()
 
     if args.stub:

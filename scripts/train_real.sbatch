@@ -13,9 +13,9 @@
 # resumes from checkpoints/ckpt.pt (LoRA + optimizer + step), so progress is kept
 # with NO manual resubmission. --open-mode=append keeps the log across requeues.
 set -euo pipefail
-source /home/zsophia/orcd/scratch/grpo_tutor/env.sh
+source /home/zsophia/orcd/scratch/grpo_tutor/scripts/env.sh
 export WANDB_PROJECT=grpo_tutor
-python -u train_h100.py \
+python -u src/train_h100.py \
   --backend vllm --reward real \
   --teacher Qwen/Qwen2.5-3B-Instruct \
   --student Qwen/Qwen2.5-0.5B-Instruct \

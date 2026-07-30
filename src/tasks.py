@@ -10,7 +10,9 @@ import json
 import os
 import random
 
-DEFAULT_PATH = "data/zpd_problems.jsonl"
+import paths
+
+DEFAULT_PATH = str(paths.DATA / "zpd_problems.jsonl")
 
 _FALLBACK = [
     {"question": "Which object is the best conductor of electricity?",

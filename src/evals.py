@@ -47,12 +47,13 @@ import random
 import statistics as st
 from typing import Callable, Protocol, Sequence
 
+import paths
 from rewards import leaked_answer
 
 # teacher_fn(question, choices) -> hint text
 TeacherFn = Callable[[str, Sequence[str]], str]
 
-DEFAULT_PROBLEMS = "data/zpd_problems.jsonl"
+DEFAULT_PROBLEMS = str(paths.DATA / "zpd_problems.jsonl")
 SYNTHETIC_N = 200
 
 
@@ -355,7 +356,7 @@ def main() -> None:
                     help="cap on held-out items evaluated (0 = all); applied after the split")
     ap.add_argument("--stub", action="store_true",
                     help="StubStudent + StubTeacher: no models, no GPU, no downloads")
-    ap.add_argument("--out", default="runs/eval_results.json")
+    ap.add_argument("--out", default=str(paths.RUNS / "eval_results.json"))
     ap.add_argument("--teacher", choices=["stub", "hf", "oracle"], default=None,
                     help="teacher under test; defaults to 'stub' with --stub, else 'hf'")
     ap.add_argument("--teacher-model", default="Qwen/Qwen2.5-3B-Instruct")

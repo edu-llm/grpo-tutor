@@ -10,6 +10,8 @@ from dataclasses import dataclass
 
 import torch
 
+import paths
+
 
 @dataclass
 class Config:
@@ -65,7 +67,7 @@ class Config:
     reward_mode: str = "keyword"  # fake-reward mode (pipeline test only)
 
     # --- io ---
-    save_dir: str = "checkpoints"
+    save_dir: str = str(paths.CHECKPOINTS)
     save_every: int = 50
 
     def resolve_backend(self) -> str:
