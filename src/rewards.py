@@ -113,6 +113,18 @@ def hint_only_leak(student, hint: str, choices, gold_idx: int) -> float:
     return float(idx == gold_idx)
 
 
+def choices_only_baseline(student, choices, gold_idx: int) -> float:
+    """The FLOOR for hint_only_leak: same prompt, hint removed.
+
+    Without this, hint_only_leak is uninterpretable. LLMs routinely beat the
+    majority baseline from the choices alone - distractors leak through style,
+    length and topical coherence - so part of any hint-only score belongs to the
+    answer options, not to the teacher. Report hint_only_leak MINUS this.
+    """
+    idx = student.choose("(hidden)", list(choices), hint="")
+    return float(idx == gold_idx)
+
+
 class SolveReward:
     """1.0 if the student's post-tutoring answer matches gold, else 0.0."""
 

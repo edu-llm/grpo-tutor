@@ -153,9 +153,33 @@ def rollout_fake(cfg, engine, rewarder, rng):
     return samples, texts, traces, group_rewards
 
 
-def rollout_real(cfg, engine, rewarder, student, problems, rng, tok=None):
+class EpochSampler:
+    """Draw prompts without replacement, reshuffling once the deck runs out.
+
+    Independent draws with replacement leave coverage uneven: 300 steps x 4
+    prompts is 1200 draws from 622 problems, so some are trained on repeatedly
+    while others are never seen. A reshuffled deck visits each problem once per
+    pass, which matters for a long run over a small curated set.
+    """
+
+    def __init__(self, items, rng):
+        self._items = items
+        self._rng = rng
+        self._deck: list[int] = []
+
+    def take(self, k):
+        out = []
+        while len(out) < k:
+            if not self._deck:
+                self._deck = list(range(len(self._items)))
+                self._rng.shuffle(self._deck)
+            out.append(self._items[self._deck.pop()])
+        return out
+
+
+def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
     """Real task: hint -> student re-answers -> solved? (leak => -1)."""
-    picks = [rng.choice(problems) for _ in range(cfg.batch_prompts)]
+    picks = sampler.take(cfg.batch_prompts)
     prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in picks]
     groups = engine.generate(prompts, n=cfg.group_size,
                              max_new_tokens=cfg.teacher_max_new_tokens,
@@ -192,7 +216,7 @@ def rollout_real(cfg, engine, rewarder, student, problems, rng, tok=None):
     return samples, texts, traces, group_rewards
 
 
-def rollout_multiturn(cfg, engine, rewarder, student, problems, rng, tok=None):
+def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
     """Teacher and student DISCUSS the problem, then the student answers.
 
     Each of the K group members runs its own conversation, so the K dialogues
@@ -201,7 +225,7 @@ def rollout_multiturn(cfg, engine, rewarder, student, problems, rng, tok=None):
     Student turns are environment text - they are never trained on, which is the
     teacher-token masking (we only ever store the teacher's gen_ids).
     """
-    picks = [rng.choice(problems) for _ in range(cfg.batch_prompts)]
+    picks = sampler.take(cfg.batch_prompts)
     n_dialogues = cfg.batch_prompts * cfg.group_size
     # flat index d = prompt_i * K + k
     problem_of = [picks[d // cfg.group_size] for d in range(n_dialogues)]
@@ -274,7 +298,7 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     Held-out gold accuracy separates them, and divergence between the two is the
     hacking alarm. Greedy decoding so the number is comparable across steps.
     """
-    from rewards import hint_only_leak, leaked_answer
+    from rewards import choices_only_baseline, hint_only_leak, leaked_answer
 
     items = held_out[:n]
     if not items:
@@ -282,27 +306,40 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
     gens = engine.generate(prompts, n=1,
                            max_new_tokens=cfg.teacher_max_new_tokens, temperature=0.0)
+    hints = [g[0].text for g in gens]
+    # each item gets ANOTHER item's hint; rotating by one keeps the pairing
+    # deterministic and guarantees no item ever receives its own hint
+    swapped = hints[1:] + hints[:1]
 
-    base_ok = help_ok = leak = probe = 0.0
+    base_ok = help_ok = leak = probe = floor = swap_ok = 0.0
     hint_words = 0
-    for p, g in zip(items, gens):
-        hint = g[0].text
+    for p, hint, other in zip(items, hints, swapped):
         gold_idx = p["gold_idx"]
         gold = p["choices"][gold_idx]
         distractors = [c for j, c in enumerate(p["choices"]) if j != gold_idx]
         base_ok += float(student.choose(p["question"], p["choices"]) == gold_idx)
         help_ok += float(student.choose(p["question"], p["choices"], hint=hint) == gold_idx)
+        # a hint from a DIFFERENT problem: whatever accuracy survives this is
+        # generic encouragement, not teaching about this question
+        swap_ok += float(student.choose(p["question"], p["choices"], hint=other) == gold_idx)
         leak += leaked_answer(hint, gold, distractors)
         hint_words += len(hint.split())
         if cfg.hint_probe:
             probe += hint_only_leak(student, hint, p["choices"], gold_idx)
+            floor += choices_only_baseline(student, p["choices"], gold_idx)
 
     m = len(items)
     out = {"eval/baseline_acc": base_ok / m, "eval/teacher_acc": help_ok / m,
            "eval/teaching_gain": (help_ok - base_ok) / m, "eval/leak_rate": leak / m,
-           "eval/hint_words": hint_words / m, "eval/n": float(m)}
+           "eval/hint_words": hint_words / m, "eval/n": float(m),
+           "eval/swapped_acc": swap_ok / m,
+           # gain that does NOT survive swapping = the question-specific part
+           "eval/specificity": (help_ok - swap_ok) / m}
     if cfg.hint_probe:
         out["eval/hint_only_leak"] = probe / m
+        out["eval/choices_only"] = floor / m
+        # the only interpretable form of the probe
+        out["eval/leak_above_floor"] = (probe - floor) / m
     return out
 
 
@@ -358,7 +395,7 @@ def main():
                       run_id=meta["run_id"], dir_override=meta["run_dir"])
 
     # ---- reward + (for real mode) the student and the ZPD problem set ----
-    problems = student = None
+    problems = student = sampler = None
     if args.reward == "real":
         rewarder = LeakGuard(SolveReward(), penalty=-1.0)
         all_problems = tasks.load_zpd(args.problems)
@@ -366,6 +403,7 @@ def main():
         from zpd_filter import HFStudent, StubStudent
 
         student = StubStudent() if stub else HFStudent(cfg.student_model, device=device)
+        sampler = EpochSampler(problems, rng)
         print(f"[data] {len(problems)} train / {len(held_out)} held-out ZPD problems", flush=True)
         if cfg.eval_benchmark:
             # The ZPD held-out split has baseline_acc == 0 by construction, which
@@ -435,7 +473,7 @@ def main():
         with awake():
             if args.reward == "real":
                 roll = rollout_multiturn if cfg.turns > 1 else rollout_real
-                return roll(cfg, engine, rewarder, student, problems, rng, tok=tok)
+                return roll(cfg, engine, rewarder, student, sampler, rng, tok=tok)
             return rollout_fake(cfg, engine, rewarder, rng)
 
     for step in range(start_step, cfg.total_steps):
@@ -457,8 +495,10 @@ def main():
                     torch.nn.utils.clip_grad_norm_(
                         [p for p in teacher.parameters() if p.requires_grad], 1.0)
                     optimizer.step()
-                    scheduler.step()
                     epoch_metrics.append(m)
+                # once per TRAINING step, not per epoch - otherwise warmup finishes
+                # update_epochs times too early
+                scheduler.step()
                 # average over epochs so the logged loss represents the STEP, not
                 # just whichever epoch happened to run last
                 metrics = {k: sum(d[k] for d in epoch_metrics) / len(epoch_metrics)

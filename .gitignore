@@ -23,5 +23,7 @@ logs/*
 data/my_inputs.txt
 data/my_inputs.jsonl
 
-# regenerable from HF: python src/benchmarks.py --name <set>
-data/bench_*.jsonl
+# # regenerable from HF: python src/benchmarks.py --name <set>
+# data/bench_*.jsonl
+
+.gitignore

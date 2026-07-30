@@ -132,9 +132,13 @@ that stays flat, the reward is being gamed.
   ZPD filter keeps only problems the student fails alone, so held-out
   `baseline_acc` is 0.0 by construction and the baseline term subtracts nothing.
   Pass `--eval-benchmark qasc` (or any set above) to get a real baseline.
-- **The behavioral leak probe finds ~2x what the rules do.** First GPU eval:
-  `hint_only_leak` 0.30-0.35 vs rule-based `leak_rate` 0.15. Only the rule-caught
-  share is penalized in the reward, so most leakage is currently unpriced.
+- **The leak probe is missing its control and is currently uninterpretable.**
+  `hint_only_leak` (0.33-0.40 on QASC) is a partial-input baseline, and we never
+  measured what the student scores on *choices alone*. LLMs beat majority
+  baselines on choices-only prompts routinely, so an unknown share of that number
+  is the student exploiting the distractors, not the teacher leaking. It also
+  cannot distinguish leaking from legitimately nudging a student who already
+  half-knew the answer. See `docs/eval_leakage.md` for the controls needed.
 - **Multi-turn is verified in stub mode only.** `--turns > 1` runs the dialogue loop
   (student asks -> teacher guides -> student retries), masks loss to teacher tokens,
   and shares the terminal reward across turns, but it has not yet run on a GPU.
