@@ -64,8 +64,24 @@ class HFStudent:
         "question. Talk like a kid. Never just guess the final answer."
     )
 
+    @staticmethod
+    def _trim_to_sentence(text: str) -> str:
+        """Drop a trailing half-sentence left by the token cap.
+
+        A truncated student turn ends the transcript mid-sentence, and the
+        teacher's next turn then CONTINUES that sentence instead of taking its
+        own. Observed on GPU: a student turn cut at "...why people still" was
+        completed by the tutor with the gold answer, scoring as a leak that the
+        tutor never really chose to commit.
+        """
+        t = text.strip()
+        cut = max(t.rfind("."), t.rfind("!"), t.rfind("?"))
+        # only trim when a sentence boundary is far enough in; short bare
+        # replies ("Rain") have no punctuation and should survive untouched
+        return t[: cut + 1] if cut >= 20 else t
+
     @torch.no_grad()
-    def reply(self, dialogues, max_new_tokens: int = 48):
+    def reply(self, dialogues, max_new_tokens: int = 80):
         """Batched free-text student turns (the environment's side of the dialogue)."""
         texts = []
         for d in dialogues:
@@ -79,7 +95,8 @@ class HFStudent:
                                   max_new_tokens=max_new_tokens,
                                   pad_token_id=self.tok.pad_token_id)
         gen = out[:, enc.input_ids.shape[1]:]
-        return [self.tok.decode(g, skip_special_tokens=True).strip() for g in gen]
+        return [self._trim_to_sentence(self.tok.decode(g, skip_special_tokens=True))
+                for g in gen]
 
     @torch.no_grad()
     def choose(self, question, choices, hint=""):
