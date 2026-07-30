@@ -121,6 +121,24 @@ class HFStudent:
         return int(max(range(len(scores)), key=lambda i: scores[i]))
 
 
+FREE_TEXT_ASK = ("Question you're stuck on:\n{q}\n{choices}\n\n"
+                 "Just say which option you think it is and why, in one sentence.")
+
+
+def _format_choices(choices) -> str:
+    return "\n".join(f"{chr(65 + i)}. {c}" for i, c in enumerate(choices))
+
+
+def _names_gold(text: str, gold: str, distractors) -> bool:
+    """Gold mentioned and no distractor mentioned, so a scattershot reply that
+    lists several options does not count as knowing the answer."""
+    low = text.lower()
+    g = gold.lower().strip()
+    if not g or g not in low:
+        return False
+    return not any(d.lower().strip() and d.lower().strip() in low for d in distractors)
+
+
 def load_openbookqa(limit: int):
     from datasets import load_dataset
 
@@ -147,8 +165,15 @@ def main():
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--student", default="Qwen/Qwen2.5-0.5B-Instruct")
     ap.add_argument("--stub", action="store_true", help="no model; validate the logic")
-    ap.add_argument("--out", default=str(paths.DATA / "zpd_problems.jsonl"))
+    ap.add_argument("--no-free-text-screen", action="store_true",
+                    help="keep items the student can already answer in free text "
+                         "(the old, choose()-only criterion)")
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
+    if args.out is None:
+        # a --stub smoke test must never overwrite the real curated set
+        args.out = str(paths.DATA / ("zpd_stub.jsonl" if args.stub
+                                     else "zpd_problems.jsonl"))
 
     if args.stub:
         items = [{"question": f"toy question {i}?", "choices": ["a", "b", "c", "d"],
@@ -159,14 +184,34 @@ def main():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         student = HFStudent(args.student, device=device)
 
-    kept, n_base, n_help = [], 0, 0
-    for it in items:
+    # Free-text screen: choose() compares option log-probs with no room to reason,
+    # so "fails alone" under it is not the same as "does not know". Measured on the
+    # old set: 25% of curated items were answered correctly in free text. Keeping
+    # those trains the tutor to teach things the student already knows, and lets it
+    # blurt the answer mid-dialogue and score itself right.
+    free_ok = [False] * len(items)
+    if not args.stub and not args.no_free_text_screen:
+        views = [FREE_TEXT_ASK.format(q=it["question"],
+                                      choices=_format_choices(it["choices"]))
+                 for it in items]
+        replies = []
+        for i in range(0, len(views), 32):
+            replies.extend(student.reply(views[i:i + 32], max_new_tokens=60))
+        for i, (it, rep) in enumerate(zip(items, replies)):
+            gold = it["choices"][it["gold_idx"]]
+            distractors = [c for j, c in enumerate(it["choices"]) if j != it["gold_idx"]]
+            free_ok[i] = _names_gold(rep, gold, distractors)
+
+    kept, n_base, n_help, n_free = [], 0, 0, 0
+    for it, knows in zip(items, free_ok):
         alone = student.choose(it["question"], it["choices"]) == it["gold_idx"]
         helped = student.choose(it["question"], it["choices"], hint=it["hint"]) == it["gold_idx"]
         n_base += int(alone)
         n_help += int(helped)
-        if (not alone) and helped:          # <- the ZPD band
-            kept.append({**it, "baseline_correct": False, "assisted_correct": True})
+        n_free += int(knows)
+        if (not alone) and helped and not knows:      # <- the ZPD band, both channels
+            kept.append({**it, "baseline_correct": False, "assisted_correct": True,
+                         "free_text_correct": False})
 
     n = max(1, len(items))
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
@@ -176,9 +221,10 @@ def main():
 
     print("=== ZPD probe ===")
     print(f"items probed         : {len(items)}")
-    print(f"baseline accuracy    : {n_base / n:.2%}   (student alone)")
+    print(f"baseline accuracy    : {n_base / n:.2%}   (student alone, choose())")
     print(f"assisted accuracy    : {n_help / n:.2%}   (student + oracle hint)")
     print(f"teaching gain        : {(n_help - n_base) / n:+.2%}")
+    print(f"free-text correct    : {n_free / n:.2%}   (knows it when simply asked)")
     print(f"ZPD items kept       : {len(kept)} ({len(kept) / n:.1%}) -> {args.out}")
     if len(kept) / n < 0.05:
         print("\n[WARNING] almost no ZPD headroom. The tutoring reward will have "

@@ -79,9 +79,15 @@ def dialogue_prompt(problem, transcript: str, tokenizer=None) -> str:
 
 
 def student_dialogue_view(problem, transcript: str) -> str:
-    """What the student sees when it is their turn to speak."""
-    return (f"Question you're stuck on:\n{problem['question']}\n"
-            f"{format_choices(problem['choices'])}\n\n"
+    """What the student sees when it is their turn to SPEAK.
+
+    Deliberately WITHOUT the answer options. Showing them here let the student
+    read one aloud: it named gold in 34% of dialogues, and since the final score
+    is choose(..., hint=transcript), it then read its own words back and scored
+    correct - paying the teacher for the student's knowledge. `choose()` still
+    gets the options, because picking an answer requires them.
+    """
+    return (f"Question you're stuck on:\n{problem['question']}\n\n"
             f"Conversation so far:\n{transcript.strip()}\n\nYour reply:")
 
 
