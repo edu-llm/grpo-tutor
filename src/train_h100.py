@@ -216,6 +216,45 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
     return samples, texts, traces, group_rewards
 
 
+def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
+                  keep_turns: bool = False):
+    """Run `turns` rounds of tutor<->student dialogue, one conversation per entry
+    of problem_of. Shared by training rollouts and the held-out eval so that the
+    eval measures the SAME behaviour that is being trained - evaluating a
+    dialogue-trained teacher on one-shot hints would grade the wrong thing.
+
+    Returns (transcripts, turns_of). turns_of is only populated when keep_turns,
+    since the eval has no use for per-turn token ids.
+    """
+    n = len(problem_of)
+    transcripts = ["" for _ in range(n)]
+    turns_of = [[] for _ in range(n)]
+
+    for t in range(turns):
+        # --- teacher turn: one generation per ongoing dialogue ---
+        t_prompts = [tasks.dialogue_prompt(problem_of[d], transcripts[d], tokenizer=tok)
+                     for d in range(n)]
+        gens = engine.generate(t_prompts, n=1,
+                               max_new_tokens=cfg.teacher_max_new_tokens,
+                               temperature=temperature)
+        for d in range(n):
+            c = gens[d][0]
+            if keep_turns:
+                turns_of[d].append({"prompt": t_prompts[d], "gen_ids": c.token_ids,
+                                    "old_logprobs": c.logprobs})
+            transcripts[d] += f"Tutor: {c.text.strip()}\n"
+
+        # --- student turn (skipped after the last teacher turn) ---
+        if t < turns - 1:
+            views = [tasks.student_dialogue_view(problem_of[d], transcripts[d])
+                     for d in range(n)]
+            replies = student.reply(views)
+            for d in range(n):
+                transcripts[d] += f"Student: {replies[d].strip()}\n"
+
+    return transcripts, turns_of
+
+
 def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
     """Teacher and student DISCUSS the problem, then the student answers.
 
@@ -229,29 +268,8 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
     n_dialogues = cfg.batch_prompts * cfg.group_size
     # flat index d = prompt_i * K + k
     problem_of = [picks[d // cfg.group_size] for d in range(n_dialogues)]
-    transcripts = ["" for _ in range(n_dialogues)]
-    turns_of = [[] for _ in range(n_dialogues)]
-
-    for t in range(cfg.turns):
-        # --- teacher turn: one generation per ongoing dialogue ---
-        t_prompts = [tasks.dialogue_prompt(problem_of[d], transcripts[d], tokenizer=tok)
-                     for d in range(n_dialogues)]
-        gens = engine.generate(t_prompts, n=1,
-                               max_new_tokens=cfg.teacher_max_new_tokens,
-                               temperature=cfg.temperature)
-        for d in range(n_dialogues):
-            c = gens[d][0]
-            turns_of[d].append({"prompt": t_prompts[d], "gen_ids": c.token_ids,
-                                "old_logprobs": c.logprobs})
-            transcripts[d] += f"Tutor: {c.text.strip()}\n"
-
-        # --- student turn (skipped after the last teacher turn) ---
-        if t < cfg.turns - 1:
-            views = [tasks.student_dialogue_view(problem_of[d], transcripts[d])
-                     for d in range(n_dialogues)]
-            replies = student.reply(views)
-            for d in range(n_dialogues):
-                transcripts[d] += f"Student: {replies[d].strip()}\n"
+    transcripts, turns_of = run_dialogues(cfg, engine, student, problem_of, tok,
+                                          cfg.turns, cfg.temperature, keep_turns=True)
 
     # --- terminal: student answers with the whole conversation as context ---
     samples, texts, traces, group_rewards = [], [], [], []
@@ -303,10 +321,16 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     items = held_out[:n]
     if not items:
         return {}
-    prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
-    gens = engine.generate(prompts, n=1,
-                           max_new_tokens=cfg.teacher_max_new_tokens, temperature=0.0)
-    hints = [g[0].text for g in gens]
+    if cfg.turns > 1:
+        # match training: grade the dialogue, not a one-shot hint
+        hints, _ = run_dialogues(cfg, engine, student, items, tok, cfg.turns,
+                                 temperature=0.0)
+    else:
+        prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
+        gens = engine.generate(prompts, n=1,
+                               max_new_tokens=cfg.teacher_max_new_tokens,
+                               temperature=0.0)
+        hints = [g[0].text for g in gens]
     # each item gets ANOTHER item's hint; rotating by one keeps the pairing
     # deterministic and guarantees no item ever receives its own hint
     swapped = hints[1:] + hints[:1]
