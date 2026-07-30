@@ -298,20 +298,38 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
             for label, r in picks:
                 f.write(f"\n**[{label}] reward={r.get('reward', 0.0):.3f}"
                         f" solved={r.get('solved', '-')} leaked={r.get('leaked', '-')}**\n\n")
-                f.write(f"- prompt: {str(r.get('prompt', ''))[:300]}\n")
-                f.write(f"- hint: {str(r.get('completion', '')).strip()[:800]}\n")
+                f.write(f"- question: {str(r.get('prompt', ''))[:300]}\n\n")
+                # fenced so the Tutor:/Student: turn structure survives markdown
+                f.write("```\n" + str(r.get("completion", "")).strip() + "\n```\n")
                 if "student_answer" in r:
-                    f.write(f"- student answered: {r['student_answer']}  (gold: {r.get('gold')})\n")
+                    f.write(f"\n- student answered: {r['student_answer']}  (gold: {r.get('gold')})\n")
 
     def print_samples(self, k: int = 2, width: int = 400):
-        """Dump best/worst completions to stdout - the SSH-friendly view of traces."""
+        """Dump best/worst completions to stdout - the SSH-friendly view of traces.
+
+        A multi-turn dialogue is printed one line per speaker. Squashing it onto
+        a single truncated line hides who said what, which is precisely what you
+        need to see when judging whether the tutor gave the answer away.
+        """
         rows = sorted(self._recent_traces, key=lambda r: r.get("reward", 0.0))
         if not rows:
             return
         picks = [("worst", r) for r in rows[:k]] + [("best", r) for r in rows[-k:]]
         for label, r in picks:
-            txt = str(r.get("completion", "")).replace("\n", " ")[:width]
-            print(f"  [{label} r={r.get('reward', 0.0):.3f}] {txt}", flush=True)
+            txt = str(r.get("completion", "")).strip()
+            head = f"  [{label} r={r.get('reward', 0.0):.3f}"
+            if r.get("gold") is not None:
+                head += (f" gold={r.get('gold')!r}"
+                         f" answered={r.get('student_answer')!r}"
+                         f" leaked={r.get('leaked', '-')}")
+            head += "]"
+            if "\n" in txt:
+                print(head, flush=True)
+                for line in txt.splitlines():
+                    if line.strip():
+                        print(f"      {line.strip()}", flush=True)
+            else:
+                print(f"{head} {txt[:width]}", flush=True)
 
     def close(self):
         self.plot()
