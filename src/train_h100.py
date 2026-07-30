@@ -201,6 +201,7 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
             grp.append(scored["reward"])
             texts.append(hint)
             row = {"prompt": problem["question"], "completion": hint,
+                   "choices": problem["choices"], "gold_idx": problem["gold_idx"],
                    "reward": scored["reward"], "solved": scored.get("solved", 0.0),
                    "leaked": scored.get("leaked", 0.0),
                    "student_answer": pred, "gold": gold}
@@ -223,11 +224,14 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
     eval measures the SAME behaviour that is being trained - evaluating a
     dialogue-trained teacher on one-shot hints would grade the wrong thing.
 
-    Returns (transcripts, turns_of). turns_of is only populated when keep_turns,
-    since the eval has no use for per-turn token ids.
+    Returns (transcripts, turns_of, tutor_texts). `tutor_texts` holds ONLY the
+    teacher's turns: leak attribution must not charge the teacher for the answer
+    when it was the student who said it. turns_of is only populated when
+    keep_turns, since the eval has no use for per-turn token ids.
     """
     n = len(problem_of)
     transcripts = ["" for _ in range(n)]
+    tutor_only = ["" for _ in range(n)]
     turns_of = [[] for _ in range(n)]
 
     for t in range(turns):
@@ -243,6 +247,7 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
                 turns_of[d].append({"prompt": t_prompts[d], "gen_ids": c.token_ids,
                                     "old_logprobs": c.logprobs})
             transcripts[d] += f"Tutor: {c.text.strip()}\n"
+            tutor_only[d] += c.text.strip() + "\n"
 
         # --- student turn (skipped after the last teacher turn) ---
         if t < turns - 1:
@@ -252,7 +257,7 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
             for d in range(n):
                 transcripts[d] += f"Student: {replies[d].strip()}\n"
 
-    return transcripts, turns_of
+    return transcripts, turns_of, tutor_only
 
 
 def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
@@ -268,8 +273,9 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
     n_dialogues = cfg.batch_prompts * cfg.group_size
     # flat index d = prompt_i * K + k
     problem_of = [picks[d // cfg.group_size] for d in range(n_dialogues)]
-    transcripts, turns_of = run_dialogues(cfg, engine, student, problem_of, tok,
-                                          cfg.turns, cfg.temperature, keep_turns=True)
+    transcripts, turns_of, tutor_texts = run_dialogues(
+        cfg, engine, student, problem_of, tok, cfg.turns, cfg.temperature,
+        keep_turns=True)
 
     # --- terminal: student answers with the whole conversation as context ---
     samples, texts, traces, group_rewards = [], [], [], []
@@ -284,21 +290,25 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
             idx = student.choose(problem["question"], problem["choices"], hint=convo)
             pred = problem["choices"][idx]
             traj = Trajectory(turns=[], transcript=convo)
-            traj.info = {"student_answer": pred, "gold": gold, "distractors": distractors}
+            # the student answers from the WHOLE conversation (it saw all of it),
+            # but only the tutor's own words are used to judge leaking
+            traj.info = {"student_answer": pred, "gold": gold, "distractors": distractors,
+                         "teacher_text": tutor_texts[d]}
             scored = rewarder.score(traj)
             grp.append(scored["reward"])
             grp_turns.append(turns_of[d])
             texts.append(convo)
             row = {"prompt": problem["question"], "completion": convo,
+                   "choices": problem["choices"], "gold_idx": problem["gold_idx"],
                    "reward": scored["reward"], "solved": scored.get("solved", 0.0),
                    "leaked": scored.get("leaked", 0.0),
                    "student_answer": pred, "gold": gold, "turns": len(turns_of[d])}
             if cfg.hint_probe:
-                # probe the whole transcript: leakage can be spread across turns
-                # (elimination over several messages) rather than sitting in one.
+                # tutor turns only, for the same attribution reason; leakage can
+                # still be spread across several of them (elimination)
                 from rewards import hint_only_leak
                 row["hint_only_leak"] = hint_only_leak(
-                    student, convo, problem["choices"], problem["gold_idx"])
+                    student, tutor_texts[d], problem["choices"], problem["gold_idx"])
             traces.append(row)
         advs = grpo.group_normalized_advantages(grp, cfg.group_size)
         for turns, a in zip(grp_turns, advs):
@@ -322,22 +332,24 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     if not items:
         return {}
     if cfg.turns > 1:
-        # match training: grade the dialogue, not a one-shot hint
-        hints, _ = run_dialogues(cfg, engine, student, items, tok, cfg.turns,
-                                 temperature=0.0)
+        # match training: grade the dialogue, not a one-shot hint. The student is
+        # shown the full transcript; leak checks see only the tutor's turns.
+        hints, _, tutor_texts = run_dialogues(cfg, engine, student, items, tok,
+                                              cfg.turns, temperature=0.0)
     else:
         prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
         gens = engine.generate(prompts, n=1,
                                max_new_tokens=cfg.teacher_max_new_tokens,
                                temperature=0.0)
         hints = [g[0].text for g in gens]
+        tutor_texts = hints
     # each item gets ANOTHER item's hint; rotating by one keeps the pairing
     # deterministic and guarantees no item ever receives its own hint
     swapped = hints[1:] + hints[:1]
 
     base_ok = help_ok = leak = probe = floor = swap_ok = 0.0
     hint_words = 0
-    for p, hint, other in zip(items, hints, swapped):
+    for p, hint, tutor_txt, other in zip(items, hints, tutor_texts, swapped):
         gold_idx = p["gold_idx"]
         gold = p["choices"][gold_idx]
         distractors = [c for j, c in enumerate(p["choices"]) if j != gold_idx]
@@ -346,10 +358,11 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
         # a hint from a DIFFERENT problem: whatever accuracy survives this is
         # generic encouragement, not teaching about this question
         swap_ok += float(student.choose(p["question"], p["choices"], hint=other) == gold_idx)
-        leak += leaked_answer(hint, gold, distractors)
-        hint_words += len(hint.split())
+        # leak checks use the tutor's words only, never the student's
+        leak += leaked_answer(tutor_txt, gold, distractors)
+        hint_words += len(tutor_txt.split())
         if cfg.hint_probe:
-            probe += hint_only_leak(student, hint, p["choices"], gold_idx)
+            probe += hint_only_leak(student, tutor_txt, p["choices"], gold_idx)
             floor += choices_only_baseline(student, p["choices"], gold_idx)
 
     m = len(items)

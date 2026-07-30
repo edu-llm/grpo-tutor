@@ -81,6 +81,21 @@ DEFAULT_THRESHOLDS = {
 
 # ---------------------------------------------------------------- monitor
 
+def format_choices(choices, gold_idx=None) -> str:
+    """A/B/C/D list with the gold option marked, for logs and the wandb table.
+
+    Without the options next to the transcript there is no way to tell whether a
+    tutor turn ruled an option out or named the answer.
+    """
+    if not choices:
+        return ""
+    out = []
+    for i, c in enumerate(choices):
+        mark = " <== gold" if gold_idx is not None and i == gold_idx else ""
+        out.append(f"{chr(65 + i)}. {c}{mark}")
+    return "\n".join(out)
+
+
 @dataclass
 class Monitor:
     run_dir: str = str(paths.RUNS)
@@ -272,7 +287,8 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
         try:
             ranked = sorted(rows, key=lambda r: r.get("reward", 0.0))
             picks = ranked[: max(1, k // 2)] + ranked[-max(1, k // 2):]
-            cols = ["step", "reward", "solved", "leaked", "prompt", "completion"]
+            cols = ["step", "reward", "solved", "leaked", "prompt", "choices",
+                    "gold", "student_answer", "completion"]
             table = self._wandb.Table(columns=cols)
             for r in picks:
                 table.add_data(
@@ -281,6 +297,9 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
                     float(r.get("solved", 0.0) or 0.0),
                     float(r.get("leaked", 0.0) or 0.0),
                     str(r.get("prompt", ""))[:600],
+                    format_choices(r.get("choices"), r.get("gold_idx")),
+                    str(r.get("gold", "")),
+                    str(r.get("student_answer", "")),
                     str(r.get("completion", ""))[:2000],
                 )
             self._wandb.log({"samples": table}, step=step)
@@ -299,6 +318,9 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
                 f.write(f"\n**[{label}] reward={r.get('reward', 0.0):.3f}"
                         f" solved={r.get('solved', '-')} leaked={r.get('leaked', '-')}**\n\n")
                 f.write(f"- question: {str(r.get('prompt', ''))[:300]}\n\n")
+                if r.get("choices"):
+                    f.write("```\n" + format_choices(r["choices"], r.get("gold_idx"))
+                            + "\n```\n")
                 # fenced so the Tutor:/Student: turn structure survives markdown
                 f.write("```\n" + str(r.get("completion", "")).strip() + "\n```\n")
                 if "student_answer" in r:
@@ -325,6 +347,9 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
             head += "]"
             if "\n" in txt:
                 print(head, flush=True)
+                if r.get("choices"):
+                    print(f"      choices: {' | '.join(str(c) for c in r['choices'])}",
+                          flush=True)
                 for line in txt.splitlines():
                     if line.strip():
                         print(f"      {line.strip()}", flush=True)

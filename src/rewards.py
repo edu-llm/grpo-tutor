@@ -158,7 +158,11 @@ class LeakGuard:
     def score(self, trajectory) -> dict:
         out = dict(self.inner.score(trajectory))
         info = trajectory.info or {}
-        teacher_text = trajectory.transcript or " ".join(
+        # info["teacher_text"] carries the TUTOR's turns only. Scoring the whole
+        # multi-turn transcript charges the teacher for words the student said:
+        # measured on 864 live dialogues, 17% of flags were the student blurting
+        # the answer while the tutor never named it.
+        teacher_text = info.get("teacher_text") or trajectory.transcript or " ".join(
             t.completion.text for t in trajectory.turns
         )
         gold = info.get("gold", "")
