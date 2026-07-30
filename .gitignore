@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+
+# run artifacts
+runs/
+logs/
+wandb/
+checkpoints/
+
+# model weights / adapters
+*.pt
+*.bin
+*.safetensors
+
+# raw personal chat history scraped for style; the synthetic file replaces it
+data/my_inputs.txt
+data/my_inputs.jsonl

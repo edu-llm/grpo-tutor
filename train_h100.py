@@ -1,0 +1,549 @@
+"""GRPO training: teacher LLM learns to tutor a frozen student.
+
+Two reward modes:
+  --reward fake   gameable keyword reward. A PIPELINE TEST: mean reward SHOULD
+                  climb. If it doesn't, generation/advantage/loss/optimizer/sync
+                  is broken. Nothing to do with tutoring.
+  --reward real   the actual task. Pick a ZPD problem the student cannot solve
+                  alone -> teacher writes a short hint (never sees the gold
+                  answer) -> student answers WITH the hint -> reward = solved,
+                  slammed to -1 if the teacher leaked the answer.
+
+Colocated on one GPU: the engine sleeps while the trainer runs, then wakes.
+SSH-friendly: no GUI, line-buffered logs, periodic sample dumps.
+
+    python train_h100.py --backend stub --reward fake --steps 6   # no GPU smoke
+    python train_h100.py --reward real --steps 200 --wandb        # the real run
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import signal
+import time
+
+import torch
+
+import grpo
+import tasks
+from config import Config
+from engine import build_engine
+from fake_reward import FakeReward
+from interfaces import Trajectory, Turn
+from monitor import Monitor
+from rewards import LeakGuard, SolveReward
+
+def load_fake_topics(path="data/topics.jsonl"):
+    """Varied teaching prompts (math/science/english/social studies/logic) for the
+    fake-reward pipeline test. Falls back if the file is absent."""
+    if os.path.exists(path):
+        with open(path) as f:
+            return [json.loads(l)["topic"] for l in f if l.strip()]
+    return ["Explain to a 5th grader how to compare two fractions."]
+
+
+def run_meta(save_dir):
+    """Stable (wandb run id, local run dir), persisted so a requeued job continues
+    the SAME wandb run and the same log dir - otherwise preemption splits the loss
+    curve across two runs with a discontinuous step axis.
+
+    Reuse is conditional on a resumable checkpoint existing. A requeue resumes from
+    ckpt.pt and must keep the old identity; a fresh experiment starts from step 0 and
+    must NOT, or it silently appends to the previous run's traces and metrics.
+    """
+    path = os.path.join(save_dir, "run_meta.json")
+    resuming = os.path.exists(os.path.join(save_dir, "ckpt.pt"))
+    if os.path.exists(path) and resuming:
+        with open(path) as f:
+            return json.load(f)
+    import uuid
+
+    meta = {"run_id": os.environ.get("SLURM_JOB_ID") or uuid.uuid4().hex[:8],
+            "run_dir": os.path.join("runs", time.strftime("%Y%m%d-%H%M%S"))}
+    os.makedirs(save_dir, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(meta, f)
+    return meta
+
+
+def save_ckpt(path, teacher, optimizer, step):
+    """Atomic resumable checkpoint: LoRA weights + optimizer state + step.
+
+    Written to a .tmp then os.replace'd, so a preemption mid-write can never
+    leave a corrupt checkpoint behind.
+    """
+    from peft import get_peft_model_state_dict
+
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    torch.save({"step": step,
+                "lora": get_peft_model_state_dict(teacher),
+                "optim": optimizer.state_dict()}, path + ".tmp")
+    os.replace(path + ".tmp", path)
+
+
+def load_ckpt(path, teacher, optimizer):
+    """Resume after a preemption/requeue. Returns the step to start from."""
+    if not os.path.exists(path):
+        return 0
+    from peft import set_peft_model_state_dict
+
+    ck = torch.load(path, map_location="cpu", weights_only=False)
+    set_peft_model_state_dict(teacher, ck["lora"])
+    optimizer.load_state_dict(ck["optim"])
+    start = int(ck["step"]) + 1
+    print(f"[resume] loaded {path} - continuing from step {start}", flush=True)
+    return start
+
+
+class Timer:
+    def __init__(self, store, name):
+        self.store, self.name = store, name
+
+    def __enter__(self):
+        self.t = time.time()
+        return self
+
+    def __exit__(self, *a):
+        self.store[self.name] = self.store.get(self.name, 0.0) + (time.time() - self.t)
+
+
+def load_teacher(cfg):
+    from peft import LoraConfig, get_peft_model
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    tok = AutoTokenizer.from_pretrained(cfg.teacher_model)
+    if tok.pad_token_id is None:
+        tok.pad_token = tok.eos_token
+    base = AutoModelForCausalLM.from_pretrained(cfg.teacher_model, dtype=cfg.resolve_dtype())
+    base.config.use_cache = False
+    model = get_peft_model(
+        base,
+        LoraConfig(r=cfg.lora_r, lora_alpha=cfg.lora_alpha, lora_dropout=cfg.lora_dropout,
+                   target_modules="all-linear", task_type="CAUSAL_LM"),
+    ).to(cfg.resolve_device())
+    model.print_trainable_parameters()
+    return model, tok
+
+
+def rollout_fake(cfg, engine, rewarder, rng):
+    """Gameable keyword reward on generic teaching prompts."""
+    topics = load_fake_topics()
+    prompts = [rng.choice(topics) for _ in range(cfg.batch_prompts)]
+    groups = engine.generate(prompts, n=cfg.group_size,
+                             max_new_tokens=cfg.teacher_max_new_tokens,
+                             temperature=cfg.temperature)
+    samples, texts, traces, group_rewards = [], [], [], []
+    for prompt, comps in zip(prompts, groups):
+        grp = []
+        for c in comps:
+            traj = Trajectory(turns=[Turn(prompt, c)], transcript=c.text)
+            r = rewarder.score(traj)["reward"]
+            grp.append(r)
+            texts.append(c.text)
+            traces.append({"prompt": prompt, "completion": c.text, "reward": r})
+        for c, a in zip(comps, grpo.group_normalized_advantages(grp, cfg.group_size)):
+            samples.append({"prompt": prompt, "gen_ids": c.token_ids,
+                            "old_logprobs": c.logprobs, "advantage": a})
+        group_rewards.append(grp)
+    return samples, texts, traces, group_rewards
+
+
+def rollout_real(cfg, engine, rewarder, student, problems, rng, tok=None):
+    """Real task: hint -> student re-answers -> solved? (leak => -1)."""
+    picks = [rng.choice(problems) for _ in range(cfg.batch_prompts)]
+    prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in picks]
+    groups = engine.generate(prompts, n=cfg.group_size,
+                             max_new_tokens=cfg.teacher_max_new_tokens,
+                             temperature=cfg.temperature)
+
+    samples, texts, traces, group_rewards = [], [], [], []
+    for problem, prompt, comps in zip(picks, prompts, groups):
+        gold = tasks.gold_text(problem)
+        grp = []
+        for c in comps:
+            hint = c.text
+            idx = student.choose(problem["question"], problem["choices"], hint=hint)
+            pred = problem["choices"][idx]
+            traj = Trajectory(turns=[Turn(prompt, c)], transcript=hint)
+            traj.info = {"student_answer": pred, "gold": gold,
+                         "distractors": [c for j, c in enumerate(problem["choices"])
+                                         if j != problem["gold_idx"]]}
+            scored = rewarder.score(traj)
+            grp.append(scored["reward"])
+            texts.append(hint)
+            row = {"prompt": problem["question"], "completion": hint,
+                   "reward": scored["reward"], "solved": scored.get("solved", 0.0),
+                   "leaked": scored.get("leaked", 0.0),
+                   "student_answer": pred, "gold": gold}
+            if cfg.hint_probe:
+                from rewards import hint_only_leak
+                row["hint_only_leak"] = hint_only_leak(
+                    student, hint, problem["choices"], problem["gold_idx"])
+            traces.append(row)
+        for c, a in zip(comps, grpo.group_normalized_advantages(grp, cfg.group_size)):
+            samples.append({"prompt": prompt, "gen_ids": c.token_ids,
+                            "old_logprobs": c.logprobs, "advantage": a})
+        group_rewards.append(grp)
+    return samples, texts, traces, group_rewards
+
+
+def rollout_multiturn(cfg, engine, rewarder, student, problems, rng, tok=None):
+    """Teacher and student DISCUSS the problem, then the student answers.
+
+    Each of the K group members runs its own conversation, so the K dialogues
+    diverge. Every teacher turn becomes a training sample; the terminal reward
+    (did the student finally solve it?) is shared by all turns in that trajectory.
+    Student turns are environment text - they are never trained on, which is the
+    teacher-token masking (we only ever store the teacher's gen_ids).
+    """
+    picks = [rng.choice(problems) for _ in range(cfg.batch_prompts)]
+    n_dialogues = cfg.batch_prompts * cfg.group_size
+    # flat index d = prompt_i * K + k
+    problem_of = [picks[d // cfg.group_size] for d in range(n_dialogues)]
+    transcripts = ["" for _ in range(n_dialogues)]
+    turns_of = [[] for _ in range(n_dialogues)]
+
+    for t in range(cfg.turns):
+        # --- teacher turn: one generation per ongoing dialogue ---
+        t_prompts = [tasks.dialogue_prompt(problem_of[d], transcripts[d], tokenizer=tok)
+                     for d in range(n_dialogues)]
+        gens = engine.generate(t_prompts, n=1,
+                               max_new_tokens=cfg.teacher_max_new_tokens,
+                               temperature=cfg.temperature)
+        for d in range(n_dialogues):
+            c = gens[d][0]
+            turns_of[d].append({"prompt": t_prompts[d], "gen_ids": c.token_ids,
+                                "old_logprobs": c.logprobs})
+            transcripts[d] += f"Tutor: {c.text.strip()}\n"
+
+        # --- student turn (skipped after the last teacher turn) ---
+        if t < cfg.turns - 1:
+            views = [tasks.student_dialogue_view(problem_of[d], transcripts[d])
+                     for d in range(n_dialogues)]
+            replies = student.reply(views)
+            for d in range(n_dialogues):
+                transcripts[d] += f"Student: {replies[d].strip()}\n"
+
+    # --- terminal: student answers with the whole conversation as context ---
+    samples, texts, traces, group_rewards = [], [], [], []
+    for i in range(cfg.batch_prompts):
+        problem = picks[i]
+        gold = tasks.gold_text(problem)
+        distractors = [c for j, c in enumerate(problem["choices"]) if j != problem["gold_idx"]]
+        grp, grp_turns = [], []
+        for k in range(cfg.group_size):
+            d = i * cfg.group_size + k
+            convo = transcripts[d]
+            idx = student.choose(problem["question"], problem["choices"], hint=convo)
+            pred = problem["choices"][idx]
+            traj = Trajectory(turns=[], transcript=convo)
+            traj.info = {"student_answer": pred, "gold": gold, "distractors": distractors}
+            scored = rewarder.score(traj)
+            grp.append(scored["reward"])
+            grp_turns.append(turns_of[d])
+            texts.append(convo)
+            row = {"prompt": problem["question"], "completion": convo,
+                   "reward": scored["reward"], "solved": scored.get("solved", 0.0),
+                   "leaked": scored.get("leaked", 0.0),
+                   "student_answer": pred, "gold": gold, "turns": len(turns_of[d])}
+            if cfg.hint_probe:
+                # probe the whole transcript: leakage can be spread across turns
+                # (elimination over several messages) rather than sitting in one.
+                from rewards import hint_only_leak
+                row["hint_only_leak"] = hint_only_leak(
+                    student, convo, problem["choices"], problem["gold_idx"])
+            traces.append(row)
+        advs = grpo.group_normalized_advantages(grp, cfg.group_size)
+        for turns, a in zip(grp_turns, advs):
+            for turn in turns:              # terminal reward shared by every teacher turn
+                samples.append({**turn, "advantage": a})
+        group_rewards.append(grp)
+    return samples, texts, traces, group_rewards
+
+
+def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
+    """Benchmark on problems the teacher NEVER trains on.
+
+    This is the honest measure. Training reward can rise because the teacher got
+    better OR because it found a hack - those look identical on training prompts.
+    Held-out gold accuracy separates them, and divergence between the two is the
+    hacking alarm. Greedy decoding so the number is comparable across steps.
+    """
+    from rewards import hint_only_leak, leaked_answer
+
+    items = held_out[:n]
+    if not items:
+        return {}
+    prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
+    gens = engine.generate(prompts, n=1,
+                           max_new_tokens=cfg.teacher_max_new_tokens, temperature=0.0)
+
+    base_ok = help_ok = leak = probe = 0.0
+    hint_words = 0
+    for p, g in zip(items, gens):
+        hint = g[0].text
+        gold_idx = p["gold_idx"]
+        gold = p["choices"][gold_idx]
+        distractors = [c for j, c in enumerate(p["choices"]) if j != gold_idx]
+        base_ok += float(student.choose(p["question"], p["choices"]) == gold_idx)
+        help_ok += float(student.choose(p["question"], p["choices"], hint=hint) == gold_idx)
+        leak += leaked_answer(hint, gold, distractors)
+        hint_words += len(hint.split())
+        if cfg.hint_probe:
+            probe += hint_only_leak(student, hint, p["choices"], gold_idx)
+
+    m = len(items)
+    out = {"eval/baseline_acc": base_ok / m, "eval/teacher_acc": help_ok / m,
+           "eval/teaching_gain": (help_ok - base_ok) / m, "eval/leak_rate": leak / m,
+           "eval/hint_words": hint_words / m, "eval/n": float(m)}
+    if cfg.hint_probe:
+        out["eval/hint_only_leak"] = probe / m
+    return out
+
+
+class Prefetcher:
+    """Generate the NEXT rollout batch in a background thread while the trainer
+    works on the current one (asynchronous / pipelined RL).
+
+    The rollout is produced by weights that are one optimizer step behind, i.e.
+    slightly OFF-POLICY - which is exactly what the stored behavior log-probs plus
+    the clipped importance ratio are there to absorb.
+
+    On ONE GPU this mostly hides Python/host overhead, since generation and training
+    contend for the same SMs. On TWO GPUs (engine pinned via --engine-gpu) the two
+    genuinely overlap and the step approaches max(gen, train) instead of their sum.
+    """
+
+    def __init__(self, fn):
+        import threading
+
+        self._fn = fn
+        self._threading = threading
+        self._result = None
+        self._thread = None
+
+    def start(self):
+        def run():
+            self._result = self._fn()
+        self._thread = self._threading.Thread(target=run, daemon=True)
+        self._thread.start()
+
+    def get(self):
+        if self._thread is None:
+            self.start()
+        self._thread.join()
+        out, self._result, self._thread = self._result, None, None
+        return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--backend", default=None, choices=["stub", "hf", "vllm"])
+    ap.add_argument("--reward", default="fake", choices=["fake", "real"])
+    ap.add_argument("--steps", type=int, default=None)
+    ap.add_argument("--group-size", type=int, default=None)
+    ap.add_argument("--reward-mode", default=None, choices=["keyword", "length", "random"])
+    ap.add_argument("--teacher", default=None)
+    ap.add_argument("--student", default=None)
+    ap.add_argument("--problems", default=tasks.DEFAULT_PATH)
+    ap.add_argument("--micro-batch", type=int, default=None)
+    ap.add_argument("--save-every", type=int, default=None, help="checkpoint every N steps")
+    ap.add_argument("--hint-probe", action="store_true", help="log the hint-only leak probe")
+    ap.add_argument("--eval-every", type=int, default=None, help="held-out benchmark every N steps (0=off)")
+    ap.add_argument("--eval-n", type=int, default=None, help="held-out problems per benchmark")
+    ap.add_argument("--no-sleep", action="store_true", help="keep the engine resident (no sleep/wake)")
+    ap.add_argument("--engine-gpu", type=int, default=None, help="pin vLLM to this GPU (2-GPU disaggregated)")
+    ap.add_argument("--pipeline", action="store_true", help="prefetch next rollout while training (async, 1-step stale)")
+    ap.add_argument("--turns", type=int, default=None, help="teacher turns per dialogue (1 = single-turn hint)")
+    ap.add_argument("--sync-every", type=int, default=None, help="push LoRA into the engine every N steps")
+    ap.add_argument("--gpu-mem-util", type=float, default=None, help="vLLM share of GPU memory (rest for trainer)")
+    ap.add_argument("--wandb", action="store_true")
+    args = ap.parse_args()
+
+    cfg = Config()
+    for src, dst in [(args.backend, "backend"), (args.steps, "total_steps"),
+                     (args.group_size, "group_size"), (args.reward_mode, "reward_mode"),
+                     (args.teacher, "teacher_model"), (args.student, "student_model"),
+                     (args.micro_batch, "micro_batch_size"), (args.save_every, "save_every"),
+                     (args.sync_every, "sync_every"), (args.gpu_mem_util, "gpu_mem_util"),
+                     (args.turns, "turns")]:
+        if src:
+            setattr(cfg, dst, src)
+    cfg.use_wandb = args.wandb
+    cfg.no_sleep = args.no_sleep or args.engine_gpu is not None   # separate GPUs => no need to sleep
+    cfg.engine_gpu = args.engine_gpu
+    cfg.pipeline = args.pipeline
+    cfg.hint_probe = args.hint_probe
+    if args.eval_every is not None:
+        cfg.eval_every = args.eval_every
+    if args.eval_n:
+        cfg.eval_n = args.eval_n
+
+    import random as _random
+    rng = _random.Random(cfg.seed)
+    stub = cfg.resolve_backend() == "stub"
+    device = cfg.resolve_device()
+    meta = run_meta(cfg.save_dir)
+    monitor = Monitor(use_wandb=cfg.use_wandb, wandb_project=cfg.wandb_project,
+                      config=vars(cfg), run_id=meta["run_id"], dir_override=meta["run_dir"])
+
+    # ---- reward + (for real mode) the student and the ZPD problem set ----
+    problems = student = None
+    if args.reward == "real":
+        rewarder = LeakGuard(SolveReward(), penalty=-1.0)
+        all_problems = tasks.load_zpd(args.problems)
+        problems, held_out = tasks.split_problems(all_problems, test_frac=0.15, seed=cfg.seed)
+        from zpd_filter import HFStudent, StubStudent
+
+        student = StubStudent() if stub else HFStudent(cfg.student_model, device=device)
+        print(f"[data] {len(problems)} train / {len(held_out)} held-out ZPD problems", flush=True)
+    else:
+        rewarder = FakeReward(mode=cfg.reward_mode)
+
+    print(f"[cfg] backend={cfg.resolve_backend()} device={device} reward={args.reward} "
+          f"K={cfg.group_size} micro_batch={cfg.micro_batch_size}", flush=True)
+
+    if stub:
+        teacher = tok = optimizer = scheduler = None
+        engine = build_engine(cfg)
+        print("[stub] no teacher weights - orchestration/monitoring only", flush=True)
+    else:
+        teacher, tok = load_teacher(cfg)
+        engine = build_engine(cfg, model=teacher, tokenizer=tok)
+        optimizer = torch.optim.AdamW(
+            [p for p in teacher.parameters() if p.requires_grad], lr=cfg.lr)
+        # linear warmup then CONSTANT (no cosine): RL gradients are noisy and an
+        # early spike can derail the run; after warmup the lr stays flat.
+        scheduler = torch.optim.lr_scheduler.LambdaLR(
+            optimizer, lambda s: min(1.0, (s + 1) / max(1, cfg.warmup_steps)))
+
+    os.makedirs(cfg.save_dir, exist_ok=True)
+    ckpt_path = os.path.join(cfg.save_dir, "ckpt.pt")
+
+    # resume across Slurm preemption/requeue
+    start_step = 0 if stub else load_ckpt(ckpt_path, teacher, optimizer)
+
+    # Slurm sends SIGTERM before killing a preempted job - checkpoint and exit
+    # cleanly so --requeue picks up exactly where we left off.
+    preempted = {"flag": False}
+
+    def _on_term(signum, frame):
+        preempted["flag"] = True
+        print(f"[signal {signum}] preemption - will checkpoint and exit", flush=True)
+
+    signal.signal(signal.SIGTERM, _on_term)
+
+    def do_rollout():
+        if not cfg.no_sleep:
+            engine.wake()
+        if args.reward == "real":
+            roll = rollout_multiturn if cfg.turns > 1 else rollout_real
+            out = roll(cfg, engine, rewarder, student, problems, rng, tok=tok)
+        else:
+            out = rollout_fake(cfg, engine, rewarder, rng)
+        if not cfg.no_sleep:
+            engine.sleep()
+        return out
+
+    prefetch = Prefetcher(do_rollout) if cfg.pipeline else None
+    if prefetch is not None:
+        prefetch.start()
+
+    for step in range(start_step, cfg.total_steps):
+        t: dict = {}
+        with Timer(t, "generate_and_reward"):
+            if prefetch is not None:
+                samples, texts, traces, group_rewards = prefetch.get()
+                prefetch.start()      # kick off the NEXT batch, then train on this one
+            else:
+                samples, texts, traces, group_rewards = do_rollout()
+
+        # ---- update ----
+        metrics = {}
+        with Timer(t, "update"):
+            if not stub:
+                batch = grpo.prepare_batch(tok, samples, device, max_len=cfg.max_seq_len)
+                ref = grpo.reference_logprobs(teacher, batch, micro_batch=cfg.micro_batch_size)
+                epoch_metrics = []
+                for _ in range(cfg.update_epochs):
+                    optimizer.zero_grad(set_to_none=True)
+                    _, m = grpo.grpo_loss(teacher, batch, ref, cfg,
+                                          micro_batch=cfg.micro_batch_size)
+                    torch.nn.utils.clip_grad_norm_(
+                        [p for p in teacher.parameters() if p.requires_grad], 1.0)
+                    optimizer.step()
+                    scheduler.step()
+                    epoch_metrics.append(m)
+                # average over epochs so the logged loss represents the STEP, not
+                # just whichever epoch happened to run last
+                metrics = {k: sum(d[k] for d in epoch_metrics) / len(epoch_metrics)
+                           for k in epoch_metrics[0]}
+
+        with Timer(t, "sync"):
+            if (step + 1) % cfg.sync_every == 0:
+                engine.sync_weights(teacher)
+
+        # ---- metrics ----
+        rewards = [r for grp in group_rewards for r in grp]
+        if not stub:
+            metrics["lr"] = optimizer.param_groups[0]["lr"]
+        mean_r = sum(rewards) / max(1, len(rewards))
+        # groups with no reward variance contribute EXACTLY ZERO gradient in GRPO
+        # (advantage = (r - mean)/std = 0). This is the real "is my data working"
+        # signal - if it approaches 1.0, most compute is wasted.
+        zero_adv = sum(1 for g in group_rewards if max(g) == min(g)) / max(1, len(group_rewards))
+        extra = {}
+        if args.reward == "real":
+            if cfg.hint_probe and traces and "hint_only_leak" in traces[0]:
+                extra["hint_only_leak"] = sum(tr["hint_only_leak"] for tr in traces) / len(traces)
+            extra = {**extra, "solved_rate": sum(tr.get("solved", 0.0) for tr in traces) / max(1, len(traces)),
+                     "leak_rate": sum(tr.get("leaked", 0.0) for tr in traces) / max(1, len(traces))}
+
+        monitor.log_metrics(step, {"reward": mean_r, "zero_adv_frac": zero_adv, **extra,
+                                   **metrics, **{f"time/{k}": v for k, v in t.items()}})
+        monitor.log_traces(step, traces)
+        monitor.check_hacking(step, texts, rewards)
+        msg = (f"step {step}/{cfg.total_steps}  reward={mean_r:.3f}  zero_adv={zero_adv:.2f}  "
+               f"loss={metrics.get('loss', float('nan')):.4f}  kl={metrics.get('kl', 0.0):.4f}  "
+               f"clip={metrics.get('clip_frac', 0.0):.2f}")
+        if extra:
+            msg += f"  solved={extra['solved_rate']:.2f}  leak={extra['leak_rate']:.2f}"
+        print(msg + "  " + "  ".join(f"{k}={v:.1f}s" for k, v in t.items()), flush=True)
+
+        if (not stub and cfg.eval_every and step > 0 and step % cfg.eval_every == 0):
+            with Timer(t, "heldout_eval"):
+                ev = heldout_eval(cfg, engine, student, held_out, tok, n=cfg.eval_n)
+            if ev:
+                monitor.log_metrics(step, ev)
+                print(f"  [held-out] teacher_acc={ev['eval/teacher_acc']:.3f} "
+                      f"gain={ev['eval/teaching_gain']:+.3f} leak={ev['eval/leak_rate']:.3f}"
+                      + (f" hint_only_leak={ev['eval/hint_only_leak']:.3f}"
+                         if 'eval/hint_only_leak' in ev else ""), flush=True)
+
+        if cfg.print_samples_every and step % cfg.print_samples_every == 0:
+            monitor.print_samples(k=1)          # stdout (tail -f the job log)
+            monitor.append_samples_md(step, traces)  # samples.md (tail -f over SSH)
+            monitor.log_sample_table(step, traces)   # wandb Table (live web UI)
+
+        if not stub and ((step + 1) % cfg.save_every == 0 or preempted["flag"]):
+            save_ckpt(ckpt_path, teacher, optimizer, step)
+            teacher.save_pretrained(os.path.join(cfg.save_dir, "adapter-latest"))
+            monitor.plot()
+            monitor.write_html()
+
+        if preempted["flag"]:
+            print("[exit] checkpointed at step "
+                  f"{step}; Slurm --requeue will resume from here", flush=True)
+            monitor.close()
+            return
+
+    if not stub:
+        save_ckpt(ckpt_path, teacher, optimizer, cfg.total_steps - 1)
+        teacher.save_pretrained(os.path.join(cfg.save_dir, "teacher-final"))
+    monitor.close()
+
+
+if __name__ == "__main__":
+    main()

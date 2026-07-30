@@ -1,0 +1,11 @@
+# Core (all platforms, incl. Mac dev / CPU / MPS)
+torch>=2.3
+transformers>=4.44
+peft>=0.12
+accelerate>=0.33
+datasets>=2.20
+matplotlib>=3.8
+
+# CUDA-only, for the fast generation backend on the H100.
+# Install separately on the GPU box (it will NOT install on macOS):
+#   pip install vllm
