@@ -19,6 +19,7 @@ SSH-friendly: no GUI, line-buffered logs, periodic sample dumps.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import signal
@@ -382,6 +383,9 @@ def main():
         cfg.eval_every = args.eval_every
     if args.eval_n:
         cfg.eval_n = args.eval_n
+    if cfg.pipeline and cfg.eval_every and not cfg.no_sleep:
+        raise SystemExit("--pipeline with --eval-every requires --no-sleep: the prefetch "
+                         "thread can put the engine to sleep while the eval is generating.")
 
     import random as _random
     rng = _random.Random(cfg.seed)
@@ -437,17 +441,29 @@ def main():
 
     signal.signal(signal.SIGTERM, _on_term)
 
-    def do_rollout():
+    @contextlib.contextmanager
+    def awake():
+        """Every engine.generate() must happen inside this.
+
+        vLLM sleep(level=1) offloads weights and drops the KV cache. Generating
+        while asleep does not raise a clean error - it fails deep inside LoRA
+        activation with `CUDA error: invalid argument`, which reads like a shape
+        bug rather than a lifecycle bug.
+        """
         if not cfg.no_sleep:
             engine.wake()
-        if args.reward == "real":
-            roll = rollout_multiturn if cfg.turns > 1 else rollout_real
-            out = roll(cfg, engine, rewarder, student, problems, rng, tok=tok)
-        else:
-            out = rollout_fake(cfg, engine, rewarder, rng)
-        if not cfg.no_sleep:
-            engine.sleep()
-        return out
+        try:
+            yield
+        finally:
+            if not cfg.no_sleep:
+                engine.sleep()
+
+    def do_rollout():
+        with awake():
+            if args.reward == "real":
+                roll = rollout_multiturn if cfg.turns > 1 else rollout_real
+                return roll(cfg, engine, rewarder, student, problems, rng, tok=tok)
+            return rollout_fake(cfg, engine, rewarder, rng)
 
     prefetch = Prefetcher(do_rollout) if cfg.pipeline else None
     if prefetch is not None:
@@ -515,7 +531,7 @@ def main():
         print(msg + "  " + "  ".join(f"{k}={v:.1f}s" for k, v in t.items()), flush=True)
 
         if (not stub and cfg.eval_every and step > 0 and step % cfg.eval_every == 0):
-            with Timer(t, "heldout_eval"):
+            with Timer(t, "heldout_eval"), awake():
                 ev = heldout_eval(cfg, engine, student, held_out, tok, n=cfg.eval_n)
             if ev:
                 monitor.log_metrics(step, ev)
