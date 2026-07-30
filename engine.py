@@ -10,10 +10,12 @@ Three implementations behind one interface:
 
 COLOCATED vs DISAGGREGATED
 --------------------------
-On a single H100 the trainer and the inference engine cannot both hold full
-memory, so we ALTERNATE:
+On a single H100 the default is to ALTERNATE:
     wake -> generate rollouts -> sleep -> train N epochs -> sync weights -> wake
 `sleep()` offloads engine KV cache/weights so the optimizer has room.
+In practice an 80GB H100 CAN hold both a 3B teacher (LoRA) and the engine at
+once - `--no-sleep` keeps it resident and skips the ~0.3s cycle. Alternating is
+the safe default that also holds for bigger teachers or a tighter card.
 With >=2 GPUs you can instead pin the engine to its own device and run
 generation concurrently with training (disaggregated/async); then sleep/wake
 become no-ops and `sync_weights` is the only coupling point.
