@@ -107,6 +107,14 @@ that stays flat, the reward is being gamed.
   proposed fix and is **not implemented**.
 - **No full training run has been done yet** - only smoke tests up to 6 steps. The
   encouraging early numbers are far too short to call a trend.
+- **`eval/teaching_gain` is currently identical to `eval/teacher_acc`.** The ZPD
+  filter keeps only problems the student fails alone, so held-out
+  `baseline_acc` is 0.0 by construction and the baseline term subtracts nothing.
+  It still tracks improvement over training, but it is not the independent
+  measurement the name suggests.
+- **The behavioral leak probe finds ~2x what the rules do.** First GPU eval:
+  `hint_only_leak` 0.30-0.35 vs rule-based `leak_rate` 0.15. Only the rule-caught
+  share is penalized in the reward, so most leakage is currently unpriced.
 - **Multi-turn is verified in stub mode only.** `--turns > 1` runs the dialogue loop
   (student asks -> teacher guides -> student retries), masks loss to teacher tokens,
   and shares the terminal reward across turns, but it has not yet run on a GPU.
