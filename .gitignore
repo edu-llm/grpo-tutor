@@ -6,9 +6,13 @@ venv/
 
 # run artifacts
 runs/
-logs/
 wandb/
-checkpoints/
+checkpoints*/
+
+# keep the dir: slurm resolves `#SBATCH -o logs/...` before the job runs, so it
+# must already exist on a fresh clone
+logs/*
+!logs/.gitkeep
 
 # model weights / adapters
 *.pt
@@ -18,3 +22,6 @@ checkpoints/
 # raw personal chat history scraped for style; the synthetic file replaces it
 data/my_inputs.txt
 data/my_inputs.jsonl
+
+# regenerable from HF: python src/benchmarks.py --name <set>
+data/bench_*.jsonl

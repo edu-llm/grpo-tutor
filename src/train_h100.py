@@ -306,41 +306,6 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     return out
 
 
-class Prefetcher:
-    """Generate the NEXT rollout batch in a background thread while the trainer
-    works on the current one (asynchronous / pipelined RL).
-
-    The rollout is produced by weights that are one optimizer step behind, i.e.
-    slightly OFF-POLICY - which is exactly what the stored behavior log-probs plus
-    the clipped importance ratio are there to absorb.
-
-    On ONE GPU this mostly hides Python/host overhead, since generation and training
-    contend for the same SMs. On TWO GPUs (engine pinned via --engine-gpu) the two
-    genuinely overlap and the step approaches max(gen, train) instead of their sum.
-    """
-
-    def __init__(self, fn):
-        import threading
-
-        self._fn = fn
-        self._threading = threading
-        self._result = None
-        self._thread = None
-
-    def start(self):
-        def run():
-            self._result = self._fn()
-        self._thread = self._threading.Thread(target=run, daemon=True)
-        self._thread.start()
-
-    def get(self):
-        if self._thread is None:
-            self.start()
-        self._thread.join()
-        out, self._result, self._thread = self._result, None, None
-        return out
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backend", default=None, choices=["stub", "hf", "vllm"])
@@ -356,9 +321,10 @@ def main():
     ap.add_argument("--hint-probe", action="store_true", help="log the hint-only leak probe")
     ap.add_argument("--eval-every", type=int, default=None, help="held-out benchmark every N steps (0=off)")
     ap.add_argument("--eval-n", type=int, default=None, help="held-out problems per benchmark")
+    ap.add_argument("--eval-benchmark", default=None,
+                    help="external eval set instead of the ZPD held-out split "
+                         "(see: python src/benchmarks.py --list)")
     ap.add_argument("--no-sleep", action="store_true", help="keep the engine resident (no sleep/wake)")
-    ap.add_argument("--engine-gpu", type=int, default=None, help="pin vLLM to this GPU (2-GPU disaggregated)")
-    ap.add_argument("--pipeline", action="store_true", help="prefetch next rollout while training (async, 1-step stale)")
     ap.add_argument("--turns", type=int, default=None, help="teacher turns per dialogue (1 = single-turn hint)")
     ap.add_argument("--sync-every", type=int, default=None, help="push LoRA into the engine every N steps")
     ap.add_argument("--gpu-mem-util", type=float, default=None, help="vLLM share of GPU memory (rest for trainer)")
@@ -375,25 +341,21 @@ def main():
         if src:
             setattr(cfg, dst, src)
     cfg.use_wandb = args.wandb
-    cfg.no_sleep = args.no_sleep or args.engine_gpu is not None   # separate GPUs => no need to sleep
-    cfg.engine_gpu = args.engine_gpu
-    cfg.pipeline = args.pipeline
+    cfg.no_sleep = args.no_sleep
     cfg.hint_probe = args.hint_probe
+    cfg.eval_benchmark = args.eval_benchmark
     if args.eval_every is not None:
         cfg.eval_every = args.eval_every
     if args.eval_n:
         cfg.eval_n = args.eval_n
-    if cfg.pipeline and cfg.eval_every and not cfg.no_sleep:
-        raise SystemExit("--pipeline with --eval-every requires --no-sleep: the prefetch "
-                         "thread can put the engine to sleep while the eval is generating.")
-
     import random as _random
     rng = _random.Random(cfg.seed)
     stub = cfg.resolve_backend() == "stub"
     device = cfg.resolve_device()
     meta = run_meta(cfg.save_dir)
     monitor = Monitor(use_wandb=cfg.use_wandb, wandb_project=cfg.wandb_project,
-                      config=vars(cfg), run_id=meta["run_id"], dir_override=meta["run_dir"])
+                      wandb_entity=cfg.wandb_entity, config=vars(cfg),
+                      run_id=meta["run_id"], dir_override=meta["run_dir"])
 
     # ---- reward + (for real mode) the student and the ZPD problem set ----
     problems = student = None
@@ -405,6 +367,17 @@ def main():
 
         student = StubStudent() if stub else HFStudent(cfg.student_model, device=device)
         print(f"[data] {len(problems)} train / {len(held_out)} held-out ZPD problems", flush=True)
+        if cfg.eval_benchmark:
+            # The ZPD held-out split has baseline_acc == 0 by construction, which
+            # makes teaching_gain identical to teacher_acc. An unfiltered external
+            # set gives the baseline real headroom AND tests transfer off the
+            # training corpus.
+            import benchmarks
+
+            held_out = benchmarks.load_benchmark(cfg.eval_benchmark, limit=cfg.eval_n,
+                                                 seed=cfg.seed)
+            print(f"[data] held-out eval switched to '{cfg.eval_benchmark}' "
+                  f"({len(held_out)} items, unfiltered)", flush=True)
     else:
         rewarder = FakeReward(mode=cfg.reward_mode)
 
@@ -465,18 +438,10 @@ def main():
                 return roll(cfg, engine, rewarder, student, problems, rng, tok=tok)
             return rollout_fake(cfg, engine, rewarder, rng)
 
-    prefetch = Prefetcher(do_rollout) if cfg.pipeline else None
-    if prefetch is not None:
-        prefetch.start()
-
     for step in range(start_step, cfg.total_steps):
         t: dict = {}
         with Timer(t, "generate_and_reward"):
-            if prefetch is not None:
-                samples, texts, traces, group_rewards = prefetch.get()
-                prefetch.start()      # kick off the NEXT batch, then train on this one
-            else:
-                samples, texts, traces, group_rewards = do_rollout()
+            samples, texts, traces, group_rewards = do_rollout()
 
         # ---- update ----
         metrics = {}

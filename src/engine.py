@@ -8,17 +8,18 @@ Three implementations behind one interface:
                 the colocated lifecycle (sleep/wake) needed to share 1 H100 with
                 the trainer.
 
-COLOCATED vs DISAGGREGATED
---------------------------
-On a single H100 the default is to ALTERNATE:
+COLOCATION (single GPU)
+-----------------------
+Trainer and engine share one H100, so the default is to ALTERNATE:
     wake -> generate rollouts -> sleep -> train N epochs -> sync weights -> wake
 `sleep()` offloads engine KV cache/weights so the optimizer has room.
 In practice an 80GB H100 CAN hold both a 3B teacher (LoRA) and the engine at
 once - `--no-sleep` keeps it resident and skips the ~0.3s cycle. Alternating is
 the safe default that also holds for bigger teachers or a tighter card.
-With >=2 GPUs you can instead pin the engine to its own device and run
-generation concurrently with training (disaggregated/async); then sleep/wake
-become no-ops and `sync_weights` is the only coupling point.
+
+Generating while the engine is asleep does NOT fail cleanly: it dies inside
+LoRA activation with `CUDA error: invalid argument`. Every generate() call in
+train_h100.py goes through its awake() context manager for that reason.
 
 SPEED NOTES (the things that actually matter)
   - ask for all K group samples in ONE call (n=K) - one prefill, K decodes
@@ -113,15 +114,7 @@ class VLLMEngine:
 
     def __init__(self, model_name: str, dtype: str = "bfloat16", max_lora_rank: int = 16,
                  gpu_memory_utilization: float = 0.45, enable_prefix_caching: bool = True,
-                 tensor_parallel_size: int = 1, colocated: bool = True,
-                 engine_gpu: int | None = None):
-        """engine_gpu: pin the engine to a specific physical GPU (disaggregated mode).
-
-        vLLM V1 runs its EngineCore in a subprocess, so restricting
-        CUDA_VISIBLE_DEVICES around construction places the engine on that GPU while
-        the trainer keeps cuda:0 in this process. With the two on separate GPUs there
-        is no memory contention, so colocated sleep/wake becomes unnecessary.
-        """
+                 colocated: bool = True):
         import vllm
         from vllm.lora.request import LoRARequest
 
@@ -133,24 +126,12 @@ class VLLMEngine:
             max_lora_rank=max_lora_rank,
             gpu_memory_utilization=gpu_memory_utilization,
             enable_prefix_caching=enable_prefix_caching,
-            tensor_parallel_size=tensor_parallel_size,  # >1 shards the engine across GPUs
         )
         if colocated:
             # lets us hand VRAM back to the trainer between phases (single-GPU only)
             kwargs["enable_sleep_mode"] = True
 
-        prev = os.environ.get("CUDA_VISIBLE_DEVICES")
-        try:
-            if engine_gpu is not None:
-                os.environ["CUDA_VISIBLE_DEVICES"] = str(engine_gpu)
-                print(f"[engine] pinning vLLM to physical GPU {engine_gpu}", flush=True)
-            self.llm = vllm.LLM(**kwargs)
-        finally:
-            if engine_gpu is not None:
-                if prev is None:
-                    os.environ.pop("CUDA_VISIBLE_DEVICES", None)
-                else:
-                    os.environ["CUDA_VISIBLE_DEVICES"] = prev
+        self.llm = vllm.LLM(**kwargs)
         self.SamplingParams = vllm.SamplingParams
         self._lora_req = None
         self._version = 0
@@ -216,6 +197,5 @@ def build_engine(cfg, model=None, tokenizer=None):
     if backend == "vllm":
         return VLLMEngine(cfg.teacher_model, dtype=cfg.dtype, max_lora_rank=cfg.lora_r,
                           gpu_memory_utilization=getattr(cfg, "gpu_mem_util", 0.45),
-                          colocated=not getattr(cfg, "no_sleep", False),
-                          engine_gpu=getattr(cfg, "engine_gpu", None))
+                          colocated=not getattr(cfg, "no_sleep", False))
     return HFEngine(model, tokenizer, cfg.resolve_device())

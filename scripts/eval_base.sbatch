@@ -5,8 +5,8 @@
 #SBATCH --mem=64G
 #SBATCH -t 01:00:00
 #SBATCH -J eval_base
-#SBATCH -o /home/zsophia/orcd/scratch/grpo_tutor/logs/eval_base_%j.out
-source /home/zsophia/orcd/scratch/grpo_tutor/scripts/env.sh
+#SBATCH -o logs/eval_base_%j.out
+source scripts/env.sh
 export HF_HUB_OFFLINE=1
 # BASELINE: untrained 3B teacher on the held-out ZPD split.
 python -u src/evals.py --problems data/zpd_problems.jsonl \

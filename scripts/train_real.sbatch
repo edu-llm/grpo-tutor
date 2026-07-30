@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=grpo_real
-#SBATCH --output=/home/zsophia/orcd/scratch/grpo_tutor/logs/train_%j.out
+#SBATCH --output=logs/train_%j.out
 #SBATCH --partition=mit_preemptable
 #SBATCH --gres=gpu:h100:1
 #SBATCH --time=6:00:00
@@ -13,8 +13,9 @@
 # resumes from checkpoints/ckpt.pt (LoRA + optimizer + step), so progress is kept
 # with NO manual resubmission. --open-mode=append keeps the log across requeues.
 set -euo pipefail
-source /home/zsophia/orcd/scratch/grpo_tutor/scripts/env.sh
+source scripts/env.sh
 export WANDB_PROJECT=grpo_tutor
+export WANDB_ENTITY=eduLLM
 python -u src/train_h100.py \
   --backend vllm --reward real \
   --teacher Qwen/Qwen2.5-3B-Instruct \

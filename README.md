@@ -64,7 +64,28 @@ python src/train_h100.py --backend stub --steps 6                  # no-GPU smok
 ```
 
 Useful flags: `--turns 3` (multi-turn dialogue), `--hint-probe` (leak probe),
-`--eval-every 25 --eval-n 30` (held-out benchmark during training).
+`--eval-every 25 --eval-n 30` (held-out benchmark during training),
+`--eval-benchmark qasc` (evaluate on an unfiltered external set).
+
+### Choosing an eval set
+
+`python src/benchmarks.py --list` shows the available sets;
+`python src/bench_baseline.py` measures what the student scores on each. Measured
+for Qwen2.5-0.5B-Instruct over 150 items:
+
+| set | chance | baseline | oracle hint | headroom |
+|---|---|---|---|---|
+| qasc (8-way) | 0.125 | 0.253 | 0.893 | **+0.64** |
+| sciq | 0.250 | 0.687 | 0.970 | +0.28 |
+| obqa_test | 0.250 | 0.313 | 0.413 | +0.10 |
+| arc_easy | 0.249 | 0.533 | - | - |
+| geography | 0.250 | 0.427 | - | - |
+| commonsense | 0.200 | 0.393 | - | - |
+| arc_challenge | 0.251 | 0.353 | - | - |
+
+**qasc** is the default recommendation: the largest teachable gap by far, 8-way so
+guessing adds less noise, and its answers require composing two facts - which is
+work a tutor can actually do across turns rather than leak in one line.
 
 ## Layout
 
@@ -107,17 +128,16 @@ that stays flat, the reward is being gamed.
   proposed fix and is **not implemented**.
 - **No full training run has been done yet** - only smoke tests up to 6 steps. The
   encouraging early numbers are far too short to call a trend.
-- **`eval/teaching_gain` is currently identical to `eval/teacher_acc`.** The ZPD
-  filter keeps only problems the student fails alone, so held-out
+- **`eval/teaching_gain` equals `eval/teacher_acc` on the default eval set.** The
+  ZPD filter keeps only problems the student fails alone, so held-out
   `baseline_acc` is 0.0 by construction and the baseline term subtracts nothing.
-  It still tracks improvement over training, but it is not the independent
-  measurement the name suggests.
+  Pass `--eval-benchmark qasc` (or any set above) to get a real baseline.
 - **The behavioral leak probe finds ~2x what the rules do.** First GPU eval:
   `hint_only_leak` 0.30-0.35 vs rule-based `leak_rate` 0.15. Only the rule-caught
   share is penalized in the reward, so most leakage is currently unpriced.
 - **Multi-turn is verified in stub mode only.** `--turns > 1` runs the dialogue loop
   (student asks -> teacher guides -> student retries), masks loss to teacher tokens,
   and shares the terminal reward across turns, but it has not yet run on a GPU.
-- **The 2-GPU path (`--engine-gpu`, `--pipeline`) is untested.** Queue times for a
-  2-GPU allocation were impractical, so single-GPU is the only supported config; the
-  flags are left in but assume nothing about them.
+- Multi-GPU support was **removed**, not just disabled: 2-GPU queue times made it
+  untestable, and untested concurrency code is worse than none. Single GPU is the
+  only configuration.

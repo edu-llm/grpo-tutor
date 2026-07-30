@@ -1,11 +1,18 @@
+# Versions are the ones verified working on the H100 (1x, CUDA 12) as of
+# 2026-07-30. Lower bounds are floors, not preferences: vLLM's LoRA internals
+# are version-sensitive, and a mismatched vllm/torch pair fails at adapter
+# activation with an opaque "CUDA error: invalid argument".
+
 # Core (all platforms, incl. Mac dev / CPU / MPS)
-torch>=2.3
-transformers>=4.44
-peft>=0.12
-accelerate>=0.33
-datasets>=2.20
-matplotlib>=3.8
+torch>=2.9,<3            # verified 2.9.0
+transformers>=4.57,<5    # verified 4.57.6
+peft>=0.18,<1            # verified 0.18.1
+accelerate>=1.12,<2      # verified 1.12.0
+datasets>=4.3,<5         # verified 4.3.0
+numpy>=2.2,<3            # verified 2.2.6
+matplotlib>=3.10,<4      # verified 3.10.7
+wandb>=0.23,<1           # verified 0.23.1
 
 # CUDA-only, for the fast generation backend on the H100.
 # Install separately on the GPU box (it will NOT install on macOS):
-#   pip install vllm
+#   pip install 'vllm>=0.11.2,<0.12'

@@ -36,10 +36,8 @@ class Config:
     teacher_max_new_tokens: int = 256
     turns: int = 1            # teacher turns per dialogue; >1 enables multi-turn discussion
 
-    gpu_mem_util: float = 0.45
+    gpu_mem_util: float = 0.45    # vLLM's share of GPU mem; rest is for the trainer
     no_sleep: bool = False        # keep the engine resident (fits on 80GB; saves sleep/wake)
-    engine_gpu: int | None = None # pin vLLM to this GPU (disaggregated 2-GPU mode)
-    pipeline: bool = False        # prefetch the next rollout while training (1-step stale)   # vLLM's share of GPU mem; rest is for the trainer
 
     # --- LoRA ---
     lora_r: int = 32        # verl recommends r>=32 for RL; GRPO gradients are high-rank
@@ -59,10 +57,14 @@ class Config:
     eval_every: int = 25      # run a held-out benchmark every N steps (0 = off)
     eval_n: int = 30          # held-out problems per benchmark
     hint_probe: bool = False  # log the hint-only leak probe (1 extra student call/sample)
+    eval_benchmark: str | None = None  # external eval set; None = ZPD held-out split
 
     # --- monitoring ---
     use_wandb: bool = False
     wandb_project: str = "grpo_tutor"
+    # the *team* entity, not the org (philote-...-org): wandb rejects runs logged
+    # directly to an organization with "please try using your team entity"
+    wandb_entity: str = "eduLLM"
     print_samples_every: int = 10
     reward_mode: str = "keyword"  # fake-reward mode (pipeline test only)
 

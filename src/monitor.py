@@ -86,6 +86,7 @@ class Monitor:
     run_dir: str = str(paths.RUNS)
     use_wandb: bool = False
     wandb_project: str = "grpo_tutor"
+    wandb_entity: str | None = None
     config: dict = field(default_factory=dict)
     thresholds: dict = field(default_factory=lambda: dict(DEFAULT_THRESHOLDS))
     run_id: str | None = None      # stable id so a requeued job RESUMES the same wandb run
@@ -103,18 +104,19 @@ class Monitor:
         self._baseline_len = None
         self._wandb = None
         if self.use_wandb:
+            # env var wins if set (conventional wandb behaviour); passing project=
+            # explicitly would otherwise silently ignore WANDB_PROJECT
+            project = os.environ.get("WANDB_PROJECT") or self.wandb_project
+            entity = os.environ.get("WANDB_ENTITY") or self.wandb_entity
             try:
                 import wandb
 
                 self._wandb = wandb
                 # id + resume="allow" so a Slurm requeue continues the SAME run and
                 # the step axis stays continuous instead of restarting in a new run
-                # env var wins if set (conventional wandb behaviour); passing
-                # project= explicitly would otherwise silently ignore WANDB_PROJECT
-                project = os.environ.get("WANDB_PROJECT") or self.wandb_project
-                wandb.init(project=project, config=self.config, dir=self.dir,
+                wandb.init(project=project, entity=entity, config=self.config, dir=self.dir,
                            id=self.run_id, resume="allow" if self.run_id else None)
-                print(f"[monitor] wandb project={project}")
+                print(f"[monitor] wandb {entity or '(default entity)'}/{project}")
                 if self.run_id:
                     print(f"[monitor] wandb run id={self.run_id} (resumable)")
                 mode = os.environ.get("WANDB_MODE", "online")
@@ -122,8 +124,18 @@ class Monitor:
                 if mode == "offline":
                     # compute nodes have no internet; upload later from a login node
                     print(f"[monitor] after the job:  wandb sync {self.dir}/wandb/latest-run")
-            except Exception as e:  # never let logging kill a run
-                print(f"[monitor] wandb disabled ({e})")
+            except Exception as e:
+                # Do NOT swallow this. A wrong entity (e.g. an org rather than a
+                # team) fails here, and quietly continuing means a multi-hour run
+                # produces no remote logs at all. Local traces/metrics still work,
+                # so WANDB_MODE=offline or dropping --wandb is the escape hatch.
+                self._wandb = None
+                raise SystemExit(
+                    f"[monitor] wandb init failed: {e}\n"
+                    f"           entity={entity!r} project={project!r}\n"
+                    f"           note: runs must go to a TEAM entity, not an organization\n"
+                    f"           rerun without --wandb, or set WANDB_MODE=offline, to proceed"
+                ) from e
         print(f"[monitor] run dir: {self.dir}")
 
     # ---- scalars ----
