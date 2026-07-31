@@ -4,15 +4,17 @@ The whole tutoring reward only has a gradient on problems where the student
 FAILS ALONE but SUCCEEDS WITH HELP. Too easy -> ceiling, reward 0. Too hard ->
 floor, reward 0. This script measures that band and writes out the usable set.
 
-Uses OpenBookQA, which ships `fact1` - the science fact needed to answer. That's
-an ideal ORACLE HINT: genuinely helpful, but not the answer itself (so a "solved
-with help" here really does mean teachable, not leaked).
+Every supported corpus ships an ORACLE HINT - the fact the item turns on
+(QASC's `combinedfact`, OpenBookQA's `fact1`). Genuinely helpful but not the
+answer itself, so "solved with help" here means teachable, not leaked. The pools
+come from `benchmarks.py` so there is one loader per corpus (see SOURCES).
 
 Multiple choice is scored by comparing the length-normalized log-prob of each
 choice - deterministic and far more reliable for small models than parsing free
 text.
 
-    python zpd_filter.py --limit 200                     # needs a GPU-ish box
+    python zpd_filter.py --limit 5000                    # QASC (default), GPU-ish box
+    python zpd_filter.py --limit 5000 --source openbookqa # the original corpus
     python zpd_filter.py --limit 20 --stub               # no model: smoke the logic
 """
 
@@ -22,10 +24,12 @@ import argparse
 import contextlib
 import json
 import os
+import re
 
 import torch
 
 import paths
+import seeding
 
 
 class StubStudent:
@@ -42,6 +46,23 @@ class StubStudent:
         if hint and h < 0.5:
             return gold_idx           # hint rescues it
         return (gold_idx + 1) % len(choices)   # wrong without help
+
+    def choose_free(self, question, choices, hint=""):
+        """Agrees with choose() most of the time and not always - the stub is here
+        so the free-answer plumbing runs with no GPU, and a channel that always
+        agreed would make `--student-answer-mode free` untestable."""
+        idx = self.choose(question, choices, hint=hint)
+        if hash(question) % 4 == 0:
+            return (idx + 1) % len(choices)
+        return idx
+
+    def set_answer_mode(self, mode: str) -> None:
+        self.answer_mode = mode
+
+    def answer(self, question, choices, hint=""):
+        if getattr(self, "answer_mode", "logprob") == "free":
+            return self.choose_free(question, choices, hint=hint)
+        return self.choose(question, choices, hint=hint)
 
 
 class HFStudent:
@@ -146,6 +167,130 @@ class HFStudent:
                 scores.append(choice_lp.mean().item())       # length-normalized
         return int(max(range(len(scores)), key=lambda i: scores[i]))
 
+    # ---- second answering channel (OFF by default; see set_answer_mode) ----
+
+    FREE_ANSWER_SYSTEM = (
+        "You are a student answering a multiple-choice question.\n"
+        "Give at most ONE short sentence of reasoning, then a final line of the "
+        "form 'Answer: X' where X is the letter of your choice."
+    )
+
+    @torch.no_grad()
+    def choose_free(self, question, choices, hint="", max_new_tokens: int = 64) -> int:
+        """Answer in free text with room to reason, then map back to an option.
+
+        WHY: `choose()` ranks the options by log-prob behind the bare prompt
+        `Fact: ...\\nQuestion: ...\\nAnswer:` - no chat template, no persona, no
+        tokens to think in. Measured on 120 problems where choose() scored 1%, the
+        same student answered 26% correctly when simply asked, so "the student
+        cannot solve this" is partly a property of the channel, not the student.
+
+        The prompt keeps choose()'s `Fact:` framing for the hint on purpose: the
+        two channels then differ ONLY in how the answer is produced, which is what
+        `check_answer_modes.py` is trying to isolate.
+
+        Greedy, and run on the base weights like choose(), so the reward stays a
+        function of the problem rather than of the persona or the sampling seed.
+        Falls back to choose() when the reply commits to no single option -
+        guessing would inject noise straight into the reward.
+        """
+        head = f"Fact: {hint}\n" if hint else ""
+        user = (f"{head}Question: {question}\n{_format_choices(choices)}\n"
+                "Which option is it?")
+        text = self.tok.apply_chat_template(
+            [{"role": "system", "content": self.FREE_ANSWER_SYSTEM},
+             {"role": "user", "content": user}],
+            tokenize=False, add_generation_prompt=True)
+        enc = self.tok(text, return_tensors="pt").to(self.device)
+        with self._scoring_weights():
+            out = self.model.generate(**enc, do_sample=False,
+                                      max_new_tokens=max_new_tokens,
+                                      pad_token_id=self.tok.pad_token_id)
+        reply = self.tok.decode(out[0, enc.input_ids.shape[1]:], skip_special_tokens=True)
+        self.free_calls = getattr(self, "free_calls", 0) + 1
+        idx = map_reply_to_choice(reply, choices)
+        if idx is None:
+            self.free_unmapped = getattr(self, "free_unmapped", 0) + 1
+            return self.choose(question, choices, hint=hint)
+        return idx
+
+    ANSWER_MODES = ("logprob", "free")
+
+    def set_answer_mode(self, mode: str) -> None:
+        """Choose which channel `answer()` - the REWARD channel - uses.
+
+        Set at construction time only, and left at "logprob" by default, because
+        moving it moves the reward: the 731 curated ZPD problems were selected by
+        choose() failing on them, and every baseline in the README (QASC 0.253 ->
+        0.893 included) was measured through choose(). Switching to "free" makes
+        all of those numbers describe a channel the run no longer uses; the
+        curation has to be rebuilt before they mean anything again.
+        """
+        if mode not in self.ANSWER_MODES:
+            raise ValueError(f"answer mode {mode!r} not in {self.ANSWER_MODES}")
+        self.answer_mode = mode
+
+    def answer(self, question, choices, hint="") -> int:
+        if getattr(self, "answer_mode", "logprob") == "free":
+            return self.choose_free(question, choices, hint=hint)
+        return self.choose(question, choices, hint=hint)
+
+
+def student_answer(student, question, choices, hint="") -> int:
+    """The reward channel, for students that may predate `answer()`.
+
+    `interfaces.Student` only promises `choose()`, and a teammate's student is
+    allowed to implement just that - so the mode switch degrades to the log-prob
+    channel instead of crashing the run.
+    """
+    fn = getattr(student, "answer", None)
+    if fn is None:
+        return student.choose(question, choices, hint=hint)
+    return fn(question, choices, hint=hint)
+
+
+_ANSWER_LABEL = re.compile(r"answer\s*(?:is|:|=)?\s*[\(\[]?([A-Za-z])([^A-Za-z]|$)",
+                           re.IGNORECASE)
+_BARE_LETTER = re.compile(r"^\s*[\(\[]?([A-Za-z])[\)\].:]?\s*$")
+# a lower-case letter followed by a SPACE is a word, not a label: "the answer is
+# a bird" must not resolve to option A
+_LABEL_ENDS = {")", "]", ".", ",", ":", ";", "\n", ""}
+
+
+def _index_of_letter(letter: str, n: int) -> int | None:
+    i = ord(letter.lower()) - ord("a")
+    return i if 0 <= i < n else None
+
+
+def map_reply_to_choice(reply: str, choices) -> int | None:
+    """Map a free-text answer back to an option index, or None if it commits to none.
+
+    None rather than a guess: the caller falls back to the log-prob channel, so an
+    unparseable reply costs measurement coverage instead of injecting a random
+    reward. Same reason a reply naming SEVERAL options is refused - that is the
+    stance `_names_gold` already takes for the free-text screen.
+    """
+    if not reply or not choices:
+        return None
+    n = len(choices)
+
+    for m in _ANSWER_LABEL.finditer(reply):
+        letter, nxt = m.group(1), m.group(2)
+        if letter.isupper() or nxt in _LABEL_ENDS:
+            i = _index_of_letter(letter, n)
+            if i is not None:
+                return i
+    for line in reversed(reply.splitlines()):     # a bare "C." on its own line
+        m = _BARE_LETTER.match(line)
+        if m:
+            i = _index_of_letter(m.group(1), n)
+            if i is not None:
+                return i
+    low = reply.lower()
+    hits = [i for i, c in enumerate(choices)
+            if str(c).strip().lower() and str(c).strip().lower() in low]
+    return hits[0] if len(hits) == 1 else None
+
 
 FREE_TEXT_ASK = ("Question you're stuck on:\n{q}\n{choices}\n\n"
                  "Just say which option you think it is and why, in one sentence.")
@@ -165,31 +310,46 @@ def _names_gold(text: str, gold: str, distractors) -> bool:
     return not any(d.lower().strip() and d.lower().strip() in low for d in distractors)
 
 
-def load_openbookqa(limit: int):
-    from datasets import load_dataset
+# --source name -> the benchmarks.py registry entry that supplies the pool.
+# Routing through benchmarks.py keeps ONE loader per corpus: the eval sets and the
+# curation pool then agree on the schema, the oracle-hint field and the answer-key
+# handling by construction rather than by two copies staying in sync.
+SOURCES = {"qasc": "qasc_train", "openbookqa": "obqa_train"}
 
-    ds = load_dataset("allenai/openbookqa", "additional", split="train")
-    items = []
-    for row in ds:
-        labels = row["choices"]["label"]
-        texts = row["choices"]["text"]
-        if row["answerKey"] not in labels:
-            continue
-        items.append({
-            "question": row["question_stem"],
-            "choices": texts,
-            "gold_idx": labels.index(row["answerKey"]),
-            "hint": row.get("fact1", ""),
-        })
-        if len(items) >= limit:
-            break
-    return items
+# QASC is the default because OpenBookQA is a poor TUTORING task, not because it
+# is harder: its answers are one-word factual recall, so "correct the
+# misconception" and "reveal the answer" are the same sentence and the leak guard
+# has nothing to separate. QASC items need TWO facts composed, so a tutor can
+# supply one and leave the join to the student. Measured on the 0.5B student over
+# 150 items: qasc 0.253 -> 0.893 with an oracle hint (+0.64, 8-way), obqa_test
+# 0.313 -> 0.413 (+0.10, 4-way).
+DEFAULT_SOURCE = "qasc"
+
+
+def load_source(source: str, limit: int, seed: int = 0):
+    """Curation pool for `source`, minus items with no oracle hint.
+
+    An item without one cannot be screened at all: "solves it WITH help" is
+    undefined, so it would be dropped by the ZPD test anyway - as an unsolvable
+    item rather than as missing data.
+    """
+    import benchmarks
+
+    items = benchmarks.load_benchmark(SOURCES[source], limit=limit, seed=seed)
+    kept = [it for it in items if (it.get("hint") or "").strip()]
+    if len(kept) < len(items):
+        print(f"[zpd] {len(items) - len(kept)} items dropped: no oracle hint", flush=True)
+    return kept
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=200)
+    ap.add_argument("--source", default=DEFAULT_SOURCE, choices=sorted(SOURCES),
+                    help="corpus to curate the training set from (default: qasc)")
     ap.add_argument("--student", default="Qwen/Qwen2.5-0.5B-Instruct")
+    ap.add_argument("--seed", type=int, default=0,
+                    help="sampling of the pool + the student's free-text screen")
     ap.add_argument("--stub", action="store_true", help="no model; validate the logic")
     ap.add_argument("--no-free-text-screen", action="store_true",
                     help="keep items the student can already answer in free text "
@@ -201,12 +361,14 @@ def main():
         args.out = str(paths.DATA / ("zpd_stub.jsonl" if args.stub
                                      else "zpd_problems.jsonl"))
 
+    seeding.seed_everything(args.seed)
     if args.stub:
         items = [{"question": f"toy question {i}?", "choices": ["a", "b", "c", "d"],
-                  "gold_idx": i % 4, "hint": f"fact {i}"} for i in range(args.limit)]
+                  "gold_idx": i % 4, "hint": f"fact {i}", "source": "stub"}
+                 for i in range(args.limit)]
         student = StubStudent()
     else:
-        items = load_openbookqa(args.limit)
+        items = load_source(args.source, args.limit, seed=args.seed)
         device = "cuda" if torch.cuda.is_available() else "cpu"
         student = HFStudent(args.student, device=device)
 
@@ -246,6 +408,8 @@ def main():
             f.write(json.dumps(k) + "\n")
 
     print("=== ZPD probe ===")
+    print(f"source               : {'stub' if args.stub else args.source} "
+          f"({'-' if args.stub else SOURCES[args.source]})")
     print(f"items probed         : {len(items)}")
     print(f"baseline accuracy    : {n_base / n:.2%}   (student alone, choose())")
     print(f"assisted accuracy    : {n_help / n:.2%}   (student + oracle hint)")

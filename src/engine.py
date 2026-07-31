@@ -64,6 +64,11 @@ class StubEngine:
                 words = [self.WORDS[(seed >> (3 * b)) % len(self.WORDS)] for b in range(length)]
                 ids = [(seed >> (b % 24)) % self.vocab for b in range(length)]
                 lps = [-((seed >> b) % 300) / 100.0 - 0.01 for b in range(length)]
+                # echo the self-stop marker on a third of turns, but ONLY when the
+                # prompt asked for it - otherwise the stub could never exercise the
+                # stop/strip path, and a smoke test would pass a dead feature
+                if "[DONE]" in p and seed % 3 == 0:
+                    words.append("[DONE]")
                 samples.append(Completion(text=" ".join(words), token_ids=ids, logprobs=lps))
             out.append(samples)
         return out
@@ -104,6 +109,19 @@ class HFEngine:
         pass
 
 
+def _accepts_seed(sampling_params_cls) -> bool:
+    """Can this vLLM's SamplingParams carry a per-request seed?
+
+    Constructing a throwaway instance is the only reliable probe: the class is a
+    msgspec Struct, so `inspect.signature` raises rather than listing the fields.
+    """
+    try:
+        sampling_params_cls(seed=0)
+    except TypeError:
+        return False
+    return True
+
+
 class VLLMEngine:
     """vLLM backend with colocated sleep/wake + LoRA weight sync.
 
@@ -114,7 +132,7 @@ class VLLMEngine:
 
     def __init__(self, model_name: str, dtype: str = "bfloat16", max_lora_rank: int = 16,
                  gpu_memory_utilization: float = 0.45, enable_prefix_caching: bool = True,
-                 colocated: bool = True):
+                 colocated: bool = True, seed: int | None = None):
         import vllm
         from vllm.lora.request import LoRARequest
 
@@ -136,15 +154,36 @@ class VLLMEngine:
         self._lora_req = None
         self._version = 0
         self._supports_sleep = hasattr(self.llm, "sleep") and colocated
+        self._seed = seed
+        self._epoch = 0
+        self._n_calls = 0
+        # SamplingParams is a msgspec Struct in recent vLLM, and msgspec's C-level
+        # __init__ has no introspectable signature - so ASK it, don't inspect it.
+        # Verified present in vllm 0.11.2; older builds sample from a shared engine
+        # RNG instead and simply get no per-request seed.
+        self._supports_seed = seed is not None and _accepts_seed(vllm.SamplingParams)
+        if seed is not None and not self._supports_seed:
+            print("[engine] installed vLLM takes no per-request seed - teacher "
+                  "sampling stays unseeded", flush=True)
 
     def generate(self, prompts, n, max_new_tokens, temperature):
-        params = self.SamplingParams(
+        kwargs = dict(
             n=n,                       # all K group samples in one call
             temperature=max(temperature, 1e-5),
             top_p=1.0,
             max_tokens=max_new_tokens,
             logprobs=0,                # logprob of each sampled token
         )
+        if self._supports_seed:
+            # One seed per CALL, not per run: a fixed seed would make every step
+            # resample the same continuations. Every prompt in the call shares it,
+            # which is fine - the same random stream against different logits still
+            # yields different text.
+            from seeding import derive_seed
+
+            kwargs["seed"] = derive_seed(self._seed, self._epoch, self._n_calls)
+        self._n_calls += 1
+        params = self.SamplingParams(**kwargs)
         outs = self.llm.generate(prompts, params, lora_request=self._lora_req)
         results = []
         for out in outs:
@@ -155,6 +194,16 @@ class VLLMEngine:
                 samples.append(Completion(text=comp.text, token_ids=ids, logprobs=lps))
             results.append(samples)
         return results
+
+    def set_seed_epoch(self, epoch: int) -> None:
+        """Anchor the per-call sampling seeds to the training step.
+
+        The call counter alone restarts at 0 after a Slurm requeue, so a resumed
+        run would replay step 0's random stream at step 300. Keying on the step
+        makes the seed a function of (run seed, step) and survives preemption.
+        """
+        self._epoch = int(epoch)
+        self._n_calls = 0
 
     def sync_weights(self, source):
         """Hand vLLM the trainer's fresh LoRA adapter.
@@ -217,5 +266,6 @@ def build_engine(cfg, model=None, tokenizer=None):
     if backend == "vllm":
         return VLLMEngine(cfg.teacher_model, dtype=cfg.dtype, max_lora_rank=cfg.lora_r,
                           gpu_memory_utilization=getattr(cfg, "gpu_mem_util", 0.45),
-                          colocated=not getattr(cfg, "no_sleep", False))
+                          colocated=not getattr(cfg, "no_sleep", False),
+                          seed=getattr(cfg, "seed", None))
     return HFEngine(model, tokenizer, cfg.resolve_device())

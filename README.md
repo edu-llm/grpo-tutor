@@ -93,8 +93,10 @@ member's own hint varies**.
 
 **1. It proved the reward signal exists before spending any training compute.**
 The whole idea only works on problems the student fails alone but solves with help.
-`zpd_filter.py` measured that empirically across 4,957 items (baseline 37.95% ->
-47.53% with an oracle hint) and curated the **731 problems** where the gap is real.
+`zpd_filter.py` measured that empirically across 4,957 OpenBookQA items (baseline
+37.95% -> 47.53% with an oracle hint) and curated the **731 problems** where the
+gap is real. `data/zpd_problems.jsonl` is still that OpenBookQA set - the QASC
+default landed after it was built, and rebuilding it needs a GPU.
 Without this the reward would have had no gradient and no amount of RL tuning
 would have shown it.
 
@@ -128,7 +130,7 @@ wrapped in `LeakGuard` inherits leak protection for free.
 
 | what | number |
 |---|---|
-| ZPD headroom (4,957 items) | 37.95% -> 47.53% (**+9.58%**) |
+| ZPD headroom, OpenBookQA (4,957 items) | 37.95% -> 47.53% (**+9.58%**) |
 | Curated training set | **731** problems (0% -> 100% by construction) |
 | Untrained 3B teacher | captures **42.7%** of ceiling, 2.7% leak (greedy) |
 | Base vs instruct student | +14.0% vs +13.0% - a wash, so instruct kept |
@@ -139,7 +141,7 @@ wrapped in `LeakGuard` inherits leak protection for free.
 Everything below assumes **one** H100.
 
 ```bash
-python src/zpd_filter.py --limit 5000    # 1. build the ZPD set (do this first)
+python src/zpd_filter.py --limit 5000    # 1. build the ZPD set (QASC by default)
 sbatch scripts/train_real.sbatch         # 2. train (H100, preemptable, auto-resumes)
 python src/evals.py --teacher-adapter checkpoints/adapter-latest   # 3. evaluate
 python src/train_h100.py --backend stub --steps 6                  # no-GPU smoke test
@@ -147,7 +149,62 @@ python src/train_h100.py --backend stub --steps 6                  # no-GPU smok
 
 Useful flags: `--turns 3` (multi-turn dialogue), `--hint-probe` (leak probe),
 `--eval-every 25 --eval-n 30` (held-out benchmark during training),
-`--eval-benchmark qasc` (evaluate on an unfiltered external set).
+`--eval-benchmark qasc` (evaluate on an unfiltered external set),
+`--seed 0` (see Reproducibility), `--self-stop` (the teacher ends the dialogue),
+`--student-answer-mode free` (change the reward channel - read the warning below).
+
+### The training task: QASC
+
+`zpd_filter.py --source qasc|openbookqa` picks the corpus to curate from; both
+load through `benchmarks.py`, so there is one loader per corpus rather than a
+copy inside the filter. **QASC is the default.** OpenBookQA answers are one-word
+factual recall, which makes "correct the misconception" and "reveal the answer"
+the same sentence; QASC items need two facts composed, so a tutor can supply one
+and leave the join to the student. It also has 6x the headroom (see the table
+below).
+
+The curation pool is the corpus's **train** split (`qasc_train` / `obqa_train`)
+and the eval sets are the validation/test splits, so `--eval-benchmark qasc`
+never scores an item the teacher trained on. `load_zpd` prints the source mix of
+whatever `data/zpd_problems.jsonl` currently holds, because the filter overwrites
+that file in place and the filename does not say which corpus produced it.
+
+### Self-stopping dialogues
+
+`--self-stop` adds a rule to the teacher's system prompt: end your turn with
+`[DONE]` once the student can take it from here. The marker is stripped before
+the student sees the transcript and before the leak rules read the tutor text -
+otherwise the control token is scored as tutoring. `self_stop_rate` (fraction of
+dialogues the teacher ended) is logged next to `mean_turns`.
+
+It **disables** `stop_when_solved`, which is the oracle early-stop. Running both
+is pointless: the oracle stop fires first, on the turn the student becomes able
+to answer, so a teacher that would have rambled for three more turns never pays
+for it, and `[DONE]` has no consequence to learn from.
+
+### Reproducibility
+
+`--seed N` (default 0) seeds `random`, torch (CPU and all CUDA devices), numpy,
+the train/test split, the problem sampler, and - when the installed vLLM accepts
+one - a per-call `SamplingParams.seed` keyed on `(seed, step)` so a Slurm requeue
+resumes the stream instead of replaying step 0. The frozen student samples its
+dialogue turns from torch's global generator, so seeding at startup covers those
+without touching `HFStudent.reply`.
+
+What this does **not** promise:
+
+- **vLLM is not bit-reproducible.** Under continuous batching, which requests
+  share a batch depends on timing, and a token's numerics depend on the batch it
+  was computed in. Same seed, same prompt, occasionally different text.
+- `torch.use_deterministic_algorithms(True)` is deliberately not set: several
+  kernels then fall back to slow paths or raise, and that is a worse trade than
+  residual nondeterminism.
+- Stub-mode numbers also need `PYTHONHASHSEED=0` exported in the shell -
+  `StubStudent` keys off `hash(question)` and the salt is fixed before the
+  process starts, so it cannot be set from inside.
+
+Treat the seed as "same data order, same starting weights, comparable run",
+not as "identical bytes".
 
 ### Choosing an eval set
 
@@ -165,9 +222,38 @@ for Qwen2.5-0.5B-Instruct over 150 items:
 | commonsense | 0.200 | 0.393 | - | - |
 | arc_challenge | 0.251 | 0.353 | - | - |
 
-**qasc** is the default recommendation: the largest teachable gap by far, 8-way so
-guessing adds less noise, and its answers require composing two facts - which is
-work a tutor can actually do across turns rather than leak in one line.
+**qasc** is the default for training and the recommended eval set: the largest
+teachable gap by far, 8-way so guessing adds less noise, and its answers require
+composing two facts - which is work a tutor can actually do across turns rather
+than leak in one line.
+
+### How the student commits to an answer
+
+The reward is `student.choose(...)`: options ranked by length-normalized log-prob
+behind a bare `Fact: ...\nQuestion: ...\nAnswer:` prompt, with no chat template
+and no room to reason. That channel is stricter than the student's actual
+ability - on 120 problems where `choose()` scored 1%, the same student answered
+26% correctly in free text.
+
+`--student-answer-mode free` switches the reward to `choose_free()`, which lets
+the student write one sentence and maps it back to an option (falling back to
+`choose()` when it commits to nothing). It is **off by default**, because moving
+it moves the reward: the curated ZPD set was selected by `choose()` failing, and
+every baseline in this README was measured through `choose()`.
+
+`python src/check_answer_modes.py --source qasc --limit 100` measures the gap.
+Qwen2.5-0.5B-Instruct over 100 QASC train items:
+
+| condition | log-prob | free text | the two agree |
+|---|---|---|---|
+| alone | 0.200 | 0.250 | **0.170** |
+| with the oracle hint | 0.940 | 0.620 | 0.580 |
+
+Unaided, the channels agree on 17% of items - barely above the 12.5% two
+independent 8-way guesses would hit. They are close to *different measurements*,
+not two views of one ability, and the ZPD keep rate ("fails alone AND solves with
+help") moves from **0.74 to 0.41** with the switch. 0.5% of free replies named no
+option and fell back to `choose()`.
 
 ## Layout
 
@@ -179,8 +265,10 @@ data/     problems + personas runs/     traces, metrics, samples (gitignored)
 `config.py` knobs · `engine.py` vLLM/HF/stub inference + sleep/wake/sync ·
 `grpo.py` the GRPO loss · `tasks.py` problems + prompts · `rewards.py`
 SolveReward + LeakGuard · `zpd_filter.py` ZPD curation + student ·
-`evals.py` held-out eval · `monitor.py` traces + metrics + hack detectors ·
-`train_h100.py` training loop · `interfaces.py` seams · `paths.py` repo-root anchors
+`benchmarks.py` corpora (curation pools + eval sets) · `evals.py` held-out eval ·
+`monitor.py` traces + metrics + hack detectors · `train_h100.py` training loop ·
+`seeding.py` every RNG in one call · `interfaces.py` seams ·
+`paths.py` repo-root anchors · `check_answer_modes.py` log-prob vs free-text reward channel
 
 Data and output paths are anchored to the repo root, so scripts work from any
 working directory - a requeued job cannot miss `checkpoints/` and silently
@@ -203,6 +291,19 @@ that stays flat, the reward is being gamed.
 
 ## Known open issues
 
+- **QASC's oracle hint mostly contains the answer.** Measured over all 8,134
+  train items with `rewards.leak_signals`, `combinedfact` states the gold option
+  verbatim in **88.5%** of items and trips the leak rule in **96.7%**
+  (OpenBookQA's `fact1`: 5.8% / 10.1%). So the `0.253 -> 0.893` QASC ceiling is
+  largely "the student copies the answer out of the hint", and a tutor that never
+  leaks cannot reach it. The ZPD screen inherits this: "solves it with help" on
+  QASC partly means "can copy". QASC's `fact1` alone trips the rule on 37.2% and
+  is the obvious candidate for an honest ceiling, but nothing uses it yet.
+- **Self-stop and the free answer channel are stub-tested only.** `--self-stop`
+  and `--student-answer-mode free` run end to end in stub mode; neither has been
+  through a GPU run, so there is no evidence yet that the 3B teacher emits
+  `[DONE]` at sensible moments or that the free channel's mapping holds up on
+  real replies.
 - **Generic-filler hack is unsolved.** At eval, ~70% of the teacher's gain survived
   swapping hints between problems, i.e. much of it is not question-specific. No
   detector catches this; the check is `teaching_gain` vs `transfer_gain` in

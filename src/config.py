@@ -18,6 +18,12 @@ class Config:
     # --- models ---
     teacher_model: str = "Qwen/Qwen2.5-3B-Instruct"    # the policy we train (LoRA)
     student_model: str = "Qwen/Qwen2.5-0.5B-Instruct"  # frozen "environment"
+    # How the student commits to an answer, i.e. WHAT THE REWARD MEASURES.
+    # "logprob" ranks the options behind a bare prompt; "free" lets it write a
+    # sentence first and maps that back to an option. Default stays "logprob"
+    # because the curated ZPD set and every published baseline were measured with
+    # it - see HFStudent.set_answer_mode before moving this.
+    student_answer_mode: str = "logprob"    # "logprob" | "free"
 
     # --- backend / device ("auto" resolves at runtime) ---
     backend: str = "auto"    # "auto" | "stub" | "hf" | "vllm"
@@ -38,6 +44,14 @@ class Config:
     stop_when_solved: bool = True   # end a dialogue once the student answers right
                                     # (oracle stop: saves turns, and every extra
                                     #  turn is another chance to leak)
+    # Let the TEACHER end the dialogue by emitting [DONE]. Mutually exclusive with
+    # stop_when_solved, and the trainer turns that off rather than running both:
+    # the oracle stop fires FIRST, on the turn the student becomes able to answer,
+    # so a teacher that would have rambled on for three more turns never
+    # experiences the leak or the wasted turns. With the consequence removed,
+    # emitting [DONE] and not emitting it earn the same reward, and there is
+    # nothing for GRPO to separate.
+    self_stop: bool = False
 
     gpu_mem_util: float = 0.45    # vLLM's share of GPU mem; rest is for the trainer
     no_sleep: bool = False        # keep the engine resident (fits on 80GB; saves sleep/wake)

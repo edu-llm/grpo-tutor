@@ -6,9 +6,11 @@ SUCCEEDS WITH an oracle hint - the only items that can produce reward gradient.
 
 from __future__ import annotations
 
+import collections
 import json
 import os
 import random
+import re
 
 import paths
 
@@ -31,7 +33,14 @@ def load_zpd(path: str = DEFAULT_PATH):
         print(f"[tasks] {path} not found - using {len(_FALLBACK)} fallback problems")
         return list(_FALLBACK)
     with open(path) as f:
-        return [json.loads(l) for l in f if l.strip()]
+        items = [json.loads(l) for l in f if l.strip()]
+    # `zpd_filter.py` overwrites this file in place and the name does not say
+    # which corpus it came from, so a run's log has to state it - otherwise a
+    # QASC run and an OpenBookQA run are indistinguishable after the fact
+    mix = collections.Counter(it.get("source", "unknown") for it in items)
+    print(f"[tasks] {len(items)} ZPD problems from {path} "
+          f"({', '.join(f'{k}={v}' for k, v in mix.most_common())})")
+    return items
 
 
 def split_problems(items, test_frac: float = 0.15, seed: int = 0):
@@ -61,8 +70,39 @@ TEACHER_SYSTEM = (
 )
 
 
-def dialogue_prompt(problem, transcript: str, tokenizer=None) -> str:
-    """Teacher's view mid-conversation: the problem plus the dialogue so far."""
+SELF_STOP_MARKER = "[DONE]"
+
+SELF_STOP_RULE = (
+    "\n4. When you judge that the student can now answer on their own, finish that "
+    "turn with [DONE] on its own line. Say [DONE] only when you have nothing left "
+    "to teach on this question - not to get out of a hard explanation."
+)
+
+# tolerate the ways an instruct model actually emits it: lower case, padded,
+# wrapped in markdown bold, or trailing a sentence
+_SELF_STOP_RE = re.compile(r"[*_`]*\[\s*done\s*\][*_`]*", re.IGNORECASE)
+
+
+def strip_self_stop(text: str) -> tuple[str, bool]:
+    """Split a teacher turn into (text the student may see, did it stop?).
+
+    The marker MUST come off before the transcript is built. It is a control
+    token, not tutoring: left in, the student reads "[DONE]" as part of the
+    lesson, and `rewards.leak_signals` counts its characters as teacher words.
+    """
+    cleaned = _SELF_STOP_RE.sub(" ", text)
+    return re.sub(r"[ \t]+", " ", cleaned).strip(), bool(_SELF_STOP_RE.search(text))
+
+
+def dialogue_prompt(problem, transcript: str, tokenizer=None,
+                    self_stop: bool = False) -> str:
+    """Teacher's view mid-conversation: the problem plus the dialogue so far.
+
+    `self_stop` adds the rule that lets the teacher end the dialogue itself. It is
+    off by default so the single-turn prompt and every existing measurement keep
+    the system prompt they were taken with.
+    """
+    system = TEACHER_SYSTEM + (SELF_STOP_RULE if self_stop else "")
     user = (
         f"The student is working on this question:\n\n{problem['question']}\n"
         f"{format_choices(problem['choices'])}\n\n"
@@ -71,11 +111,11 @@ def dialogue_prompt(problem, transcript: str, tokenizer=None) -> str:
              if transcript.strip() else "Start the conversation - open the discussion:")
     if tokenizer is not None and hasattr(tokenizer, "apply_chat_template"):
         return tokenizer.apply_chat_template(
-            [{"role": "system", "content": TEACHER_SYSTEM},
+            [{"role": "system", "content": system},
              {"role": "user", "content": user}],
             tokenize=False, add_generation_prompt=True,
         )
-    return f"{TEACHER_SYSTEM}\n\n{user}"
+    return f"{system}\n\n{user}"
 
 
 def student_opening_view(problem) -> str:

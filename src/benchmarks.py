@@ -8,9 +8,10 @@ by construction, so `teaching_gain` collapses to `teacher_acc` and measures
 nothing independent.
 
 These sets are NOT filtered, so the student starts with real, non-zero accuracy
-and a hint has to actually move it. They also come from different corpora than
-the OpenBookQA training pool, which is the only way to tell whether the teacher
-learned to teach or learned this dataset.
+and a hint has to actually move it. Most also come from different corpora than
+the training pool, which is the only way to tell whether the teacher learned to
+teach or learned this dataset. Where they share a corpus (`qasc` vs the
+`qasc_train` curation pool) they are at least different SPLITS - see REGISTRY.
 
 Everything is normalized to the project schema:
     {question: str, choices: list[str], gold_idx: int, hint: str|None, source: str}
@@ -68,30 +69,44 @@ def _sciq(limit):
     return out
 
 
-def _qasc(limit):
-    from datasets import load_dataset
+def _qasc(split):
+    """QASC ships `combinedfact`: the two facts the item needs, already composed
+    into one sentence. That is the oracle hint.
 
-    ds = load_dataset("allenai/qasc", split="validation")
-    out = []
-    for ex in ds:
-        item = _from_labeled(ex)
-        if item:
-            out.append({**item, "hint": ex.get("combinedfact") or None})
-    return out
+    CAVEAT, measured over all 8,134 train items with `rewards.leak_signals`:
+    `combinedfact` states the gold option VERBATIM in 88.5% of items and trips the
+    leak rule in 96.7% (OpenBookQA's `fact1`: 5.8% / 10.1%). So the QASC oracle
+    ceiling is largely "student copies the answer out of the hint", and a tutor
+    that never leaks cannot reach it. `fact1` alone trips the rule on 37.2% and is
+    the closer analogue of a legitimate scaffold if that ceiling ever needs to be
+    an honest one.
+    """
+    def load(limit):
+        from datasets import load_dataset
+
+        ds = load_dataset("allenai/qasc", split=split)
+        out = []
+        for ex in ds:
+            item = _from_labeled(ex)
+            if item:
+                out.append({**item, "hint": ex.get("combinedfact") or None})
+        return out
+    return load
 
 
-def _openbookqa_test(limit):
-    """Same corpus as training, but the unfiltered TEST split - the control that
-    isolates 'different distribution' from 'not ZPD-filtered'."""
-    from datasets import load_dataset
+def _openbookqa(split):
+    """`fact1` is the science fact the item turns on - OpenBookQA's oracle hint."""
+    def load(limit):
+        from datasets import load_dataset
 
-    ds = load_dataset("allenai/openbookqa", "additional", split="test")
-    out = []
-    for ex in ds:
-        item = _from_labeled(ex, q_key="question_stem")
-        if item:
-            out.append({**item, "hint": ex.get("fact1") or None})
-    return out
+        ds = load_dataset("allenai/openbookqa", "additional", split=split)
+        out = []
+        for ex in ds:
+            item = _from_labeled(ex, q_key="question_stem")
+            if item:
+                out.append({**item, "hint": ex.get("fact1") or None})
+        return out
+    return load
 
 
 def _commonsense_qa(limit):
@@ -117,12 +132,19 @@ def _mmlu(subject):
 
 
 # name -> (loader, one-line description)
+#
+# The `*_train` entries are the CURATION pools `zpd_filter.py` draws training
+# problems from; the plain names are eval sets. They are deliberately different
+# splits of the same corpus: curating training items out of the rows that
+# `--eval-benchmark qasc` later scores would put the eval inside the training set.
 REGISTRY = {
     "arc_easy":      (_arc("ARC-Easy"),      "grade-school science, 4-way (closest sibling of the training set)"),
     "arc_challenge": (_arc("ARC-Challenge"), "harder grade-school science, 4-way"),
     "sciq":          (_sciq,                 "science, 4-way, ships a support passage as an oracle hint"),
-    "qasc":          (_qasc,                 "science, 8-way, needs two facts composed - good for multi-turn"),
-    "obqa_test":     (_openbookqa_test,      "OpenBookQA test split: same corpus, unfiltered (control)"),
+    "qasc":          (_qasc("validation"),   "science, 8-way, needs two facts composed - good for multi-turn"),
+    "qasc_train":    (_qasc("train"),        "QASC train split: the default ZPD curation pool (8k items)"),
+    "obqa_test":     (_openbookqa("test"),   "OpenBookQA test split: same corpus, unfiltered (control)"),
+    "obqa_train":    (_openbookqa("train"),  "OpenBookQA train split: the original ZPD curation pool"),
     "commonsense":   (_commonsense_qa,       "commonsense reasoning, 5-way, non-science"),
     "geography":     (_mmlu("high_school_geography"), "MMLU social studies, 4-way"),
     "us_history":    (_mmlu("high_school_us_history"), "MMLU social studies, 4-way"),

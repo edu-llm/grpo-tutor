@@ -22,6 +22,7 @@ import argparse
 import contextlib
 import json
 import os
+import random
 import signal
 import time
 
@@ -29,6 +30,7 @@ import torch
 
 import grpo
 import paths
+import seeding
 import tasks
 from config import Config
 from engine import build_engine
@@ -36,6 +38,7 @@ from fake_reward import FakeReward
 from interfaces import Trajectory, Turn
 from monitor import Monitor
 from rewards import LeakGuard, SolveReward
+from zpd_filter import student_answer
 
 def load_fake_topics(path=None):
     """Varied teaching prompts (math/science/english/social studies/logic) for the
@@ -191,7 +194,8 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
         grp = []
         for c in comps:
             hint = c.text
-            idx = student.choose(problem["question"], problem["choices"], hint=hint)
+            idx = student_answer(student, problem["question"], problem["choices"],
+                                 hint=hint)
             pred = problem["choices"][idx]
             traj = Trajectory(turns=[Turn(prompt, c)], transcript=hint)
             traj.info = {"student_answer": pred, "gold": gold,
@@ -224,16 +228,18 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
     eval measures the SAME behaviour that is being trained - evaluating a
     dialogue-trained teacher on one-shot hints would grade the wrong thing.
 
-    Returns (transcripts, turns_of, tutor_texts). `tutor_texts` holds ONLY the
-    teacher's turns: leak attribution must not charge the teacher for the answer
-    when it was the student who said it. turns_of is only populated when
-    keep_turns, since the eval has no use for per-turn token ids.
+    Returns (transcripts, turns_of, tutor_texts, self_stopped). `tutor_texts`
+    holds ONLY the teacher's turns: leak attribution must not charge the teacher
+    for the answer when it was the student who said it. turns_of is only populated
+    when keep_turns, since the eval has no use for per-turn token ids.
     """
     n = len(problem_of)
     transcripts = ["" for _ in range(n)]
     tutor_only = ["" for _ in range(n)]
     turns_of = [[] for _ in range(n)]
-    done = [False] * n            # dialogues the student has already got right
+    done = [False] * n            # dialogues that ended early (solved, or teacher stopped)
+    self_stopped = [0.0] * n      # ...of those, the ones the TEACHER ended
+    self_stop = getattr(cfg, "self_stop", False)
 
     # --- the student speaks first ---
     openers = student.reply([tasks.student_opening_view(problem_of[d]) for d in range(n)])
@@ -246,7 +252,8 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
             break
 
         # --- teacher turn: one generation per ongoing dialogue ---
-        t_prompts = [tasks.dialogue_prompt(problem_of[d], transcripts[d], tokenizer=tok)
+        t_prompts = [tasks.dialogue_prompt(problem_of[d], transcripts[d], tokenizer=tok,
+                                           self_stop=self_stop)
                      for d in live]
         gens = engine.generate(t_prompts, n=1,
                                max_new_tokens=cfg.teacher_max_new_tokens,
@@ -254,12 +261,25 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
         for prompt, d, g in zip(t_prompts, live, gens):
             c = g[0]
             if keep_turns:
+                # gen_ids stay RAW, marker included: the decision to stop is an
+                # action the teacher took, and masking those tokens out of the loss
+                # would leave the one behaviour we are trying to teach untrained
                 turns_of[d].append({"prompt": prompt, "gen_ids": c.token_ids,
                                     "old_logprobs": c.logprobs})
-            transcripts[d] += f"Tutor: {c.text.strip()}\n"
-            tutor_only[d] += c.text.strip() + "\n"
+            text, wants_stop = (tasks.strip_self_stop(c.text) if self_stop
+                                else (c.text.strip(), False))
+            if text:      # a turn that was ONLY the marker adds no tutoring to read
+                transcripts[d] += f"Tutor: {text}\n"
+                tutor_only[d] += text + "\n"
+            if wants_stop:
+                done[d] = True
+                self_stopped[d] = 1.0
 
         if t == turns - 1:
+            break
+
+        live = [d for d in live if not done[d]]   # a teacher-ended dialogue gets no reply
+        if not live:
             break
 
         # --- stop dialogues the student can now answer ---
@@ -269,7 +289,7 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
         if getattr(cfg, "stop_when_solved", True):
             for d in live:
                 p = problem_of[d]
-                if student.choose(p["question"], p["choices"],
+                if student_answer(student, p["question"], p["choices"],
                                   hint=transcripts[d]) == p["gold_idx"]:
                     done[d] = True
             live = [d for d in live if not done[d]]
@@ -282,7 +302,7 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
         for d, rep in zip(live, replies):
             transcripts[d] += f"Student: {rep.strip()}\n"
 
-    return transcripts, turns_of, tutor_only
+    return transcripts, turns_of, tutor_only, self_stopped
 
 
 def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
@@ -298,7 +318,7 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
     n_dialogues = cfg.batch_prompts * cfg.group_size
     # flat index d = prompt_i * K + k
     problem_of = [picks[d // cfg.group_size] for d in range(n_dialogues)]
-    transcripts, turns_of, tutor_texts = run_dialogues(
+    transcripts, turns_of, tutor_texts, self_stopped = run_dialogues(
         cfg, engine, student, problem_of, tok, cfg.turns, cfg.temperature,
         keep_turns=True)
 
@@ -312,7 +332,8 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
         for k in range(cfg.group_size):
             d = i * cfg.group_size + k
             convo = transcripts[d]
-            idx = student.choose(problem["question"], problem["choices"], hint=convo)
+            idx = student_answer(student, problem["question"], problem["choices"],
+                                 hint=convo)
             pred = problem["choices"][idx]
             traj = Trajectory(turns=[], transcript=convo)
             # the student answers from the WHOLE conversation (it saw all of it),
@@ -327,7 +348,8 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
                    "choices": problem["choices"], "gold_idx": problem["gold_idx"],
                    "reward": scored["reward"], "solved": scored.get("solved", 0.0),
                    "leaked": scored.get("leaked", 0.0),
-                   "student_answer": pred, "gold": gold, "turns": len(turns_of[d])}
+                   "student_answer": pred, "gold": gold, "turns": len(turns_of[d]),
+                   "self_stopped": self_stopped[d]}
             if cfg.hint_probe:
                 # tutor turns only, for the same attribution reason; leakage can
                 # still be spread across several of them (elimination)
@@ -359,8 +381,9 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     if cfg.turns > 1:
         # match training: grade the dialogue, not a one-shot hint. The student is
         # shown the full transcript; leak checks see only the tutor's turns.
-        hints, _, tutor_texts = run_dialogues(cfg, engine, student, items, tok,
-                                              cfg.turns, temperature=0.0)
+        hints, _, tutor_texts, self_stopped = run_dialogues(cfg, engine, student, items,
+                                                            tok, cfg.turns,
+                                                            temperature=0.0)
     else:
         prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
         gens = engine.generate(prompts, n=1,
@@ -368,6 +391,7 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
                                temperature=0.0)
         hints = [g[0].text for g in gens]
         tutor_texts = hints
+        self_stopped = [0.0] * len(items)   # nothing to stop: one turn, then answer
     # each item gets ANOTHER item's hint; rotating by one keeps the pairing
     # deterministic and guarantees no item ever receives its own hint
     swapped = hints[1:] + hints[:1]
@@ -378,11 +402,14 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
         gold_idx = p["gold_idx"]
         gold = p["choices"][gold_idx]
         distractors = [c for j, c in enumerate(p["choices"]) if j != gold_idx]
-        base_ok += float(student.choose(p["question"], p["choices"]) == gold_idx)
-        help_ok += float(student.choose(p["question"], p["choices"], hint=hint) == gold_idx)
+        # the same channel the reward uses, so eval and training cannot drift apart
+        base_ok += float(student_answer(student, p["question"], p["choices"]) == gold_idx)
+        help_ok += float(student_answer(student, p["question"], p["choices"],
+                                        hint=hint) == gold_idx)
         # a hint from a DIFFERENT problem: whatever accuracy survives this is
         # generic encouragement, not teaching about this question
-        swap_ok += float(student.choose(p["question"], p["choices"], hint=other) == gold_idx)
+        swap_ok += float(student_answer(student, p["question"], p["choices"],
+                                        hint=other) == gold_idx)
         # leak checks use the tutor's words only, never the student's
         leak += leaked_answer(tutor_txt, gold, distractors)
         hint_words += len(tutor_txt.split())
@@ -397,6 +424,10 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
            "eval/swapped_acc": swap_ok / m,
            # gain that does NOT survive swapping = the question-specific part
            "eval/specificity": (help_ok - swap_ok) / m}
+    if getattr(cfg, "self_stop", False):
+        # greedy decoding here, sampled in training: if this is far below the
+        # training rate, stopping is a sampling accident rather than a policy
+        out["eval/self_stop_rate"] = sum(self_stopped) / m
     if cfg.hint_probe:
         out["eval/hint_only_leak"] = probe / m
         out["eval/choices_only"] = floor / m
@@ -428,8 +459,19 @@ def main():
     ap.add_argument("--no-early-stop", action="store_true",
                     help="keep tutoring for the full turn budget even once the "
                          "student answers correctly")
+    ap.add_argument("--student-answer-mode", default=None, choices=["logprob", "free"],
+                    help="how the student commits to an answer, i.e. the reward "
+                         "channel; 'free' invalidates the ZPD curation and the "
+                         "published baselines (python src/check_answer_modes.py)")
+    ap.add_argument("--self-stop", action="store_true",
+                    help="let the teacher end the dialogue with [DONE] (multi-turn "
+                         "only; disables the oracle --stop-when-solved)")
     ap.add_argument("--sync-every", type=int, default=None, help="push LoRA into the engine every N steps")
     ap.add_argument("--gpu-mem-util", type=float, default=None, help="vLLM share of GPU memory (rest for trainer)")
+    ap.add_argument("--seed", type=int, default=None,
+                    help="seeds the data split, the sampler, torch/numpy and the "
+                         "engine's per-call sampling seed (see src/seeding.py for "
+                         "what is still nondeterministic)")
     ap.add_argument("--wandb", action="store_true")
     args = ap.parse_args()
 
@@ -439,7 +481,8 @@ def main():
                      (args.teacher, "teacher_model"), (args.student, "student_model"),
                      (args.micro_batch, "micro_batch_size"), (args.save_every, "save_every"),
                      (args.sync_every, "sync_every"), (args.gpu_mem_util, "gpu_mem_util"),
-                     (args.turns, "turns")]:
+                     (args.turns, "turns"),
+                     (args.student_answer_mode, "student_answer_mode")]:
         if src:
             setattr(cfg, dst, src)
     cfg.use_wandb = args.wandb
@@ -447,12 +490,27 @@ def main():
     cfg.hint_probe = args.hint_probe
     cfg.eval_benchmark = args.eval_benchmark
     cfg.stop_when_solved = not args.no_early_stop
+    cfg.self_stop = args.self_stop
+    if cfg.self_stop:
+        # see Config.self_stop: with the oracle stop cutting the dialogue off first,
+        # over-talking costs the teacher nothing and [DONE] cannot be learned
+        cfg.stop_when_solved = False
+        if cfg.turns <= 1:
+            print("[cfg] --self-stop has no effect at --turns 1: the single-turn "
+                  "path answers straight after one hint, so there is no dialogue "
+                  "to end", flush=True)
+        else:
+            print("[cfg] self-stop on - oracle stop_when_solved disabled", flush=True)
     if args.eval_every is not None:
         cfg.eval_every = args.eval_every
     if args.eval_n:
         cfg.eval_n = args.eval_n
-    import random as _random
-    rng = _random.Random(cfg.seed)
+    if args.seed is not None:
+        cfg.seed = args.seed
+    # before load_teacher: the LoRA A matrices are randomly initialised, so a run
+    # seeded after the model is built starts from different weights every time
+    seeding.seed_everything(cfg.seed)
+    rng = random.Random(cfg.seed)
     stub = cfg.resolve_backend() == "stub"
     device = cfg.resolve_device()
     meta = run_meta(cfg.save_dir)
@@ -469,6 +527,11 @@ def main():
         from zpd_filter import HFStudent, StubStudent
 
         student = StubStudent() if stub else HFStudent(cfg.student_model, device=device)
+        if cfg.student_answer_mode != "logprob":
+            student.set_answer_mode(cfg.student_answer_mode)
+            print(f"[student] reward channel = {cfg.student_answer_mode}: the ZPD "
+                  "curation and the reported baselines were measured on 'logprob' "
+                  "and do not describe this run", flush=True)
         sampler = EpochSampler(problems, rng)
         print(f"[data] {len(problems)} train / {len(held_out)} held-out ZPD problems", flush=True)
         if cfg.eval_benchmark:
@@ -544,6 +607,10 @@ def main():
 
     for step in range(start_step, cfg.total_steps):
         t: dict = {}
+        # engines that seed per request key off the step, so a requeued run picks
+        # the stream back up instead of replaying the beginning (see set_seed_epoch)
+        if hasattr(engine, "set_seed_epoch"):
+            engine.set_seed_epoch(step)
         with Timer(t, "generate_and_reward"):
             samples, texts, traces, group_rewards = do_rollout()
 
@@ -593,6 +660,12 @@ def main():
             if used:
                 # falls below cfg.turns when the student gets there early
                 extra["mean_turns"] = sum(used) / len(used)
+            if cfg.self_stop:
+                # mean_turns alone cannot say WHY a dialogue was short; this is the
+                # share the teacher chose to end
+                ended = [tr["self_stopped"] for tr in traces if "self_stopped" in tr]
+                if ended:
+                    extra["self_stop_rate"] = sum(ended) / len(ended)
 
         monitor.log_metrics(step, {"reward": mean_r, "zero_adv_frac": zero_adv, **extra,
                                    **metrics, **{f"time/{k}": v for k, v in t.items()}})

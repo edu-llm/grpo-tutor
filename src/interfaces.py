@@ -80,6 +80,11 @@ class Student(Protocol):
     NOTE: a conversational `reply(...)` method will be needed if/when multi-turn
     tutoring dialogue lands; it is deliberately NOT declared here because nothing
     calls it yet.
+
+    A student MAY also offer `answer(question, choices, hint)` - a second, freer
+    answering channel selected by `cfg.student_answer_mode`. It stays out of the
+    contract because `zpd_filter.student_answer` falls back to `choose()` when it
+    is absent, so implementing only `choose()` remains enough.
     """
 
     def choose(self, question: str, choices: list[str], hint: str = "") -> int:
