@@ -141,7 +141,7 @@ wrapped in `LeakGuard` inherits leak protection for free.
 Everything below assumes **one** H100.
 
 ```bash
-python src/zpd_filter.py --limit 5000    # 1. build the ZPD set (QASC by default)
+python src/zpd_filter.py --limit 5000    # 1. build the ZPD set (openbookqa_honest)
 sbatch scripts/train_real.sbatch         # 2. train (H100, preemptable, auto-resumes)
 python src/evals.py --teacher-adapter checkpoints/adapter-latest   # 3. evaluate
 python src/train_h100.py --backend stub --steps 6                  # no-GPU smoke test
@@ -153,19 +153,32 @@ Useful flags: `--turns 3` (multi-turn dialogue), `--hint-probe` (leak probe),
 `--seed 0` (see Reproducibility), `--self-stop` (the teacher ends the dialogue),
 `--student-answer-mode free` (change the reward channel - read the warning below).
 
-### The training task: QASC
+### The training task: leak-screened OpenBookQA
 
-`zpd_filter.py --source qasc|openbookqa` picks the corpus to curate from; both
-load through `benchmarks.py`, so there is one loader per corpus rather than a
-copy inside the filter. **QASC is the default.** OpenBookQA answers are one-word
-factual recall, which makes "correct the misconception" and "reveal the answer"
-the same sentence; QASC items need two facts composed, so a tutor can supply one
-and leave the join to the student. It also has 6x the headroom (see the table
-below).
+`zpd_filter.py --source` picks the corpus to curate from; all pools load through
+`benchmarks.py`, so there is one loader per corpus rather than a copy inside the
+filter. **`openbookqa_honest` is the default** — OpenBookQA's `fact1`, with the
+items whose hint already contains the answer dropped (4,454 of 4,957 left).
 
-The curation pool is the corpus's **train** split (`qasc_train` / `obqa_train`)
-and the eval sets are the validation/test splits, so `--eval-benchmark qasc`
-never scores an item the teacher trained on. `load_zpd` prints the source mix of
+QASC was the default until the audit in `docs/dataset_choice.md`, and both of the
+reasons for that turned out to be wrong. Its `combinedfact` oracle hint states
+the gold option verbatim in 88.5% of items, so the 6x headroom below is mostly
+the student copying the answer out of the hint rather than being taught. And the
+"OpenBookQA answers are one word" claim does not survive measurement: OpenBookQA
+gold answers run a median of 2 words with 31% single-word, while **QASC's are 1
+word and 60% single-word**. OpenBookQA's hint tends to state a principle the
+student then has to apply — *"as distance to an object increases, that object
+will appear smaller"* for gold *"the mountains seem smaller than in
+photographs"* — which is the scaffolding move that is not a reveal.
+
+`python src/hint_audit.py --candidates` reproduces the whole survey on a laptop
+in under a minute; `race_middle` (24,587 items, 4-word median answers) is the
+registered fallback.
+
+The curation pool is the corpus's **train** split (`obqa_train_honest`,
+`qasc_train_honest`, `race_middle_train`) and the eval sets are the
+validation/test splits (`obqa_honest`, `qasc_honest`, `race_middle`), so
+`--eval-benchmark` never scores an item the teacher trained on. `load_zpd` prints the source mix of
 whatever `data/zpd_problems.jsonl` currently holds, because the filter overwrites
 that file in place and the filename does not say which corpus produced it.
 
@@ -212,20 +225,29 @@ not as "identical bytes".
 `python src/bench_baseline.py` measures what the student scores on each. Measured
 for Qwen2.5-0.5B-Instruct over 150 items:
 
-| set | chance | baseline | oracle hint | headroom |
-|---|---|---|---|---|
-| qasc (8-way) | 0.125 | 0.253 | 0.893 | **+0.64** |
-| sciq | 0.250 | 0.687 | 0.970 | +0.28 |
-| obqa_test | 0.250 | 0.313 | 0.413 | +0.10 |
-| arc_easy | 0.249 | 0.533 | - | - |
-| geography | 0.250 | 0.427 | - | - |
-| commonsense | 0.200 | 0.393 | - | - |
-| arc_challenge | 0.251 | 0.353 | - | - |
+| set | chance | baseline | oracle hint | headroom | of which reachable |
+|---|---|---|---|---|---|
+| qasc (8-way) | 0.125 | 0.253 | 0.893 | +0.64 | **~12%** |
+| sciq | 0.250 | 0.687 | 0.970 | +0.28 | unmeasured, hint leaks 96% |
+| obqa_test | 0.250 | 0.313 | 0.413 | +0.10 | unmeasured, hint leaks 15% |
+| arc_easy | 0.249 | 0.533 | - | - | - |
+| geography | 0.250 | 0.427 | - | - | - |
+| commonsense | 0.200 | 0.393 | - | - | - |
+| arc_challenge | 0.251 | 0.353 | - | - | - |
 
-**qasc** is the default for training and the recommended eval set: the largest
-teachable gap by far, 8-way so guessing adds less noise, and its answers require
-composing two facts - which is work a tutor can actually do across turns rather
-than leak in one line.
+**Read the headroom column with suspicion.** An oracle hint that contains the
+answer defines a ceiling no tutor bound by `LeakGuard` can reach. On QASC the
+student scores **0.753 from the hint alone with the question hidden**, against a
+0.107 choices-only floor - so 0.647 of that +0.64 is copying, and the honest gap
+is a rounding error. Screening QASC down to the items whose hint does not name
+the answer drops the ceiling to 0.180 -> 0.387 (+0.207), of which 0.147 is still
+available without the question.
+
+`python src/bench_baseline.py --probe` reports `hint_only` and its
+`choices_only` floor alongside the headroom, which is the only way to tell the
+two apart. `python src/hint_audit.py --candidates` gives the string-level version
+of the same question for every corpus, with no model and no GPU.
+See `docs/dataset_choice.md`.
 
 ### How the student commits to an answer
 
@@ -268,7 +290,8 @@ SolveReward + LeakGuard · `zpd_filter.py` ZPD curation + student ·
 `benchmarks.py` corpora (curation pools + eval sets) · `evals.py` held-out eval ·
 `monitor.py` traces + metrics + hack detectors · `train_h100.py` training loop ·
 `seeding.py` every RNG in one call · `interfaces.py` seams ·
-`paths.py` repo-root anchors · `check_answer_modes.py` log-prob vs free-text reward channel
+`paths.py` repo-root anchors · `check_answer_modes.py` log-prob vs free-text reward channel ·
+`hint_audit.py` is a corpus tutorable? (leak + answer shape, no model, no GPU)
 
 Data and output paths are anchored to the repo root, so scripts work from any
 working directory - a requeued job cannot miss `checkpoints/` and silently
@@ -291,14 +314,14 @@ that stays flat, the reward is being gamed.
 
 ## Known open issues
 
-- **QASC's oracle hint mostly contains the answer.** Measured over all 8,134
-  train items with `rewards.leak_signals`, `combinedfact` states the gold option
-  verbatim in **88.5%** of items and trips the leak rule in **96.7%**
-  (OpenBookQA's `fact1`: 5.8% / 10.1%). So the `0.253 -> 0.893` QASC ceiling is
-  largely "the student copies the answer out of the hint", and a tutor that never
-  leaks cannot reach it. The ZPD screen inherits this: "solves it with help" on
-  QASC partly means "can copy". QASC's `fact1` alone trips the rule on 37.2% and
-  is the obvious candidate for an honest ceiling, but nothing uses it yet.
+- **The ZPD screen selects FOR leaky hints.** "Fails alone but solves with help"
+  has a degenerate solution - a hint containing the answer - so the filter
+  prefers exactly the items whose ceiling an honest tutor cannot reach. Measured
+  on the live 549-item set against the OpenBookQA pool it came from: **28.2%** of
+  its hints trip the leak rule versus **10.1%** in the pool, and 47% of its
+  answers are one word versus 31%. The `*_honest` sources drop those items up
+  front, but **`data/zpd_problems.jsonl` has not been rebuilt** - that needs a
+  GPU, and run v0 trained on the contaminated set. See `docs/dataset_choice.md`.
 - **Self-stop and the free answer channel are stub-tested only.** `--self-stop`
   and `--student-answer-mode free` run end to end in stub mode; neither has been
   through a GPU run, so there is no evidence yet that the 3B teacher emits

@@ -4,18 +4,21 @@ The whole tutoring reward only has a gradient on problems where the student
 FAILS ALONE but SUCCEEDS WITH HELP. Too easy -> ceiling, reward 0. Too hard ->
 floor, reward 0. This script measures that band and writes out the usable set.
 
-Every supported corpus ships an ORACLE HINT - the fact the item turns on
-(QASC's `combinedfact`, OpenBookQA's `fact1`). Genuinely helpful but not the
-answer itself, so "solved with help" here means teachable, not leaked. The pools
-come from `benchmarks.py` so there is one loader per corpus (see SOURCES).
+Every supported corpus ships an ORACLE HINT - the fact the item turns on. It has
+to be helpful WITHOUT being the answer, or "solved with help" degenerates into
+"can copy the answer out of the hint". That is not hypothetical: 28.2% of the
+hints in the set run v0 trained on contain their answer, against 10.1% in the
+pool they were drawn from, because this screen prefers them. The `*_honest`
+sources drop those items up front - see SOURCES. The pools come from
+`benchmarks.py` so there is one loader per corpus.
 
 Multiple choice is scored by comparing the length-normalized log-prob of each
 choice - deterministic and far more reliable for small models than parsing free
 text.
 
-    python zpd_filter.py --limit 5000                    # QASC (default), GPU-ish box
-    python zpd_filter.py --limit 5000 --source openbookqa # the original corpus
-    python zpd_filter.py --limit 20 --stub               # no model: smoke the logic
+    python zpd_filter.py --limit 5000                        # openbookqa_honest
+    python zpd_filter.py --limit 25000 --source race_middle  # the fallback corpus
+    python zpd_filter.py --limit 20 --stub                   # no model: smoke the logic
 """
 
 from __future__ import annotations
@@ -314,16 +317,42 @@ def _names_gold(text: str, gold: str, distractors) -> bool:
 # Routing through benchmarks.py keeps ONE loader per corpus: the eval sets and the
 # curation pool then agree on the schema, the oracle-hint field and the answer-key
 # handling by construction rather than by two copies staying in sync.
-SOURCES = {"qasc": "qasc_train", "openbookqa": "obqa_train"}
+SOURCES = {"openbookqa_honest": "obqa_train_honest", "openbookqa": "obqa_train",
+           "qasc_honest": "qasc_train_honest", "qasc": "qasc_train",
+           "race_middle": "race_middle_train"}
 
-# QASC is the default because OpenBookQA is a poor TUTORING task, not because it
-# is harder: its answers are one-word factual recall, so "correct the
-# misconception" and "reveal the answer" are the same sentence and the leak guard
-# has nothing to separate. QASC items need TWO facts composed, so a tutor can
-# supply one and leave the join to the student. Measured on the 0.5B student over
-# 150 items: qasc 0.253 -> 0.893 with an oracle hint (+0.64, 8-way), obqa_test
-# 0.313 -> 0.413 (+0.10, 4-way).
-DEFAULT_SOURCE = "qasc"
+# THE SCREEN SELECTS FOR LEAKY HINTS, AND THAT IS THE BUG
+#
+# "Fails alone AND solves with help" has an easy degenerate solution: the hint
+# contains the answer. So this filter preferentially keeps exactly the items
+# whose oracle ceiling is unreachable by an honest tutor. Measured with
+# `hint_audit.py` on the 549-item set run v0 trained on, against the OpenBookQA
+# pool it was drawn from:
+#
+#                      hints tripping the leak rule   single-word answers
+#   obqa_train pool              10.1%                      31%
+#   the curated 549              28.2%                      47%
+#
+# A 2.8x enrichment in leaky hints. Run v0 read specificity ~0 as "OpenBookQA is
+# the wrong corpus"; this says the screen manufactured a worse corpus than the
+# one it was given. The `*_honest` pools drop the leaky items BEFORE screening,
+# which is why they are the defaults here.
+#
+# Why OpenBookQA and not QASC: QASC's answers are the shortest of any candidate
+# (60% a single word vs OpenBookQA's 31%), which is the structure run v0 blamed
+# for specificity ~0, and its `combinedfact` states the gold verbatim in 88.5% of
+# items - so its headline 0.253 -> 0.893 ceiling is mostly the student copying.
+# Measured on the 0.5B over 150 sampled items, all four conditions, log-prob:
+#
+#   pool                  baseline  +hint   gain    hint-only minus choices-only
+#   qasc combinedfact       0.160   0.893  +0.733   +0.647  <- the hint IS the answer
+#   qasc fact1 (all)        0.160   0.487  +0.327   +0.253
+#   qasc fact1 honest-only  0.180   0.387  +0.207   +0.147
+#
+# `race_middle` is the fallback if OpenBookQA's honest headroom proves too thin:
+# 24,587 items, 4-word median answers, and a hint that points at a passage the
+# student can already see. See docs/dataset_choice.md.
+DEFAULT_SOURCE = "openbookqa_honest"
 
 
 def load_source(source: str, limit: int, seed: int = 0):
@@ -346,7 +375,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--source", default=DEFAULT_SOURCE, choices=sorted(SOURCES),
-                    help="corpus to curate the training set from (default: qasc)")
+                    help=f"corpus to curate the training set from "
+                         f"(default: {DEFAULT_SOURCE})")
     ap.add_argument("--student", default="Qwen/Qwen2.5-0.5B-Instruct")
     ap.add_argument("--seed", type=int, default=0,
                     help="sampling of the pool + the student's free-text screen")

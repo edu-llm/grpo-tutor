@@ -108,5 +108,13 @@ Found and fixed before or during it; each was silently corrupting the numbers:
    note QASC's `combinedfact` states the gold answer verbatim in 88.8% of items,
    so its apparent +0.64 headroom is mostly copying — `fact1` is the honest
    candidate and its real headroom is unmeasured.
+
+   > **Corrected later — see `docs/dataset_choice.md`.** Two halves of this are
+   > wrong. OpenBookQA answers are *not* mostly single words (median 2 words, 31%
+   > single-word); QASC's are (1 word, 60%). And the 549 items this run trained
+   > on were not representative of OpenBookQA: 28.2% of their hints contain the
+   > answer against 10.1% in the pool, because the ZPD screen selects for exactly
+   > that. The corpus was less at fault than the curation, and this run never
+   > tested the hypothesis it was blamed on.
 3. **Leak measurement needs calibrating** before the leak rate is quotable.
 4. Shorter runs. 150 steps would have produced the same conclusions in an hour.
