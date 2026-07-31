@@ -65,3 +65,30 @@ def test_generic_words_are_not_identifying():
 def test_verbatim_still_wins():
     assert leaked_answer("The answer is Trial by Jury.", GOLD_FULL, DISTRACTORS,
                          question=QUESTION) == 1.0
+
+
+# Math items carry no content words at all, so the word rule cannot see them.
+MATH_Q = ("Kristin drinks 0.5 liter of orange juice with breakfast each day for "
+          "15 days. How many milliliters of orange juice does she drink?")
+MATH_GOLD = "7,500 mL"
+MATH_DISTRACTORS = ["15,000 mL", "750 mL", "500 mL"]
+
+
+def test_numeric_answer_leak_is_caught():
+    """Stating the number IS stating the answer, however it is spelled."""
+    assert leaked_answer("So you end up with 7500 mL in total.", MATH_GOLD,
+                         MATH_DISTRACTORS, question=MATH_Q) == 1.0
+    assert leaked_answer("That gives 7,500 mL.", MATH_GOLD,
+                         MATH_DISTRACTORS, question=MATH_Q) == 1.0
+
+
+def test_numeric_method_hint_does_not_flag():
+    hint = ("How many milliliters are in one liter? Once you know that, what "
+            "would you do with the number of days?")
+    assert leaked_answer(hint, MATH_GOLD, MATH_DISTRACTORS, question=MATH_Q) == 0.0
+
+
+def test_numbers_from_the_stem_are_not_leaks():
+    """Repeating 0.5 and 15 back is restating the problem, not answering it."""
+    hint = "You drink 0.5 liter a day for 15 days. What does that come to?"
+    assert leaked_answer(hint, MATH_GOLD, MATH_DISTRACTORS, question=MATH_Q) == 0.0

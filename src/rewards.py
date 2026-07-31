@@ -98,6 +98,21 @@ def _matches(gold_word: str, text_words: set[str], min_prefix: int = 4) -> bool:
     )
 
 
+_NUM_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
+def _numbers(s: str) -> set[str]:
+    """Canonical numeric values in a string; 7,500 and 7500.0 collapse to one."""
+    out: set[str] = set()
+    for m in _NUM_RE.findall(str(s)):
+        t = m.replace(",", "")
+        try:
+            out.add("%g" % float(t))
+        except ValueError:
+            continue
+    return out
+
+
 def _identifying_words(gold: str, distractors=(), question: str = "") -> set[str]:
     """Content words that point at THIS option and nothing else.
 
@@ -114,6 +129,24 @@ def _identifying_words(gold: str, distractors=(), question: str = "") -> set[str
         elsewhere |= _content(d)
     elsewhere |= _content(question)
     return {w for w in g - elsewhere if len(w) >= 4 and w not in _GENERIC}
+
+
+def _identifying_numbers(gold: str, distractors=(), question: str = "") -> set[str]:
+    """Numbers that appear in gold and nowhere else in the item.
+
+    Half the state corpus is math, where the answer IS a number and carries no
+    content words at all - 170 of 495 items have an empty identifying-word set.
+    Excluding numbers from the stem matters: quoting the diameter back to the
+    student is teaching, quoting the circumference is the answer.
+    """
+    g = _numbers(gold)
+    if not g:
+        return set()
+    elsewhere: set[str] = set()
+    for d in distractors:
+        elsewhere |= _numbers(d)
+    elsewhere |= _numbers(question)
+    return g - elsewhere
 
 
 def leak_signals(teacher_text: str, gold: str, distractors=(), question: str = "") -> dict:
@@ -143,7 +176,11 @@ def leak_signals(teacher_text: str, gold: str, distractors=(), question: str = "
 
     ident_words = _identifying_words(gold, distractors, question)
     hits = sum(_matches(w, t_words) for w in ident_words)
-    identifying = hits / len(ident_words) if ident_words else 0.0
+    ident_nums = _identifying_numbers(gold, distractors, question)
+    if ident_nums:
+        hits += len(ident_nums & _numbers(teacher_text))
+    n_ident = len(ident_words) + len(ident_nums)
+    identifying = hits / n_ident if n_ident else 0.0
 
     named = 0
     for d in distractors:
