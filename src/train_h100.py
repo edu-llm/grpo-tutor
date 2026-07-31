@@ -37,7 +37,7 @@ from engine import build_engine
 from fake_reward import FakeReward
 from interfaces import Trajectory, Turn
 from monitor import Monitor
-from rewards import LeakGuard, SolveReward
+from rewards import build_real_rewarder
 from zpd_filter import student_answer
 
 def load_fake_topics(path=None):
@@ -188,9 +188,13 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
                              max_new_tokens=cfg.teacher_max_new_tokens,
                              temperature=cfg.temperature)
 
+    use_spec = getattr(cfg, "specificity", "off") not in (None, "off")
     samples, texts, traces, group_rewards = [], [], [], []
-    for problem, prompt, comps in zip(picks, prompts, groups):
+    for i, (problem, prompt, comps) in enumerate(zip(picks, prompts, groups)):
         gold = tasks.gold_text(problem)
+        # ONE foreign problem for the whole group, so the only thing that varies
+        # across the K members is their own hint - see SpecificityGuard
+        other = picks[(i + 1) % len(picks)] if len(picks) > 1 else None
         grp = []
         for c in comps:
             hint = c.text
@@ -201,6 +205,11 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
             traj.info = {"student_answer": pred, "gold": gold,
                          "distractors": [c for j, c in enumerate(problem["choices"])
                                          if j != problem["gold_idx"]]}
+            if use_spec and other is not None:
+                # does MY hint also work on a question it was not written for?
+                off = student_answer(student, other["question"], other["choices"],
+                                     hint=hint)
+                traj.info["off_problem_solved"] = float(off == other["gold_idx"])
             scored = rewarder.score(traj)
             grp.append(scored["reward"])
             texts.append(hint)
@@ -208,6 +217,8 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
                    "choices": problem["choices"], "gold_idx": problem["gold_idx"],
                    "reward": scored["reward"], "solved": scored.get("solved", 0.0),
                    "leaked": scored.get("leaked", 0.0),
+                   "specificity": scored.get("specificity"),
+                   "off_problem_solved": scored.get("off_problem_solved"),
                    "student_answer": pred, "gold": gold}
             if cfg.hint_probe:
                 from rewards import hint_only_leak
@@ -323,11 +334,14 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
         keep_turns=True)
 
     # --- terminal: student answers with the whole conversation as context ---
+    use_spec = getattr(cfg, "specificity", "off") not in (None, "off")
     samples, texts, traces, group_rewards = [], [], [], []
     for i in range(cfg.batch_prompts):
         problem = picks[i]
         gold = tasks.gold_text(problem)
         distractors = [c for j, c in enumerate(problem["choices"]) if j != problem["gold_idx"]]
+        # one foreign problem for the whole group; only the hint varies across k
+        other = picks[(i + 1) % len(picks)] if len(picks) > 1 else None
         grp, grp_turns = [], []
         for k in range(cfg.group_size):
             d = i * cfg.group_size + k
@@ -340,6 +354,10 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
             # but only the tutor's own words are used to judge leaking
             traj.info = {"student_answer": pred, "gold": gold, "distractors": distractors,
                          "teacher_text": tutor_texts[d]}
+            if use_spec and other is not None:
+                off = student_answer(student, other["question"], other["choices"],
+                                     hint=tutor_texts[d])
+                traj.info["off_problem_solved"] = float(off == other["gold_idx"])
             scored = rewarder.score(traj)
             grp.append(scored["reward"])
             grp_turns.append(turns_of[d])
@@ -348,6 +366,8 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
                    "choices": problem["choices"], "gold_idx": problem["gold_idx"],
                    "reward": scored["reward"], "solved": scored.get("solved", 0.0),
                    "leaked": scored.get("leaked", 0.0),
+                   "specificity": scored.get("specificity"),
+                   "off_problem_solved": scored.get("off_problem_solved"),
                    "student_answer": pred, "gold": gold, "turns": len(turns_of[d]),
                    "self_stopped": self_stopped[d]}
             if cfg.hint_probe:
@@ -449,6 +469,14 @@ def main():
     ap.add_argument("--micro-batch", type=int, default=None)
     ap.add_argument("--save-every", type=int, default=None, help="checkpoint every N steps")
     ap.add_argument("--hint-probe", action="store_true", help="log the hint-only leak probe")
+    ap.add_argument("--specificity", default=None, choices=["difference", "gated", "off"],
+                    help="pay only for question-specific help: "
+                         "solved(own problem) - solved(other problem | same hint)")
+    ap.add_argument("--persona-adapter", default=None,
+                    help="LoRA adapter making the student TALK like a kid; "
+                         "applies to reply() only, choose() disables it")
+    ap.add_argument("--kl-coef", type=float, default=None,
+                    help="weight on KL-to-reference (default 0.05)")
     ap.add_argument("--eval-every", type=int, default=None, help="held-out benchmark every N steps (0=off)")
     ap.add_argument("--eval-n", type=int, default=None, help="held-out problems per benchmark")
     ap.add_argument("--eval-benchmark", default=None,
@@ -488,6 +516,12 @@ def main():
     cfg.use_wandb = args.wandb
     cfg.no_sleep = args.no_sleep
     cfg.hint_probe = args.hint_probe
+    if args.specificity is not None:
+        cfg.specificity = args.specificity
+    if args.kl_coef is not None:
+        cfg.kl_coef = args.kl_coef
+    if args.persona_adapter:
+        cfg.persona_adapter = args.persona_adapter
     cfg.eval_benchmark = args.eval_benchmark
     cfg.stop_when_solved = not args.no_early_stop
     cfg.self_stop = args.self_stop
@@ -521,12 +555,16 @@ def main():
     # ---- reward + (for real mode) the student and the ZPD problem set ----
     problems = student = sampler = None
     if args.reward == "real":
-        rewarder = LeakGuard(SolveReward(), penalty=-1.0)
+        rewarder = build_real_rewarder(specificity=cfg.specificity, leak_penalty=-1.0)
+        print(f"[reward] LeakGuard o SpecificityGuard({cfg.specificity!r}) o SolveReward",
+              flush=True)
         all_problems = tasks.load_zpd(args.problems)
         problems, held_out = tasks.split_problems(all_problems, test_frac=0.15, seed=cfg.seed)
         from zpd_filter import HFStudent, StubStudent
 
-        student = StubStudent() if stub else HFStudent(cfg.student_model, device=device)
+        student = (StubStudent() if stub else
+                   HFStudent(cfg.student_model, device=device,
+                             persona_adapter=cfg.persona_adapter))
         if cfg.student_answer_mode != "logprob":
             student.set_answer_mode(cfg.student_answer_mode)
             print(f"[student] reward channel = {cfg.student_answer_mode}: the ZPD "

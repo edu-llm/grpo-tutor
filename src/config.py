@@ -74,6 +74,10 @@ class Config:
     eval_every: int = 25      # run a held-out benchmark every N steps (0 = off)
     eval_n: int = 30          # held-out problems per benchmark
     hint_probe: bool = False  # log the hint-only leak probe (1 extra student call/sample)
+    # pay only for question-specific help; run v0 measured specificity ~0 under
+    # the plain solve reward. Costs one extra student forward per sample.
+    specificity: str = "off"  # "difference" | "gated" | "off"
+    persona_adapter: str | None = None   # student TALKS like a kid; choose() unaffected
     eval_benchmark: str | None = None  # external eval set; None = ZPD held-out split
 
     # --- monitoring ---

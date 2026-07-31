@@ -141,6 +141,67 @@ class SolveReward:
         return {"reward": solved, "solved": solved}
 
 
+class SpecificityGuard:
+    """Wrap a RewardModel; pay only for help that is about THIS question.
+
+    Run v0's finding: a hint written for a different problem helped the student
+    as much as the correct one (specificity -0.10 .. +0.10 across 500 steps).
+    The +0.10 "teaching gain" was generic help - any tutor-shaped text lifts the
+    student - and a reward that only asks "did the student get it right" cannot
+    tell the two apart, so 500 steps of optimisation never moved it.
+
+        reward = solved(my problem | my hint) - solved(OTHER problem | my hint)
+
+    DIRECTION MATTERS. The subtracted term must hold the HINT fixed and vary the
+    PROBLEM. The inverse - my problem with someone else's hint - measures how
+    hackable my problem is, which is not a property of my hint at all, and GRPO
+    would then credit a member for a hint they did not write.
+
+    It must also vary WITHIN the group or it does nothing: advantages are
+    mean-centred over the K completions, so any term identical across them
+    cancels exactly. Using one fixed foreign problem per group and letting each
+    member's own hint be the thing that changes satisfies both requirements.
+
+    Needs `trajectory.info["off_problem_solved"]` in {0, 1}; the rollout is
+    responsible for that extra student forward pass.
+    """
+
+    MODES = ("difference", "gated", "off")
+
+    def __init__(self, inner, mode: str = "difference"):
+        if mode not in self.MODES:
+            raise ValueError(f"specificity mode must be one of {self.MODES}, got {mode!r}")
+        self.inner = inner
+        self.mode = mode
+
+    def score(self, trajectory) -> dict:
+        out = dict(self.inner.score(trajectory))
+        off = (trajectory.info or {}).get("off_problem_solved")
+        out["off_problem_solved"] = off
+        out["specificity"] = None
+        if self.mode == "off" or off is None:
+            return out
+        off = float(off)
+        solved = float(out.get("solved", 0.0))
+        out["specificity"] = solved - off
+        # difference: a hint that also works elsewhere earns nothing
+        # gated: only pay for wins that do NOT transfer (never negative)
+        out["reward"] = (solved - off) if self.mode == "difference" else solved * (1.0 - off)
+        return out
+
+
+def build_real_rewarder(specificity: str = "off", leak_penalty: float = -1.0):
+    """LeakGuard OUTSIDE SpecificityGuard, deliberately.
+
+    A leaked answer is maximally question-specific, so it scores well on
+    specificity. Wrapping the other way round would pay the teacher for leaking.
+    """
+    inner = SolveReward()
+    if specificity and specificity != "off":
+        inner = SpecificityGuard(inner, mode=specificity)
+    return LeakGuard(inner, penalty=leak_penalty)
+
+
 class LeakGuard:
     """Wrap a RewardModel; punish giving the answer away.
 
