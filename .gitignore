@@ -19,10 +19,6 @@ logs/*
 *.bin
 *.safetensors
 
-# raw personal chat history scraped for style; the synthetic file replaces it
-data/my_inputs.txt
-data/my_inputs.jsonl
-
 # # regenerable from HF: python src/benchmarks.py --name <set>
 # data/bench_*.jsonl
 
