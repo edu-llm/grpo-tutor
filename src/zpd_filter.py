@@ -19,6 +19,7 @@ text.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 
@@ -44,19 +45,43 @@ class StubStudent:
 
 
 class HFStudent:
-    """Small frozen model; answers MC by length-normalized choice log-prob."""
+    """Small frozen model; answers MC by length-normalized choice log-prob.
 
-    def __init__(self, name: str, device: str = "cuda", dtype=torch.bfloat16):
+    An optional persona adapter changes how the student TALKS without changing
+    how it SCORES: reply() runs with the adapter active, choose() runs with it
+    disabled. choose() is the reward channel, and the ZPD curation and every
+    reported baseline assume it is fixed.
+    """
+
+    def __init__(self, name: str, device: str = "cuda", dtype=torch.bfloat16,
+                 persona_adapter: str | None = None):
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
         self.tok = AutoTokenizer.from_pretrained(name)
         if self.tok.pad_token_id is None:
             self.tok.pad_token = self.tok.eos_token
         self.model = AutoModelForCausalLM.from_pretrained(name, dtype=dtype).to(device)
+        self.has_persona = False
+        if persona_adapter:
+            from peft import PeftModel
+
+            self.model = PeftModel.from_pretrained(self.model, persona_adapter)
+            self.has_persona = True
+            print(f"[student] persona adapter: {persona_adapter} "
+                  f"(reply only; choose() disables it)", flush=True)
         self.model.eval()
         for p in self.model.parameters():   # the student is the ENVIRONMENT: never trained
             p.requires_grad_(False)
         self.device = device
+
+    @contextlib.contextmanager
+    def _scoring_weights(self):
+        """Base weights, so the persona never moves the reward channel."""
+        if self.has_persona:
+            with self.model.disable_adapter():
+                yield
+        else:
+            yield
 
     STUDENT_SYSTEM = (
         "You are a 7th grader talking to your tutor about a question you're stuck on.\n"
@@ -108,16 +133,17 @@ class HFStudent:
         prompt = f"{head}Question: {question}\nAnswer:"
         p_ids = self.tok(prompt, return_tensors="pt").input_ids.to(self.device)
         scores = []
-        for ch in choices:
-            c_ids = self.tok(" " + ch, add_special_tokens=False,
-                             return_tensors="pt").input_ids.to(self.device)
-            full = torch.cat([p_ids, c_ids], dim=1)
-            logits = self.model(full).logits[:, :-1, :].float()
-            logp = torch.log_softmax(logits, dim=-1)
-            tgt = full[:, 1:]
-            tok_lp = logp.gather(-1, tgt.unsqueeze(-1)).squeeze(-1)[0]
-            choice_lp = tok_lp[p_ids.shape[1] - 1:]          # only the choice tokens
-            scores.append(choice_lp.mean().item())           # length-normalized
+        with self._scoring_weights():
+            for ch in choices:
+                c_ids = self.tok(" " + ch, add_special_tokens=False,
+                                 return_tensors="pt").input_ids.to(self.device)
+                full = torch.cat([p_ids, c_ids], dim=1)
+                logits = self.model(full).logits[:, :-1, :].float()
+                logp = torch.log_softmax(logits, dim=-1)
+                tgt = full[:, 1:]
+                tok_lp = logp.gather(-1, tgt.unsqueeze(-1)).squeeze(-1)[0]
+                choice_lp = tok_lp[p_ids.shape[1] - 1:]      # only the choice tokens
+                scores.append(choice_lp.mean().item())       # length-normalized
         return int(max(range(len(scores)), key=lambda i: scores[i]))
 
 
