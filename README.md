@@ -289,6 +289,61 @@ two apart. `python src/hint_audit.py --candidates` gives the string-level versio
 of the same question for every corpus, with no model and no GPU.
 See `docs/dataset_choice.md`.
 
+### How big do the sets need to be?
+
+Worked out after run v0's evals turned out to be uninterpretable. At the n=40 we
+were using, the smallest difference that can be trusted is **larger than every
+effect we are trying to measure**:
+
+| eval n | SE | min detectable difference |
+|---|---|---|
+| 40 | 0.077 | **0.217** |
+| 150 | 0.040 | 0.112 |
+| 200 | 0.035 | 0.097 |
+| 400 | 0.024 | 0.069 |
+
+Run v0 measured `teaching_gain` ~ +0.10 and `specificity` ~ 0.00, so its per-eval
+movement (+0.05 to +0.175) was noise. **Eval wants ~200 items.**
+
+Training wants **~300-500**. v0 plateaued after roughly one pass over 549
+problems, so more than that is wasted - but below ~200 the teacher sees each
+problem 6-13 times and can learn per-problem hints instead of how to tutor.
+
+### Real state assessments
+
+Grade 3-8 items from public state tests, extracted from released PDFs. These are
+here because run v0 traced specificity ~0 back to answer *shape*: when the gold
+answer is a single word, "correct the misconception" and "reveal the answer" are
+the same action, so no non-leaking tutoring move exists.
+
+| corpus | gold answer length | single-word |
+|---|---|---|
+| state assessments (TX) | median 5 words | **13%** |
+| ARC-Challenge | 5 | 15% |
+| RACE-middle | 4 | 19% |
+| OpenBookQA | 2 | 31% |
+| QASC | 1 | 60% |
+
+`src/staar_extract.py` and `src/extract_{pa,ma,ca,nj}.py` download the PDFs and
+parse them. Items are self-contained: anything depending on a picture, or on a
+passage shared with other questions, is dropped - which removes essentially all
+reading, correctly rather than accidentally.
+
+**The split is by state**, so held-out means a different test authored by
+different people in a different year, not a random slice of one corpus.
+Massachusetts is **sealed** - not loaded, not looked at - and is only promoted to
+a test set once there is a result worth confirming.
+
+> **These files are NOT in git and must not be.** State assessment items are
+> state-copyright (Texas: "reproduction prohibited"; Pennsylvania: duplication
+> "by Pennsylvania educators for local classroom use" only) and this repo is
+> public. `data/staar/` and `data/state_tests/` are gitignored. The extractors
+> are ours and are committed; the content is not. Rebuild it locally.
+
+Caveat: state items carry **no oracle hint**, so `zpd_filter.py` cannot screen
+them as it stands - its test is "fails alone but solves *with the hint*". Either
+screen on baseline failure alone, or use them where no hint is needed.
+
 ### How the student commits to an answer
 
 The reward is `student.choose(...)`: options ranked by length-normalized log-prob
