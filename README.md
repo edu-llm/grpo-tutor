@@ -94,11 +94,12 @@ member's own hint varies**.
 **1. It proved the reward signal exists before spending any training compute.**
 The whole idea only works on problems the student fails alone but solves with help.
 `zpd_filter.py` measured that empirically across 4,957 OpenBookQA items (baseline
-37.95% -> 47.53% with an oracle hint) and curated the **731 problems** where the
-gap is real. `data/zpd_problems.jsonl` is still that OpenBookQA set - the QASC
-default landed after it was built, and rebuilding it needs a GPU.
-Without this the reward would have had no gradient and no amount of RL tuning
-would have shown it.
+37.95% -> 47.53% with an oracle hint) and curated the problems where the gap is
+real. The live set, `data/zpd_problems.jsonl`, is **549 items screened on BOTH
+answer channels** - the student must fail under `choose()` *and* be unable to
+produce the answer in free text, because 26% of the single-channel set turned out
+to be answerable when simply asked. Without this the reward would have had no
+gradient and no amount of RL tuning would have shown it.
 
 **2. A working GRPO implementation, written from scratch.**
 Group-relative advantage, clipped importance ratio, KL-to-reference via LoRA
@@ -131,10 +132,49 @@ wrapped in `LeakGuard` inherits leak protection for free.
 | what | number |
 |---|---|
 | ZPD headroom, OpenBookQA (4,957 items) | 37.95% -> 47.53% (**+9.58%**) |
-| Curated training set | **731** problems (0% -> 100% by construction) |
-| Untrained 3B teacher | captures **42.7%** of ceiling, 2.7% leak (greedy) |
+| Curated training set | **549** problems, screened on both answer channels |
 | Base vs instruct student | +14.0% vs +13.0% - a wash, so instruct kept |
-| Throughput | ~4.6s/step (2.2 gen + 2.2 update + 0.3 sync) |
+| Throughput, single-turn | ~7.7s/step (4.6 gen + 2.7 update + 0.4 sync) |
+| Throughput, 3-turn dialogue | ~25s/step (3x the turns and 3x the training samples) |
+
+### Run v0 - the first clean multi-turn run
+
+500 steps, 16,000 dialogues, full write-up in [`docs/run_v0.md`](docs/run_v0.md).
+
+| | start | end |
+|---|---|---|
+| leak rate | 0.389 | **0.187** |
+| solve rate on dialogues that did NOT leak | 0.318 | **0.320** |
+| held-out teaching gain | +0.100 | +0.100 |
+| held-out specificity (own hint vs another problem's) | -0.100 | -0.025 |
+
+**The leak penalty works and nothing in the reward improves teaching.** Leaking
+halved while honest teaching sat flat at 0.32 - the drop in overall solve rate is
+the leak-driven solves disappearing, not a regression.
+
+**Specificity is ~0**: a hint written for a *different problem* helps the student
+as much as the correct one. The +0.100 gain is generic help, not teaching. That
+is the finding that sets the agenda for v1.
+
+Two caveats recorded so they are not rediscovered: the eval at n=40 has a minimum
+detectable difference of **0.217**, larger than the effects being measured, so
+per-eval movement was noise; and two apparent mid-run trends (falling token count,
+decaying KL) were flat over the full run.
+
+### The student
+
+`Qwen2.5-0.5B-Instruct`, frozen. Prompting it into a persona provably fails -
+rewriting `STUDENT_SYSTEM` into five explicit rules moved the median reply length
+by **zero words** (25 before, 25 after). It is instead LoRA-fine-tuned on 1,591
+turns (91 hand-written) via `persona_data.py` + `sft_student.py`:
+
+> base: *"Meteorology is the study of weather, climate, and air pressure systems…"*
+> tuned: *"like what does meteorology even mean again?"*
+
+The adapter applies to `reply()` only; `choose()` runs with it **disabled**,
+because `choose()` is the reward channel and the ZPD curation and every reported
+baseline assume it is fixed. `check_persona_safety.py` asserts this and passes
+60/60 identical predictions.
 
 ## Run
 

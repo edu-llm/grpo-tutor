@@ -19,8 +19,9 @@ logs/*
 *.bin
 *.safetensors
 
-# # regenerable from HF: python src/benchmarks.py --name <set>
-# data/bench_*.jsonl
+# regenerable from HF: python src/benchmarks.py --name <set>
+data/bench_*.jsonl
+data/zpd_stub.jsonl
 
 # TEA COPYRIGHT - MUST NOT BE COMMITTED. Released STAAR PDFs and everything
 # extracted from them: "Reproduction of all or portions of this work is
@@ -28,5 +29,11 @@ logs/*
 # Agency." This repo is public. The extractor is ours and is committed; the
 # test content is not. Rebuild with `python src/staar_extract.py --download`.
 data/staar/
+
+# Same for every other state: released items are state-copyright and this repo
+# is public. Pennsylvania, for instance, permits duplication "by Pennsylvania
+# educators for local classroom use" only. Extractors are committed, content is
+# not. Belt and braces - the extractor is also expected to add this.
+data/state_tests/
 
 .gitignore
