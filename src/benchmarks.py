@@ -222,6 +222,46 @@ def _race(cfg, split):
     return load
 
 
+def _staar(subjects=None):
+    """Released Texas STAAR exam items, grades 3-8, four subjects.
+
+    NOT ON THE HUB AND NOT IN THIS REPO. The PDFs are TEA copyright and say so
+    ("Reproduction of all or portions of this work is prohibited without
+    express written permission"), this repository is public, so `data/staar/`
+    is gitignored and the file has to be rebuilt locally:
+
+        python src/staar_extract.py --download
+
+    What makes it different from everything else in this table is that the
+    questions are real exam items with human-written distractors, and that it
+    covers social studies and maths, which no other registered set does.
+
+    What it does NOT have is an oracle hint, so `hint` is None for every item.
+    That is not a gap to be filled in later with something convenient - it
+    means STAAR cannot go through `zpd_filter.py` as it stands, because the
+    screen is defined as "fails alone AND solves with the oracle hint" and the
+    second half has nothing to evaluate. Use it as an eval set, where no hint
+    is needed and its unfiltered baseline is exactly the point. See
+    docs/dataset_choice.md for the two ways to get a hint if one is wanted.
+    """
+    def load(limit):
+        path = paths.DATA / "staar" / "staar_items.jsonl"
+        if not path.exists():
+            raise SystemExit(
+                f"{path} is missing. STAAR content is TEA copyright and is not "
+                f"committed to this public repo - rebuild it with\n"
+                f"    python src/staar_extract.py --download\n"
+                f"(needs pdfplumber: python -m venv /tmp/pdfenv && "
+                f"/tmp/pdfenv/bin/python -m pip install pdfplumber)")
+        with open(path) as f:
+            items = [json.loads(line) for line in f if line.strip()]
+        if subjects:
+            items = [it for it in items if it["subject"] in subjects]
+        return [{"question": it["question"], "choices": it["choices"],
+                 "gold_idx": it["gold_idx"], "hint": None} for it in items]
+    return load
+
+
 def _commonsense_qa(limit):
     from datasets import load_dataset
 
@@ -270,6 +310,11 @@ REGISTRY = {
                       "middle-school reading comprehension, 4-way, derived locator hint"),
     "race_middle_train": (_race("middle", "train"),
                       "RACE-middle train (24,587): phrasal answers, ~10x any science pool"),
+    "staar":         (_staar(),
+                      "released Texas STAAR exam items, grades 3-8, 4-way, NO hint - local file, see _staar"),
+    "staar_math":    (_staar({"math"}),      "STAAR maths only - the only maths set registered"),
+    "staar_science": (_staar({"science"}),   "STAAR science, grades 5 and 8"),
+    "staar_social":  (_staar({"social_studies"}), "STAAR social studies, grade 8"),
     "commonsense":   (_commonsense_qa,       "commonsense reasoning, 5-way, non-science"),
     "geography":     (_mmlu("high_school_geography"), "MMLU social studies, 4-way"),
     "us_history":    (_mmlu("high_school_us_history"), "MMLU social studies, 4-way"),

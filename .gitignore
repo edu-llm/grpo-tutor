@@ -22,4 +22,11 @@ logs/*
 # # regenerable from HF: python src/benchmarks.py --name <set>
 # data/bench_*.jsonl
 
+# TEA COPYRIGHT - MUST NOT BE COMMITTED. Released STAAR PDFs and everything
+# extracted from them: "Reproduction of all or portions of this work is
+# prohibited without express written permission from the Texas Education
+# Agency." This repo is public. The extractor is ours and is committed; the
+# test content is not. Rebuild with `python src/staar_extract.py --download`.
+data/staar/
+
 .gitignore

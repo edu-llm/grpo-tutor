@@ -324,6 +324,134 @@ unusable regardless of how honest its hints are.
 
 ---
 
+## Addendum: released Texas STAAR exams
+
+Everything above is a Hugging Face corpus. STAAR is not — it is 28 PDF exam
+booklets, and it is here because it is the only source in this document with
+**maths and social studies**, and because its items are real exam questions
+with human-written distractors rather than crowdsourced ones.
+
+`src/staar_extract.py` builds it. `staar`, `staar_math`, `staar_science` and
+`staar_social` are registered in `benchmarks.py`.
+
+### The licence, first, because it constrains everything else
+
+Every page carries:
+
+> Copyright © 2019, Texas Education Agency. All rights reserved. Reproduction
+> of all or portions of this work is prohibited without express written
+> permission from the Texas Education Agency.
+
+**This repository is public, so neither the PDFs nor the extracted items are in
+it.** They are written to `data/staar/`, which is in `.gitignore`, and the
+loader raises with rebuild instructions rather than shipping a copy. The
+extractor and this document are ours and are committed; the test content is
+TEA's and is not. If you ever find `data/staar/` staged, that is a mistake to
+undo, not to force through with `git add -f`.
+
+```bash
+python -m venv /tmp/pdfenv && /tmp/pdfenv/bin/python -m pip install pdfplumber
+/tmp/pdfenv/bin/python src/staar_extract.py --download
+```
+
+### What actually exists
+
+Probing 2013-2021 x grades 3-8 x four subjects x {test, key, answer-key} —
+972 URLs — turns up **two usable years**. 2013-2017 are gone from the site,
+2020 was cancelled, 2021 is on the `tea2` mirror under different names and
+publishes **rationales but no answer key**, and 2022+ never existed on paper
+because STAAR moved online. So: 28 forms with both a test and a key, plus two
+half-forms dropped (2019 grade 3 reading has a test and no key; 2018 grade 3
+reading the reverse).
+
+### Yield
+
+1,088 items in, **122 out — a 11.2% keep rate.**
+
+| dropped because | n |
+|---|---|
+| shared stimulus (a passage serving several items) | 319 |
+| options unreadable (two-column tables, flattened figures) | 360 |
+| the item depends on a picture | 161 |
+| figure wreckage in the stem, or flattened maths notation | 63 |
+| griddable (numeric entry, no options) | 46 |
+| degenerate options ("A 1  B 2  C 3  D 4") | 17 |
+| **kept** | **122** |
+
+| | maths | science | social studies | reading |
+|---|---|---|---|---|
+| kept | 55 | 40 | 27 | **0** |
+
+**Reading yields nothing, and that is the correct answer rather than a bug.**
+Every STAAR reading item hangs off a passage the item does not restate, which
+is exactly the structure the requirement rules out. All 372 reading items are
+dropped, and the structural detector and the lexical one ("the selection",
+"the author", "paragraph 4") agree on essentially all of them.
+
+Maths loses most of its items too, for a different reason: a maths booklet is
+mostly diagrams, and its notation is two-dimensional. Fractions and exponents
+do not survive linearisation — `V = π(6)²h` extracts as `V = π(6)2h`, `½ pt` as
+`1 pt 2 1` — and a flattened formula is worse than a missing one because it is
+still readable, just wrong. Those are detected and dropped.
+
+### Shape, which is the interesting part
+
+| | n | chance | gold words | 1-word |
+|---|---|---|---|---|
+| **staar** | 122 | 0.250 | **5** | **0.13** |
+| arc_challenge | 1,119 | 0.251 | 5 | 0.15 |
+| race_middle | 25,416 | 0.250 | 4 | 0.19 |
+| obqa_train | 4,957 | 0.250 | 2 | 0.31 |
+| qasc_train | 8,134 | 0.125 | 1 | 0.60 |
+
+On the axis run v0 blamed for specificity ~0 — single-word answers, where
+correcting the misconception and revealing the answer are the same act — STAAR
+has **the best answer shape of anything surveyed in this document**. Gold
+positions are 38/32/28/24 across A-D, so position carries no usable signal.
+
+### It has no hint, and that is a real limitation
+
+`hint` is `None` for every item. STAAR ships answer keys and rationales, not
+supporting facts, and there is nothing honest to put there.
+
+**So `zpd_filter.py` cannot be run on STAAR as it stands.** The screen keeps
+items where the student "fails alone AND solves with the oracle hint", and the
+second half of that conjunction has nothing to evaluate. Three ways forward,
+in the order they are worth trying:
+
+1. **Use it as an eval set, which needs no hint.** This is the immediate use
+   and costs nothing. `--eval-benchmark staar_math` is the first non-science,
+   non-reading held-out number this project would have, and being unfiltered it
+   has a real non-zero baseline, which the curated set does not.
+2. **Screen on baseline failure alone**, dropping the "solves with help" half.
+   That gives a set of problems the student cannot do, without evidence that a
+   tutor could get it there — so `zero_adv_frac` could sit near 1.0 and the
+   data would provide no gradient. Cheap to test, and the failure is visible.
+3. **Derive a hint by retrieval**, the same move `_locator` makes for RACE:
+   pull the nearest fact from OpenBookQA's 1,326-fact open book. This is the
+   `docs/dataset_choice.md` proposal for ARC-Challenge, unattempted, and STAAR
+   would be a second consumer of it.
+
+### Honest assessment
+
+122 items is an **eval set, not a training corpus.** It is roughly a quarter of
+the curated ZPD set and three orders of magnitude short of RACE. Nothing here
+changes the recommendation above: `openbookqa_honest` remains primary.
+
+What it is worth is narrower and real. It is the only maths and the only social
+studies in the registry, so it is the only way to ask whether a teacher trained
+on science hints transfers to a subject it has never seen — which is the
+question `eval/teaching_gain` is supposed to answer and currently cannot, since
+every registered set except RACE is science. 55 maths items and 27 social
+studies items are enough to see a large transfer effect and not a small one,
+and that is the honest limit of the claim.
+
+The extraction itself is trustworthy in a way the count does not convey: the
+parser refuses whole forms rather than guessing, and 12 items hand-checked
+across all three subjects were correct, self-contained and image-free.
+
+---
+
 ## Still unmeasured
 
 - **Honest headroom for OpenBookQA and RACE.** The single most important number
