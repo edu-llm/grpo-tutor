@@ -7,7 +7,7 @@ enter this public repo. This is the record of what was fetched.
 Re-download with the command listed for each state. Checksums are the
 first 16 hex characters of the sha256, enough to spot a changed file.
 
-**Total: 427 PDFs, 677 MB.**
+**Total: 427 PDFs, 677 MB** (all now deleted; this is the record).
 
 ## Texas STAAR (`tx`)
 
@@ -311,7 +311,7 @@ released test questions via the Wayback Machine; removed from cde.ca.gov and the
 
 doe.mass.edu released items with answer keys
 
-- **124 PDFs**, 194 MB, yielding **93 extracted items**
+- **124 PDFs**, 194 MB, yielding **144 extracted items**
 - rebuild: `python src/extract_ma.py`
 
 | file | MB | sha256[:16] |

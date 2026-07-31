@@ -94,6 +94,17 @@ def main():
 
     header += [f"**Total: {total_files} PDFs, {total_bytes / 1e6:.0f} MB.**", ""]
     OUT.parent.mkdir(exist_ok=True)
+
+    # Refuse to overwrite a fuller record with an emptier one. Re-running this
+    # after some PDFs have already been deleted would silently drop their rows,
+    # which is the one thing the manifest exists to prevent.
+    if OUT.exists():
+        had = OUT.read_text().count("\n| `")
+        if had > total_files:
+            raise SystemExit(
+                f"{OUT} already lists {had} PDFs but only {total_files} are on disk. "
+                f"Refusing to overwrite the record of files that have been deleted. "
+                f"Write elsewhere with --out if you really want a partial manifest.")
     OUT.write_text("\n".join(header + lines))
     print(f"wrote {OUT}  ({total_files} PDFs, {total_bytes / 1e6:.0f} MB catalogued)")
 
