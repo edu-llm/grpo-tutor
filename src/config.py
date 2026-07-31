@@ -35,6 +35,9 @@ class Config:
     warmup_steps: int = 10    # linear lr warmup, then CONSTANT (no cosine)
     teacher_max_new_tokens: int = 256
     turns: int = 1            # teacher turns per dialogue; >1 enables multi-turn discussion
+    stop_when_solved: bool = True   # end a dialogue once the student answers right
+                                    # (oracle stop: saves turns, and every extra
+                                    #  turn is another chance to leak)
 
     gpu_mem_util: float = 0.45    # vLLM's share of GPU mem; rest is for the trainer
     no_sleep: bool = False        # keep the engine resident (fits on 80GB; saves sleep/wake)

@@ -63,8 +63,8 @@ class HFStudent:
         "Rules:\n"
         "1. ONE short sentence, usually under 15 words.\n"
         "2. Sound like a kid: casual, unsure, plain words.\n"
-        "3. Say what confuses you, try a half-formed idea, or ask something back.\n"
-        "4. NEVER explain like a textbook and never state a confident fact.\n"
+        "3. SAY what CONFUSES you, try a half-formed idea, or ask something back.\n"
+        "4. NEVER EXPLAIN like a textbook and never state a confident fact.\n"
         "5. No lists, no formal vocabulary, no definitions."
     )
 

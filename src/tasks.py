@@ -78,6 +78,20 @@ def dialogue_prompt(problem, transcript: str, tokenizer=None) -> str:
     return f"{TEACHER_SYSTEM}\n\n{user}"
 
 
+def student_opening_view(problem) -> str:
+    """The student's FIRST message, before the tutor has said anything.
+
+    Letting the student open changes what the tutor is doing. Cold-opening with
+    nothing to respond to, it structures the problem itself - which in real
+    traces is when it starts walking the option list ("what about brimstone?"),
+    one of the leak modes. Responding to a stated confusion gives it something
+    specific to teach into.
+    """
+    return (f"Question you're stuck on:\n{problem['question']}\n\n"
+            "Your tutor just sat down with you. Say what is confusing you about "
+            "this question, in one short sentence.")
+
+
 def student_dialogue_view(problem, transcript: str) -> str:
     """What the student sees when it is their turn to SPEAK.
 

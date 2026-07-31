@@ -233,29 +233,54 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
     transcripts = ["" for _ in range(n)]
     tutor_only = ["" for _ in range(n)]
     turns_of = [[] for _ in range(n)]
+    done = [False] * n            # dialogues the student has already got right
+
+    # --- the student speaks first ---
+    openers = student.reply([tasks.student_opening_view(problem_of[d]) for d in range(n)])
+    for d in range(n):
+        transcripts[d] += f"Student: {openers[d].strip()}\n"
 
     for t in range(turns):
+        live = [d for d in range(n) if not done[d]]
+        if not live:
+            break
+
         # --- teacher turn: one generation per ongoing dialogue ---
         t_prompts = [tasks.dialogue_prompt(problem_of[d], transcripts[d], tokenizer=tok)
-                     for d in range(n)]
+                     for d in live]
         gens = engine.generate(t_prompts, n=1,
                                max_new_tokens=cfg.teacher_max_new_tokens,
                                temperature=temperature)
-        for d in range(n):
-            c = gens[d][0]
+        for prompt, d, g in zip(t_prompts, live, gens):
+            c = g[0]
             if keep_turns:
-                turns_of[d].append({"prompt": t_prompts[d], "gen_ids": c.token_ids,
+                turns_of[d].append({"prompt": prompt, "gen_ids": c.token_ids,
                                     "old_logprobs": c.logprobs})
             transcripts[d] += f"Tutor: {c.text.strip()}\n"
             tutor_only[d] += c.text.strip() + "\n"
 
-        # --- student turn (skipped after the last teacher turn) ---
-        if t < turns - 1:
-            views = [tasks.student_dialogue_view(problem_of[d], transcripts[d])
-                     for d in range(n)]
-            replies = student.reply(views)
-            for d in range(n):
-                transcripts[d] += f"Student: {replies[d].strip()}\n"
+        if t == turns - 1:
+            break
+
+        # --- stop dialogues the student can now answer ---
+        # NB: this consults gold, so it is an ORACLE stop - a deployed tutor would
+        # have to judge readiness itself. It is here because every extra turn is
+        # another chance to leak, and talking past understanding earns nothing.
+        if getattr(cfg, "stop_when_solved", True):
+            for d in live:
+                p = problem_of[d]
+                if student.choose(p["question"], p["choices"],
+                                  hint=transcripts[d]) == p["gold_idx"]:
+                    done[d] = True
+            live = [d for d in live if not done[d]]
+            if not live:
+                break
+
+        # --- student turn ---
+        views = [tasks.student_dialogue_view(problem_of[d], transcripts[d]) for d in live]
+        replies = student.reply(views)
+        for d, rep in zip(live, replies):
+            transcripts[d] += f"Student: {rep.strip()}\n"
 
     return transcripts, turns_of, tutor_only
 
@@ -400,6 +425,9 @@ def main():
                          "(see: python src/benchmarks.py --list)")
     ap.add_argument("--no-sleep", action="store_true", help="keep the engine resident (no sleep/wake)")
     ap.add_argument("--turns", type=int, default=None, help="teacher turns per dialogue (1 = single-turn hint)")
+    ap.add_argument("--no-early-stop", action="store_true",
+                    help="keep tutoring for the full turn budget even once the "
+                         "student answers correctly")
     ap.add_argument("--sync-every", type=int, default=None, help="push LoRA into the engine every N steps")
     ap.add_argument("--gpu-mem-util", type=float, default=None, help="vLLM share of GPU memory (rest for trainer)")
     ap.add_argument("--wandb", action="store_true")
@@ -418,6 +446,7 @@ def main():
     cfg.no_sleep = args.no_sleep
     cfg.hint_probe = args.hint_probe
     cfg.eval_benchmark = args.eval_benchmark
+    cfg.stop_when_solved = not args.no_early_stop
     if args.eval_every is not None:
         cfg.eval_every = args.eval_every
     if args.eval_n:
@@ -560,6 +589,10 @@ def main():
                 extra["hint_only_leak"] = sum(tr["hint_only_leak"] for tr in traces) / len(traces)
             extra = {**extra, "solved_rate": sum(tr.get("solved", 0.0) for tr in traces) / max(1, len(traces)),
                      "leak_rate": sum(tr.get("leaked", 0.0) for tr in traces) / max(1, len(traces))}
+            used = [tr["turns"] for tr in traces if tr.get("turns")]
+            if used:
+                # falls below cfg.turns when the student gets there early
+                extra["mean_turns"] = sum(used) / len(used)
 
         monitor.log_metrics(step, {"reward": mean_r, "zero_adv_frac": zero_adv, **extra,
                                    **metrics, **{f"time/{k}": v for k, v in t.items()}})
