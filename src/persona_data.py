@@ -44,16 +44,40 @@ Now here is what the student is looking at:
 
 Write ONLY the student's next line. Requirements:
 - ONE sentence, under 15 words
-- casual and unsure, like a kid typing quickly
-- say what is confusing, guess vaguely, or ask something back
+- START LOWERCASE. Typos and missing punctuation are good. Never write tidy prose.
+- react to THIS question specifically - mention something from it
 - NEVER state the correct answer, and never explain like a textbook
+- do NOT begin with "Like," or "Wait," and do NOT use the word "confused"
+- vary it: a wrong guess, a word you don't know, going off-topic, complaining
+  that the hint gave it away, or just giving up - not always a polite question
 Student:"""
 
 
-def load_seeds(path=None, k=5):
-    path = path or str(paths.DATA / "student_persona_synthetic.jsonl")
-    rows = [json.loads(l)["text"] for l in open(path) if l.strip()]
-    return rows, k
+SEED_FILES = ["student_seeds_manual.jsonl",      # hand-written, best voice
+              "student_seeds_agent.jsonl",
+              "student_persona_synthetic.jsonl"]
+
+# The first generation run collapsed onto a handful of stock phrases: 30% of
+# replies opened "Like,", 20% ended "Confused". Banned in the prompt AND the
+# filter, because asking politely was not enough.
+TICS = ["like,", "confused", "or something", "wait,", "i don't get it",
+        "hmm,", "i'm not sure", "tutor"]
+
+
+def load_seeds(k=14):
+    """Every hand-written turn we have. More per prompt than the 5 used first
+    time round: with only 5 the generator's own register beat the examples."""
+    rows = []
+    for name in SEED_FILES:
+        p = paths.DATA / name
+        if not p.exists():
+            continue
+        for line in open(p):
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            rows.append(r.get("text") or r.get("assistant") or "")
+    return [r for r in rows if r], k
 
 
 def contexts_from_traces(trace_paths, limit):
@@ -85,16 +109,34 @@ def contexts_from_traces(trace_paths, limit):
     return out
 
 
-def acceptable(reply: str, gold: str) -> bool:
+def content_words(s: str) -> set:
+    return {w for w in re.findall(r"[a-z]{4,}", s.lower())}
+
+
+STOP = content_words("what which where when about there their would could should "
+                     "think about really something someone thing know mean does "
+                     "your this that they them then than with have")
+
+
+def acceptable(reply: str, gold: str, context: str = "") -> bool:
     r = reply.strip()
+    low = r.lower()
     if not r or len(r.split()) > 18:
         return False
-    if gold and gold.lower().strip() in r.lower():
+    if gold and gold.lower().strip() in low:
         return False                       # the whole point: do not blurt it
     if r.count(".") > 1 or ":" in r or "\n" in r:
         return False                       # multi-sentence or list-like
     if re.search(r"\b(therefore|thus|in conclusion|is defined as|refers to)\b", r, re.I):
         return False                       # textbook register
+    if any(t in low for t in TICS):
+        return False                       # the stock phrases it collapsed onto
+    if r[:1].isupper() and r.endswith(".") and "," in r:
+        return False                       # tidy prose; the humans write ~90% lowercase
+    if context:
+        # half the first batch was generic filler that fit any question at all
+        if not (content_words(r) & (content_words(context) - STOP)):
+            return False
     return True
 
 
@@ -114,7 +156,7 @@ def main():
     ctxs = contexts_from_traces(traces, args.n)
     rng = random.Random(0)
     rng.shuffle(ctxs)
-    ctxs = ctxs[: args.n * 2]              # over-generate, the filter is strict
+    ctxs = ctxs[: args.n * 4]              # over-generate; the filter rejects most
     print(f"[persona] {len(ctxs)} contexts from {len(traces)} trace file(s)", flush=True)
 
     import vllm
@@ -135,10 +177,12 @@ def main():
 
     outs = llm.generate(prompts, params)
     kept, rejected = [], 0
+    seen = set()
     for (view, gold), o in zip(ctxs, outs):
         reply = o.outputs[0].text.strip().split("\n")[0].lstrip("-").strip()
         reply = reply.removeprefix("Student:").strip().strip('"')
-        if acceptable(reply, gold):
+        if acceptable(reply, gold, context=view) and reply.lower() not in seen:
+            seen.add(reply.lower())        # near-duplicates were inflating the count
             kept.append({"system": HFStudent.STUDENT_SYSTEM, "user": view,
                          "assistant": reply})
         else:
@@ -146,9 +190,30 @@ def main():
         if len(kept) >= args.n:
             break
 
+    # the hand-written turns are the best data we have: train on them directly,
+    # not only as few-shot examples
+    human = 0
+    for name in ("student_seeds_manual.jsonl", "student_seeds_agent.jsonl"):
+        p = paths.DATA / name
+        if not p.exists():
+            continue
+        for line in open(p):
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            problem = {"question": r["question"]}
+            view = (tasks.student_opening_view(problem) if r["kind"] == "opening"
+                    else tasks.student_dialogue_view(
+                        problem, "".join(f"Tutor: {t}\n" for t in r["tutor_turns"])))
+            kept.append({"system": HFStudent.STUDENT_SYSTEM, "user": view,
+                         "assistant": r["text"]})
+            human += 1
+
+    random.Random(1).shuffle(kept)
     with open(args.out, "w") as f:
         for row in kept:
             f.write(json.dumps(row) + "\n")
+    print(f"[persona] {human} hand-written rows folded in")
 
     lens = [len(r["assistant"].split()) for r in kept]
     print(f"[persona] kept {len(kept)}, rejected {rejected} "
