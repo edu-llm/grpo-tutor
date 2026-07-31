@@ -33,6 +33,37 @@ _STOP = {
 }
 
 
+# Words that are too common to identify any particular option. Only consulted by
+# the identifying-word rule, where a SINGLE hit costs the tutor -1, so a generic
+# word slipping through is an unearned penalty. Deliberately excludes words that
+# can carry answers in science items (metal, rock, high, long, ...).
+_GENERIC_RAW = {
+    "make", "made", "making", "sure", "being", "been", "have", "has", "had",
+    "get", "got", "take", "taken", "give", "given", "come", "came", "goes",
+    "went", "keep", "put", "use", "used", "using", "need", "needs", "want",
+    "know", "known", "think", "thought", "look", "looks", "find", "found",
+    "help", "helps", "thing", "things", "stuff", "kind", "sort", "type",
+    "good", "bad", "nice", "great", "well", "better", "best", "just", "very",
+    "really", "also", "like", "likes", "other", "others", "another", "same",
+    "different", "way", "ways", "one", "ones", "two", "lot", "lots", "much",
+    "many", "few", "every", "each", "both", "only", "even", "still", "always",
+    "never", "often", "sometimes", "usually", "maybe", "perhaps", "should",
+    "could", "must", "might", "may", "avoid", "avoids", "become", "becomes",
+    "there", "here", "them", "him", "her", "his", "she", "our", "who", "whom",
+    "something", "someone", "anything", "everything", "nothing", "person",
+    "people", "yes", "not",
+    # prepositions and relational words long enough to survive the length filter
+    "through", "across", "around", "between", "within", "without", "above",
+    "below", "along", "toward", "towards", "during", "before", "after",
+    # generic nouns/verbs that describe any answer rather than identify one
+    "change", "changed", "changes", "create", "created", "creates", "item",
+    "items", "form", "forms", "amount", "group", "groups", "place", "places",
+    "time", "times", "area", "areas", "number", "part", "parts", "side",
+    "sides", "late", "early", "happen", "happens", "occur", "occurs",
+}
+_GENERIC = set()
+
+
 def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9 ]+", " ", str(s).lower()).strip()
 
@@ -47,6 +78,9 @@ def _stem(w: str) -> str:
 
 def _content(s: str) -> set[str]:
     return {_stem(w) for w in _norm(s).split() if w not in _STOP and len(w) > 2}
+
+
+_GENERIC |= {_stem(w) for w in _GENERIC_RAW}
 
 
 def _matches(gold_word: str, text_words: set[str], min_prefix: int = 4) -> bool:
@@ -64,8 +98,39 @@ def _matches(gold_word: str, text_words: set[str], min_prefix: int = 4) -> bool:
     )
 
 
-def leak_signals(teacher_text: str, gold: str, distractors=()) -> dict:
-    """Three independent leak signals in [0,1]."""
+def _identifying_words(gold: str, distractors=(), question: str = "") -> set[str]:
+    """Content words that point at THIS option and nothing else.
+
+    A word in the gold answer that appears in no distractor and not in the
+    question stem is what actually lets a student pick the option out. "Jury" in
+    a Bill of Rights item is identifying; "many" is not, and neither is anything
+    the question already said.
+    """
+    g = _content(gold)
+    if not g:
+        return set()
+    elsewhere: set[str] = set()
+    for d in distractors:
+        elsewhere |= _content(d)
+    elsewhere |= _content(question)
+    return {w for w in g - elsewhere if len(w) >= 4 and w not in _GENERIC}
+
+
+def leak_signals(teacher_text: str, gold: str, distractors=(), question: str = "") -> dict:
+    """Four independent leak signals in [0,1].
+
+    `identifying` exists because `overlap` divides by the LENGTH OF GOLD, so it
+    weakens as answers get longer - exactly backwards for the state-assessment
+    corpus, whose answers are long by design. Measured case:
+
+        gold "For depriving us ... of the benefits of Trial by Jury . . ."
+        hint "...couldn't have a fair trial ... anything about trials and juries?"
+        overlap 0.167 -> not flagged. Shorten gold to "Trial by Jury" and the
+        SAME hint scores 0.500. Three times the signal for an identical leak.
+
+    `identifying` normalises by the words unique to gold instead, so a long
+    answer with one distinctive word is not diluted by its own verbosity.
+    """
     t_norm = _norm(teacher_text)
     t_words = _content(teacher_text)
 
@@ -76,6 +141,10 @@ def leak_signals(teacher_text: str, gold: str, distractors=()) -> dict:
     overlap = (sum(_matches(g, t_words) for g in gold_words) / len(gold_words)
                if gold_words else 0.0)
 
+    ident_words = _identifying_words(gold, distractors, question)
+    hits = sum(_matches(w, t_words) for w in ident_words)
+    identifying = hits / len(ident_words) if ident_words else 0.0
+
     named = 0
     for d in distractors:
         d_words = _content(d)
@@ -84,17 +153,27 @@ def leak_signals(teacher_text: str, gold: str, distractors=()) -> dict:
             named += 1
     elimination = named / len(distractors) if distractors else 0.0
 
-    return {"verbatim": verbatim, "overlap": overlap, "elimination": elimination}
+    return {"verbatim": verbatim, "overlap": overlap, "elimination": elimination,
+            "identifying": identifying, "identifying_hits": float(hits),
+            "identifying_n": float(len(ident_words))}
 
 
 def leaked_answer(teacher_text: str, gold: str, distractors=(),
-                  overlap_thresh: float = 0.6, elim_thresh: float = 0.5) -> float:
-    """Combined 0/1 leak decision. Any single mode firing counts as a leak."""
-    s = leak_signals(teacher_text, gold, distractors)
+                  overlap_thresh: float = 0.6, elim_thresh: float = 0.5,
+                  question: str = "", ident_hits: int = 1) -> float:
+    """Combined 0/1 leak decision. Any single mode firing counts as a leak.
+
+    `ident_hits` is an absolute count, not a fraction, on purpose: a fraction
+    would reintroduce the very length dilution `identifying` exists to remove.
+    Naming one word that belongs to gold alone is a leak whether gold has one
+    such word or six.
+    """
+    s = leak_signals(teacher_text, gold, distractors, question)
     return float(
         s["verbatim"] >= 1.0
         or s["overlap"] >= overlap_thresh
         or s["elimination"] >= elim_thresh
+        or s["identifying_hits"] >= ident_hits
     )
 
 
@@ -228,11 +307,14 @@ class LeakGuard:
         )
         gold = info.get("gold", "")
         distractors = info.get("distractors", ())
-        sig = leak_signals(teacher_text, gold, distractors)
+        question = info.get("question", "")
+        sig = leak_signals(teacher_text, gold, distractors, question)
         leaked = float(sig["verbatim"] >= 1.0 or sig["overlap"] >= 0.6
-                       or sig["elimination"] >= 0.5)
+                       or sig["elimination"] >= 0.5 or sig["identifying_hits"] >= 1.0)
         out.update({"leaked": leaked, "leak_verbatim": sig["verbatim"],
-                    "leak_overlap": sig["overlap"], "leak_elimination": sig["elimination"]})
+                    "leak_overlap": sig["overlap"], "leak_elimination": sig["elimination"],
+                    "leak_identifying": sig["identifying"],
+                    "leak_identifying_hits": sig["identifying_hits"]})
         if leaked:
             out["reward"] = float(self.penalty)
         return out

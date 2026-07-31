@@ -51,7 +51,8 @@ def _leaks(item) -> bool:
         return False
     gold = item["choices"][item["gold_idx"]]
     distractors = [c for i, c in enumerate(item["choices"]) if i != item["gold_idx"]]
-    return bool(rewards.leaked_answer(hint, gold, distractors))
+    return bool(rewards.leaked_answer(hint, gold, distractors,
+                                      question=item.get("question", "")))
 
 
 def _from_labeled(ex, q_key="question"):

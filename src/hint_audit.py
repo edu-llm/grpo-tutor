@@ -68,12 +68,14 @@ def _leak(items: list[dict]) -> dict:
     for it in hinted:
         gold = it["choices"][it["gold_idx"]]
         distractors = [c for j, c in enumerate(it["choices"]) if j != it["gold_idx"]]
-        sig = rewards.leak_signals(it["hint"], gold, distractors)
+        sig = rewards.leak_signals(it["hint"], gold, distractors,
+                                   it.get("question", ""))
         verb += sig["verbatim"] >= 1.0
         elim += sig["elimination"] >= 0.5
         overlaps.append(sig["overlap"])
         hint_words.append(len(it["hint"].split()))
-        trip += rewards.leaked_answer(it["hint"], gold, distractors)
+        trip += rewards.leaked_answer(it["hint"], gold, distractors,
+                                      question=it.get("question", ""))
     h = len(hinted)
     return {"has_hint": h / n,
             "hint_words_median": statistics.median(hint_words or [0]),

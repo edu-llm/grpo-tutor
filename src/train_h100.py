@@ -203,6 +203,7 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
             pred = problem["choices"][idx]
             traj = Trajectory(turns=[Turn(prompt, c)], transcript=hint)
             traj.info = {"student_answer": pred, "gold": gold,
+                         "question": problem["question"],
                          "distractors": [c for j, c in enumerate(problem["choices"])
                                          if j != problem["gold_idx"]]}
             if use_spec and other is not None:
@@ -353,6 +354,7 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
             # the student answers from the WHOLE conversation (it saw all of it),
             # but only the tutor's own words are used to judge leaking
             traj.info = {"student_answer": pred, "gold": gold, "distractors": distractors,
+                         "question": problem["question"],
                          "teacher_text": tutor_texts[d]}
             if use_spec and other is not None:
                 off = student_answer(student, other["question"], other["choices"],
@@ -431,7 +433,7 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
         swap_ok += float(student_answer(student, p["question"], p["choices"],
                                         hint=other) == gold_idx)
         # leak checks use the tutor's words only, never the student's
-        leak += leaked_answer(tutor_txt, gold, distractors)
+        leak += leaked_answer(tutor_txt, gold, distractors, question=p["question"])
         hint_words += len(tutor_txt.split())
         if cfg.hint_probe:
             probe += hint_only_leak(student, tutor_txt, p["choices"], gold_idx)
