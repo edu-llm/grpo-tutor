@@ -180,7 +180,27 @@ class VLLMEngine:
             self.llm.sleep(level=1)
 
     def wake(self):
-        if self._supports_sleep:
+        """Restore the engine, releasing the trainer's cached blocks first.
+
+        PyTorch's caching allocator holds freed memory that vLLM's allocator
+        cannot reuse, so wake_up() dies with `CUDA Error: out of memory` once the
+        optimizer state and activations have grown - observed at step 5 of a
+        multi-turn run, which produces 3x the samples of the single-turn path.
+        Retry once after a harder collect before giving up.
+        """
+        if not self._supports_sleep:
+            return
+        import gc
+
+        import torch
+
+        torch.cuda.empty_cache()
+        try:
+            self.llm.wake_up()
+        except Exception:
+            gc.collect()
+            torch.cuda.empty_cache()
+            print("[engine] wake retry after cache flush", flush=True)
             self.llm.wake_up()
 
 
