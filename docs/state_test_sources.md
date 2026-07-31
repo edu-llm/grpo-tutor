@@ -7,7 +7,7 @@ enter this public repo. This is the record of what was fetched.
 Re-download with the command listed for each state. Checksums are the
 first 16 hex characters of the sha256, enough to spot a changed file.
 
-**Total: 409 PDFs, 653 MB.**
+**Total: 427 PDFs, 677 MB.**
 
 ## Texas STAAR (`tx`)
 
@@ -200,7 +200,7 @@ pa.gov item and scoring samplers; answer key, DOK, p-values and per-option ratio
 
 released test questions via the Wayback Machine; removed from cde.ca.gov and the live site is behind a captcha
 
-- **101 PDFs**, 70 MB, yielding **375 extracted items**
+- **101 PDFs**, 70 MB, yielding **362 extracted items**
 - rebuild: `python src/extract_ca.py`
 
 | file | MB | sha256[:16] |
@@ -311,7 +311,7 @@ released test questions via the Wayback Machine; removed from cde.ca.gov and the
 
 doe.mass.edu released items with answer keys
 
-- **106 PDFs**, 170 MB, yielding **66 extracted items**
+- **124 PDFs**, 194 MB, yielding **93 extracted items**
 - rebuild: `python src/extract_ma.py`
 
 | file | MB | sha256[:16] |
@@ -325,6 +325,10 @@ doe.mass.edu released items with answer keys
 | `2019-g8-math.pdf` | 0.5 | `47d6e681097c1d65` |
 | `2019-g8-ste.pdf` | 0.4 | `10332ec341304c66` |
 | `2021-g10-ela.pdf` | 0.6 | `4ba451a33dbb44a0` |
+| `2021-g10-hs-bio.pdf` | 1.1 | `783f29afed6de5dc` |
+| `2021-g10-hs-chem.pdf` | 1.0 | `fcf34421bb8ab247` |
+| `2021-g10-hs-physics.pdf` | 1.7 | `5cfe0e8f77f593d6` |
+| `2021-g10-hs-techeng.pdf` | 0.2 | `3d5f214cf62f59be` |
 | `2021-g10-math.pdf` | 1.4 | `57e961881bc2a76f` |
 | `2021-g3-ela.pdf` | 1.4 | `0b63788435921f7e` |
 | `2021-g3-math.pdf` | 0.4 | `b88d4b517216060c` |
@@ -341,6 +345,10 @@ doe.mass.edu released items with answer keys
 | `2021-g8-math.pdf` | 0.8 | `644b6caba5333793` |
 | `2021-g8-ste.pdf` | 1.1 | `a43af18174440ffd` |
 | `2022-g10-ela.pdf` | 2.1 | `e870446446d755e6` |
+| `2022-g10-hs-bio.pdf` | 1.0 | `e9937022564e5481` |
+| `2022-g10-hs-chem.pdf` | 0.3 | `f8a8fcc6a8f263a2` |
+| `2022-g10-hs-physics.pdf` | 1.0 | `349ebee6654614f1` |
+| `2022-g10-hs-techeng.pdf` | 0.2 | `e951bb1a365d7903` |
 | `2022-g10-math.pdf` | 1.0 | `a9fdaf58742b8f9b` |
 | `2022-g3-ela.pdf` | 1.9 | `d69ef62b9ec5ebef` |
 | `2022-g3-math.pdf` | 0.7 | `b2499428036c63f8` |
@@ -357,6 +365,10 @@ doe.mass.edu released items with answer keys
 | `2022-g8-math.pdf` | 1.9 | `d6d87f2004ae9ef1` |
 | `2022-g8-ste.pdf` | 0.9 | `93fccb735a5e0e54` |
 | `2023-g10-ela.pdf` | 3.3 | `16ca1a69dcf52ab9` |
+| `2023-g10-hs-bio.pdf` | 0.8 | `0d49e94e0c6fa430` |
+| `2023-g10-hs-chem.pdf` | 1.0 | `4cd5c32ab695fabe` |
+| `2023-g10-hs-physics.pdf` | 1.5 | `2277a8cddca4e193` |
+| `2023-g10-hs-techeng.pdf` | 0.3 | `620c91eecf13347a` |
 | `2023-g10-math.pdf` | 7.4 | `980c9276bc626170` |
 | `2023-g3-ela.pdf` | 1.8 | `9e344b4f731334f6` |
 | `2023-g3-math.pdf` | 0.5 | `abcfff970086c569` |
@@ -373,6 +385,8 @@ doe.mass.edu released items with answer keys
 | `2023-g8-math.pdf` | 1.6 | `fdcd33b47f1777b4` |
 | `2023-g8-ste.pdf` | 1.5 | `9bd3b9b29d634f67` |
 | `2024-g10-ela.pdf` | 2.2 | `b45bd8f053ed7ac4` |
+| `2024-g10-hs-bio.pdf` | 1.4 | `6448b12f8e0f0474` |
+| `2024-g10-hs-physics.pdf` | 3.3 | `cf6d57d5437a0e54` |
 | `2024-g10-math.pdf` | 1.5 | `30d541effdf04468` |
 | `2024-g3-ela.pdf` | 0.3 | `32dbd5657d1709be` |
 | `2024-g3-math.pdf` | 1.0 | `9ed0895e91445c05` |
@@ -389,6 +403,8 @@ doe.mass.edu released items with answer keys
 | `2024-g8-math.pdf` | 0.9 | `05ff23b685a62461` |
 | `2024-g8-ste.pdf` | 0.4 | `b69d37ab99b7629f` |
 | `2025-g10-ela.pdf` | 1.3 | `94e82922ec001bb8` |
+| `2025-g10-hs-bio.pdf` | 0.8 | `f223ee1661d736f4` |
+| `2025-g10-hs-physics.pdf` | 1.6 | `4ce3162a8af5c5ce` |
 | `2025-g10-math.pdf` | 4.6 | `01b4fa2c071b3fa5` |
 | `2025-g3-ela.pdf` | 0.9 | `3d8f5ac3c9b4c925` |
 | `2025-g3-math.pdf` | 0.6 | `d675f6fc76a8d7c5` |
@@ -406,6 +422,8 @@ doe.mass.edu released items with answer keys
 | `2025-g8-math.pdf` | 1.8 | `7dbfcaac5ce7cc01` |
 | `2025-g8-ste.pdf` | 2.4 | `ebd28879c167a815` |
 | `2026-g10-ela.pdf` | 1.9 | `5d5b9931b61a5be3` |
+| `2026-g10-hs-biology.pdf` | 2.7 | `b9fe90c529eba2b4` |
+| `2026-g10-hs-physics.pdf` | 4.0 | `33d966b2be9ed002` |
 | `2026-g10-math.pdf` | 3.0 | `953c68821da891a5` |
 | `2026-g3-ela.pdf` | 0.5 | `0831960a1c52d0da` |
 | `2026-g3-math.pdf` | 2.6 | `d1d1ee5dfa684d29` |
@@ -427,7 +445,7 @@ doe.mass.edu released items with answer keys
 
 NJSLA / PARCC / NJ ASK released items
 
-- **35 PDFs**, 59 MB, yielding **32 extracted items**
+- **35 PDFs**, 59 MB, yielding **59 extracted items**
 - rebuild: `python src/extract_nj.py`
 
 | file | MB | sha256[:16] |

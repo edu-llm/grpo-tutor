@@ -26,6 +26,10 @@ def main():
     ap.add_argument("--states", nargs="+", default=["ca", "tx"])
     ap.add_argument("--out", default=str(paths.DATA / "state_tests" / "train_items.jsonl"))
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--min-grade", type=int, default=3)
+    ap.add_argument("--max-grade", type=int, default=8,
+                    help="a 0.5B student is at chance on high-school items, which is "
+                         "noise rather than difficulty")
     args = ap.parse_args()
 
     rows = []
@@ -33,8 +37,11 @@ def main():
         got = benchmarks.load_benchmark(s)
         for r in got:
             r.setdefault("hint", None)
-        rows.extend(got)
-        print(f"  {s}: {len(got)}")
+        in_band = [r for r in got if isinstance(r.get("grade"), int)
+                   and args.min_grade <= r["grade"] <= args.max_grade]
+        rows.extend(in_band)
+        print(f"  {s}: {len(in_band)} kept of {len(got)} "
+              f"(grades {args.min_grade}-{args.max_grade})")
 
     # interleave states so a resumed or truncated run still sees both
     random.Random(args.seed).shuffle(rows)
