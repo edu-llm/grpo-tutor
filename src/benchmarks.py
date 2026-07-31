@@ -290,7 +290,33 @@ def _mmlu(subject):
 # problems from; the plain names are eval sets. They are deliberately different
 # splits of the same corpus: curating training items out of the rows that
 # `--eval-benchmark qasc` later scores would put the eval inside the training set.
+def _state_file(name: str, label: str):
+    """Load an extracted state-assessment file.
+
+    These are NOT in git - the items are state-copyright and this repo is public
+    (see docs/state_test_sources.md). Rebuild them with the extractor rather than
+    expecting them to be present.
+    """
+    def load(limit):
+        p = paths.DATA / "state_tests" / f"{name}_items.jsonl"
+        legacy = paths.DATA / "staar" / "staar_items.jsonl"
+        if not p.exists() and name == "tx" and legacy.exists():
+            p = legacy
+        if not p.exists():
+            raise SystemExit(
+                f"{p} not found. State-test items are gitignored (state copyright); "
+                f"rebuild with the matching src/extract_*.py - see "
+                f"docs/state_test_sources.md")
+        return [json.loads(l) for l in open(p) if l.strip()]
+    return load, label
+
+
 REGISTRY = {
+    "pa": _state_file("pa", "Pennsylvania PSSA - the eval set; carries p-values"),
+    "ca": _state_file("ca", "California CST released questions"),
+    "tx": _state_file("tx", "Texas STAAR released questions"),
+    "ma": _state_file("ma", "Massachusetts MCAS released items"),
+    "nj": _state_file("nj", "New Jersey released items"),
     "arc_easy":      (_arc("ARC-Easy"),      "grade-school science, 4-way (closest sibling of the training set)"),
     "arc_challenge": (_arc("ARC-Challenge"), "harder grade-school science, 4-way"),
     "sciq":          (_sciq,                 "science, 4-way - support passage LEAKS the answer 96% of the time"),
