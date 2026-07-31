@@ -13,9 +13,9 @@ export HF_HUB_CACHE=$SCRATCH/hf-cache/hub
 export PIP_CACHE_DIR=$SCRATCH/pip-cache
 export TOKENIZERS_PARALLELISM=false
 export VLLM_WORKER_MULTIPROC_METHOD=spawn
-# trainer and vLLM share one GPU with separate allocators; expandable segments
-# keep PyTorch from fragmenting the space vLLM needs back on wake_up()
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+# NB: do NOT set PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True here. vLLM's
+# sleep mode uses a CUDA memory pool and asserts on startup:
+#   "Expandable segments are not compatible with memory pool"
 export WANDB_ENTITY=eduLLM
 
 cd "$REPO_ROOT"

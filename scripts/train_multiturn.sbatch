@@ -14,6 +14,12 @@
 # leak penalty. The question this run answers is whether GRPO trains that back
 # down, and whether teaching gain rises with it or stays flat.
 #
+# --no-sleep: the engine stays resident instead of being offloaded between
+# phases. Sleep/wake died at step 5 with an OOM inside wake_up() - vLLM could not
+# reclaim its arena once the trainer's allocator had grown, and multi-turn makes
+# that 3x worse. Keeping it resident removes the failure mode entirely and saves
+# the cycle; gpu_mem_util drops to 0.40 since vLLM never hands the memory back.
+#
 # ~19s/step (3x the teacher turns and 3x the training samples of single-turn),
 # so ~3h for 500 steps plus evals. Checkpoints every 10 steps; preemption is
 # expected and handled by --requeue.
@@ -28,6 +34,7 @@ python -u src/train_h100.py \
   --teacher Qwen/Qwen2.5-3B-Instruct \
   --student Qwen/Qwen2.5-0.5B-Instruct \
   --steps 500 --turns 3 --group-size 8 --micro-batch 4 \
+  --no-sleep --gpu-mem-util 0.40 \
   --sync-every 1 --save-every 10 \
   --hint-probe --eval-every 25 --eval-n 40 --eval-benchmark qasc \
   --wandb
