@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import pathlib
 import random
 import re
 
@@ -349,11 +350,20 @@ REGISTRY = {
 
 
 def load_benchmark(name: str, limit: int | None = None, seed: int = 0):
-    if name not in REGISTRY:
-        raise SystemExit(f"unknown benchmark {name!r}; choose from {sorted(REGISTRY)}")
-    items = REGISTRY[name][0](limit)
-    for it in items:
-        it["source"] = name
+    if name in REGISTRY:
+        items = REGISTRY[name][0](limit)
+        for it in items:
+            it["source"] = name
+    else:
+        # a path to an already-built set, so a run can name the exact file it
+        # evaluated on rather than a registry key that may be rebuilt later
+        p = pathlib.Path(name)
+        if not p.exists():
+            raise SystemExit(f"unknown benchmark {name!r}; choose from "
+                             f"{sorted(REGISTRY)}, or give a path to a .jsonl")
+        items = [json.loads(l) for l in open(p) if l.strip()]
+        for it in items:
+            it.setdefault("source", p.stem)
     if limit and len(items) > limit:
         idx = list(range(len(items)))
         random.Random(seed).shuffle(idx)

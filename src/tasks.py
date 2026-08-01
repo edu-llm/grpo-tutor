@@ -47,7 +47,9 @@ def split_problems(items, test_frac: float = 0.15, seed: int = 0):
     """Deterministic split so the held-out set is identical across runs/evals."""
     idx = list(range(len(items)))
     random.Random(seed).shuffle(idx)
-    n_test = max(1, int(len(items) * test_frac)) if items else 0
+    # test_frac=0 means "no split at all": an external eval set is in use and
+    # every problem should be trained on
+    n_test = 0 if test_frac <= 0 else (max(1, int(len(items) * test_frac)) if items else 0)
     test = [items[i] for i in idx[:n_test]]
     train = [items[i] for i in idx[n_test:]]
     return train, test

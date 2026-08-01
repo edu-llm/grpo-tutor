@@ -117,6 +117,8 @@ class Monitor:
         self.alerts: list[Alert] = []
         self._recent_traces: list[dict] = []
         self._baseline_len = None
+        self._sample_rows: list[list] = []
+        self._last_step = 0
         self._wandb = None
         if self.use_wandb:
             # env var wins if set (conventional wandb behaviour); passing project=
@@ -156,6 +158,7 @@ class Monitor:
     # ---- scalars ----
     def log_metrics(self, step: int, metrics: dict):
         row = {"step": step, **{k: float(v) for k, v in metrics.items()}}
+        self._last_step = max(self._last_step, step)
         self.history.append(row)
         with open(self.metrics_path, "a") as f:
             f.write(json.dumps(row) + "\n")
@@ -210,7 +213,9 @@ class Monitor:
         return found
 
     # ---- outputs ----
-    def plot(self, keys=("reward", "loss"), path: str | None = None):
+    def plot(self, keys=("reward", "loss", "eval/clean_solved", "eval/teacher_acc",
+                         "eval/leak_rate"),
+             path: str | None = None):
         if not self.history:
             return
         import matplotlib
@@ -276,32 +281,47 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
             f.write(doc)
         return path
 
-    def log_sample_table(self, step: int, rows: list[dict], k: int = 8):
+    SAMPLE_COLS = ["step", "reward", "solved", "leaked", "prompt", "choices",
+                   "gold", "student_answer", "completion"]
+
+    def log_sample_table(self, step: int, rows: list[dict], k: int = 8,
+                         max_rows: int = 400):
         """Log responses to wandb as a Table so they're readable live in the web UI.
 
         This is the "responses somewhere accessible" path: same dashboard as the
         loss curves, no port-forwarding, viewable from anywhere.
+
+        The table is CUMULATIVE and re-logged whole each time. wandb tables are
+        immutable once logged, and a panel renders the version at the step it is
+        parked on - so logging only this step's 8 rows every 10 steps leaves the
+        panel blank at every other step, which reads as "the table is broken".
+        Carrying all rows forward means whichever step the panel lands on shows
+        the full history.
         """
-        if not self._wandb or not rows:
+        if not self._wandb:
             return
         try:
-            ranked = sorted(rows, key=lambda r: r.get("reward", 0.0))
-            picks = ranked[: max(1, k // 2)] + ranked[-max(1, k // 2):]
-            cols = ["step", "reward", "solved", "leaked", "prompt", "choices",
-                    "gold", "student_answer", "completion"]
-            table = self._wandb.Table(columns=cols)
-            for r in picks:
-                table.add_data(
-                    step,
-                    float(r.get("reward", 0.0)),
-                    float(r.get("solved", 0.0) or 0.0),
-                    float(r.get("leaked", 0.0) or 0.0),
-                    str(r.get("prompt", ""))[:600],
-                    format_choices(r.get("choices"), r.get("gold_idx")),
-                    str(r.get("gold", "")),
-                    str(r.get("student_answer", "")),
-                    str(r.get("completion", ""))[:2000],
-                )
+            if rows:
+                ranked = sorted(rows, key=lambda r: r.get("reward", 0.0))
+                picks = ranked[: max(1, k // 2)] + ranked[-max(1, k // 2):]
+                for r in picks:
+                    self._sample_rows.append([
+                        step,
+                        float(r.get("reward", 0.0)),
+                        float(r.get("solved", 0.0) or 0.0),
+                        float(r.get("leaked", 0.0) or 0.0),
+                        str(r.get("prompt", ""))[:600],
+                        format_choices(r.get("choices"), r.get("gold_idx")),
+                        str(r.get("gold", "")),
+                        str(r.get("student_answer", "")),
+                        str(r.get("completion", ""))[:2000],
+                    ])
+                self._sample_rows = self._sample_rows[-max_rows:]
+            if not self._sample_rows:
+                return
+            table = self._wandb.Table(columns=self.SAMPLE_COLS)
+            for row in self._sample_rows:
+                table.add_data(*row)
             self._wandb.log({"samples": table}, step=step)
         except Exception as e:
             print(f"[monitor] sample table skipped ({e})", flush=True)
@@ -362,4 +382,7 @@ pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
         print(f"[monitor] traces: {path}")
         print(f"[monitor] metrics: {self.metrics_path}")
         if self._wandb:
+            # the panel opens on the final step, which is rarely a multiple of
+            # the sample cadence - without this it opens on an empty table
+            self.log_sample_table(self._last_step, [])
             self._wandb.finish()

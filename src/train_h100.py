@@ -234,11 +234,17 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
 
 
 def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
-                  keep_turns: bool = False):
+                  keep_turns: bool = False, stop_when_solved: bool | None = None):
     """Run `turns` rounds of tutor<->student dialogue, one conversation per entry
     of problem_of. Shared by training rollouts and the held-out eval so that the
     eval measures the SAME behaviour that is being trained - evaluating a
     dialogue-trained teacher on one-shot hints would grade the wrong thing.
+
+    `stop_when_solved` overrides cfg for one call. The eval passes False: the
+    oracle stop consults gold, so leaving it on gives the own-problem condition a
+    solve check at every turn while the swapped condition gets one shot at a
+    fixed transcript, and specificity = teacher_acc - swapped_acc then measures
+    the stop rather than the hint.
 
     Returns (transcripts, turns_of, tutor_texts, self_stopped). `tutor_texts`
     holds ONLY the teacher's turns: leak attribution must not charge the teacher
@@ -298,7 +304,8 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
         # NB: this consults gold, so it is an ORACLE stop - a deployed tutor would
         # have to judge readiness itself. It is here because every extra turn is
         # another chance to leak, and talking past understanding earns nothing.
-        if getattr(cfg, "stop_when_solved", True):
+        if (getattr(cfg, "stop_when_solved", True) if stop_when_solved is None
+                else stop_when_solved):
             for d in live:
                 p = problem_of[d]
                 if student_answer(student, p["question"], p["choices"],
@@ -403,9 +410,12 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     if cfg.turns > 1:
         # match training: grade the dialogue, not a one-shot hint. The student is
         # shown the full transcript; leak checks see only the tutor's turns.
+        # The one deliberate divergence is the oracle stop, disabled here so the
+        # own-problem and swapped conditions are scored on equal terms.
         hints, _, tutor_texts, self_stopped = run_dialogues(cfg, engine, student, items,
                                                             tok, cfg.turns,
-                                                            temperature=0.0)
+                                                            temperature=0.0,
+                                                            stop_when_solved=False)
     else:
         prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
         gens = engine.generate(prompts, n=1,
@@ -418,7 +428,7 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
     # deterministic and guarantees no item ever receives its own hint
     swapped = hints[1:] + hints[:1]
 
-    base_ok = help_ok = leak = probe = floor = swap_ok = 0.0
+    base_ok = help_ok = leak = probe = floor = swap_ok = clean_ok = 0.0
     hint_words = 0
     for p, hint, tutor_txt, other in zip(items, hints, tutor_texts, swapped):
         gold_idx = p["gold_idx"]
@@ -426,14 +436,21 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
         distractors = [c for j, c in enumerate(p["choices"]) if j != gold_idx]
         # the same channel the reward uses, so eval and training cannot drift apart
         base_ok += float(student_answer(student, p["question"], p["choices"]) == gold_idx)
-        help_ok += float(student_answer(student, p["question"], p["choices"],
-                                        hint=hint) == gold_idx)
+        solved = float(student_answer(student, p["question"], p["choices"],
+                                      hint=hint) == gold_idx)
+        help_ok += solved
         # a hint from a DIFFERENT problem: whatever accuracy survives this is
         # generic encouragement, not teaching about this question
         swap_ok += float(student_answer(student, p["question"], p["choices"],
                                         hint=other) == gold_idx)
         # leak checks use the tutor's words only, never the student's
-        leak += leaked_answer(tutor_txt, gold, distractors, question=p["question"])
+        leaked = leaked_answer(tutor_txt, gold, distractors, question=p["question"])
+        leak += leaked
+        # solved WITHOUT being told: the only solve that is evidence of teaching.
+        # v0's headline solve rate fell purely because leaked solves went away, so
+        # tracking this separately is what keeps a leak fix from reading as a
+        # regression - and it is the honest number to compare across runs.
+        clean_ok += solved * (1.0 - leaked)
         hint_words += len(tutor_txt.split())
         if cfg.hint_probe:
             probe += hint_only_leak(student, tutor_txt, p["choices"], gold_idx)
@@ -444,6 +461,9 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
            "eval/teaching_gain": (help_ok - base_ok) / m, "eval/leak_rate": leak / m,
            "eval/hint_words": hint_words / m, "eval/n": float(m),
            "eval/swapped_acc": swap_ok / m,
+           "eval/clean_solved": clean_ok / m,
+           # gain over the unhelped baseline, counting only un-leaked solves
+           "eval/clean_gain": (clean_ok - base_ok) / m,
            # gain that does NOT survive swapping = the question-specific part
            "eval/specificity": (help_ok - swap_ok) / m}
     if getattr(cfg, "self_stop", False):
@@ -482,8 +502,9 @@ def main():
     ap.add_argument("--eval-every", type=int, default=None, help="held-out benchmark every N steps (0=off)")
     ap.add_argument("--eval-n", type=int, default=None, help="held-out problems per benchmark")
     ap.add_argument("--eval-benchmark", default=None,
-                    help="external eval set instead of the ZPD held-out split "
-                         "(see: python src/benchmarks.py --list)")
+                    help="external eval set instead of the ZPD held-out split: a "
+                         "registry name (python src/benchmarks.py --list) or a "
+                         "path to a .jsonl")
     ap.add_argument("--no-sleep", action="store_true", help="keep the engine resident (no sleep/wake)")
     ap.add_argument("--turns", type=int, default=None, help="teacher turns per dialogue (1 = single-turn hint)")
     ap.add_argument("--no-early-stop", action="store_true",
@@ -561,7 +582,12 @@ def main():
         print(f"[reward] LeakGuard o SpecificityGuard({cfg.specificity!r}) o SolveReward",
               flush=True)
         all_problems = tasks.load_zpd(args.problems)
-        problems, held_out = tasks.split_problems(all_problems, test_frac=0.15, seed=cfg.seed)
+        # An external eval set replaces the held-out split a few lines below, so
+        # carving one out here would strand those problems: trained on by nobody,
+        # evaluated by nobody.
+        test_frac = 0.0 if cfg.eval_benchmark else 0.15
+        problems, held_out = tasks.split_problems(all_problems, test_frac=test_frac,
+                                                  seed=cfg.seed)
         from zpd_filter import HFStudent, StubStudent
 
         student = (StubStudent() if stub else
@@ -724,6 +750,7 @@ def main():
             if ev:
                 monitor.log_metrics(step, ev)
                 print(f"  [held-out] teacher_acc={ev['eval/teacher_acc']:.3f} "
+                      f"clean_solved={ev['eval/clean_solved']:.3f} "
                       f"gain={ev['eval/teaching_gain']:+.3f} leak={ev['eval/leak_rate']:.3f}"
                       + (f" hint_only_leak={ev['eval/hint_only_leak']:.3f}"
                          if 'eval/hint_only_leak' in ev else ""), flush=True)

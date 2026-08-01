@@ -18,17 +18,25 @@
 #   --specificity difference   the actual experiment. Pays solved(own problem)
 #                              minus solved(other problem | same hint), so a hint
 #                              that works anywhere earns nothing.
-#   real state assessments     CA + TX released items. v0 traced specificity ~0
+#   real state assessments     CA + TX + MA + NJ released items, baseline-screened
+#                              by scripts/screen.sbatch. v0 traced specificity ~0
 #                              to answer shape: single-word answers make
-#                              "explain" and "reveal" the same act.
-#   --eval-benchmark pa        Pennsylvania, a DIFFERENT state - held out means
-#                              different authors and a different year, not a
-#                              random slice. 235 items, so the minimum detectable
-#                              difference is 0.089 rather than v0's 0.217.
+#                              "explain" and "reveal" the same act. These golds
+#                              run 4 words median, 19% single-word, against
+#                              OpenBookQA's 2 and 31%.
+#   eval_items.jsonl           all 235 Pennsylvania items, a DIFFERENT state -
+#                              held out means different authors and a different
+#                              year, not a random slice. At n=235 the minimum
+#                              detectable difference is 0.089 rather than v0's
+#                              0.217. Left unscreened on purpose: a real baseline.
+#                              Training uses CA+TX+MA+NJ, never PA.
 #   --persona-adapter          the student talks like a child; applies to reply()
 #                              only, choose() runs with it disabled.
-#   --kl-coef 0.01             0.05 anchors the policy to a base model whose
-#                              instinct is to answer the question.
+#   --kl-coef 0.03             0.05 anchors the policy to a base model whose
+#                              instinct is to answer the question. Note the coef
+#                              is the PRICE of moving, not the distance moved:
+#                              v0 and v1-controlled both ran 0.05 and settled at
+#                              measured KL 0.040 and 0.032 respectively.
 #   250 steps                  v0 plateaued by ~150. 500 taught us nothing extra.
 set -euo pipefail
 source scripts/env.sh
@@ -40,9 +48,10 @@ python -u src/train_h100.py \
   --problems data/state_tests/train_items.jsonl \
   --persona-adapter checkpoints/student-persona \
   --specificity difference \
-  --kl-coef 0.01 \
+  --kl-coef 0.03 \
   --steps 250 --turns 3 --group-size 8 --micro-batch 4 \
   --no-sleep --gpu-mem-util 0.40 \
   --sync-every 1 --save-every 10 \
-  --hint-probe --eval-every 25 --eval-n 200 --eval-benchmark pa \
+  --hint-probe --eval-every 25 --eval-n 235 \
+  --eval-benchmark data/state_tests/eval_items.jsonl \
   --seed 0 --wandb
