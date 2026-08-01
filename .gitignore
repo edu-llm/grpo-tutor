@@ -4,10 +4,15 @@ __pycache__/
 venv/
 .DS_Store
 
+# tool caches
+.pytest_cache/
+.ruff_cache/
+
 # run artifacts
 runs/
 wandb/
 checkpoints*/
+media/
 
 # keep the dir: slurm resolves `#SBATCH -o logs/...` before the job runs, so it
 # must already exist on a fresh clone

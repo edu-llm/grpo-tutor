@@ -54,8 +54,10 @@ flowchart TB
 `specificity = solved(own hint) - solved(swapped hint)`. High means the gain was
 question-specific; near zero means the hint would have worked on anything.
 
-**Measured on QASC at step 25:** teacher 0.500, swapped 0.400, baseline 0.250 -
-so of the +0.250 gain, only **+0.100 was question-specific** and 60% was generic.
+**Measured on Pennsylvania in v2**, averaged over nine evals of 235 items:
+teacher 0.552, swapped 0.495, baseline 0.489 — so of the +0.063 gain, **+0.057
+is question-specific** and the generic component is +0.006. On OpenBookQA in v0
+it was the other way round: swapping cost nothing, and the gain was filler.
 
 ### Which way to swap matters
 
@@ -84,8 +86,9 @@ group and it cancels exactly; make it depend on someone else's hint and it
 becomes noise attributed to the wrong sample. It has to vary **because the
 member's own hint varies**.
 
-> Status: `eval/specificity` (measurement) is implemented. The specificity
-> *reward* is proposed and under review on a fork branch, not merged.
+> Status: both are implemented and shipped. `--specificity difference` has been
+> the training reward since v1. It has not moved specificity in either run that
+> used it — see the v3 notes at the end of [`docs/run_v2.md`](docs/run_v2.md).
 
 ---
 
@@ -127,39 +130,103 @@ wrapped in `LeakGuard` inherits leak protection for free.
 
 ---
 
-## Measured results
+## Results: v0 → v1 → v2
+
+Three completed runs, each changing roughly one thing. Full write-ups in
+[`docs/run_v0.md`](docs/run_v0.md), [`docs/run_v1.md`](docs/run_v1.md),
+[`docs/run_v2.md`](docs/run_v2.md).
+
+| | v0 | v1 | v2 |
+|---|---|---|---|
+| job | `19371176` | `19392772` | `19405111` |
+| steps / dialogues | 500 / 16,000 | 250 / 8,064 | 250 / 8,000 |
+| training set | 549 ZPD OpenBookQA | same | **308 state-assessment items** |
+| reward | leak + solved | **+ specificity** | same |
+| eval set | 40 QASC | 200 QASC | **235 Pennsylvania** |
+| KL coef | 0.05 | 0.05 | 0.03 |
+| held-out leak | 0.325 → 0.075 | 0.260 → 0.135 | 0.455 → 0.281 |
+| specificity | ~0.00, flat | +0.092, flat | +0.057, flat |
+| weights | `checkpoints-v0/` | `checkpoints-v1/` | `checkpoints-v2/` |
+
+**Every run reduces leaking. No run has improved teaching.** That is the
+one-line summary of the project so far, and it has survived a reward change and
+a corpus change.
+
+**v0** established the pattern: leaking halved while the solve rate on
+non-leaked dialogues sat flat at 0.32. It also found specificity ≈ 0 — a hint
+written for a *different problem* helped as much as the right one — so the
++0.100 gain was generic help, not teaching.
+
+**v1** added the specificity reward (`solved(own) − solved(other problem | same
+hint)`) on the same corpus. Specificity did not move. That run also turned out
+not to be the clean A/B its header claimed: an oracle early stop had landed in
+the dialogue loop, and because `heldout_eval` shares that loop, the own-problem
+condition got a solve check every turn while the swapped condition got one shot.
+Its +0.092 is inflated by that and is not comparable to v0 or v2.
+
+**v2** switched to real state assessments and fixed the eval. Held out on
+Pennsylvania — a different state, different authors, different year:
+
+| | start | end |
+|---|---|---|
+| held-out leak rate | 0.455 | **0.281** |
+| solve rate on non-leaked dialogues | 0.547 | 0.544 (flat, 0.534 ± 0.013) |
+| `clean_solved` (solved, no leak) | 0.298 | 0.391 |
+| held-out specificity | +0.106 | +0.060 (mean +0.057, flat) |
+
+`clean_solved` rose and it is not teaching: it factors as *how well the tutor
+teaches when it stays quiet* × *how often it stays quiet*, and only the second
+factor moved. The first held at 0.534 for all 250 steps.
+
+### What v2 changed about the diagnosis
+
+**Generic help is gone.** This retires v0's central finding. On Pennsylvania,
+averaged over nine evals of 235 items:
+
+```
+no hint at all                  0.489
+a hint for a DIFFERENT problem  0.495    +0.006
+the tutor's own hint            0.552    +0.063
+```
+
+A wrong-problem hint is worth nothing, so **91% of the gain is question-specific**
+— positive in 9 of 9 evals, and +0.162 ± 0.006 across all 8,000 training
+dialogues. The help is real. It is just small, and training does not grow it.
+
+**But answer shape was the wrong explanation.** The corpus was switched because
+short gold answers supposedly make explaining and revealing the same act. Split
+v2 by subject and the opposite holds:
+
+| subject | items | gold length | leaked | specificity | solved \| clean |
+|---|---|---|---|---|---|
+| math | 122 | 2 words, 30% single | 0.334 | **+0.222** | **0.369** |
+| science | 99 | 6 words, 15% single | 0.460 | +0.120 | 0.184 |
+| social studies | 87 | 6 words, 8% single | 0.372 | +0.126 | 0.237 |
+
+Math has the *shortest* answers — the same shape as OpenBookQA — and wins on
+every axis. Grade level barely registers by comparison (0.242 to 0.300 across
+bands, against 0.184 to 0.369 across subjects). The likelier axis is that a
+maths item has a procedure you can walk someone through without saying the
+number, while science and history items are recall, where the explanation is the
+answer.
+
+### Why leaking is learnable and teaching is not
+
+Leaking is unilateral and deterministic: the tutor controls it with its own
+tokens, it costs −1, and it fired on 38.5% of v2's dialogues — a dense, certain
+gradient. Teaching needs a frozen 0.5B student to flip a log-prob argmax, only
+**14.8%** of dialogues earned +1 at all, and a barely-adequate hint scores
+identically to an excellent one. The reward can say "solved"; it cannot say
+"more specific".
+
+### Infrastructure
 
 | what | number |
 |---|---|
 | ZPD headroom, OpenBookQA (4,957 items) | 37.95% -> 47.53% (**+9.58%**) |
-| Curated training set | **549** problems, screened on both answer channels |
 | Base vs instruct student | +14.0% vs +13.0% - a wash, so instruct kept |
 | Throughput, single-turn | ~7.7s/step (4.6 gen + 2.7 update + 0.4 sync) |
-| Throughput, 3-turn dialogue | ~25s/step (3x the turns and 3x the training samples) |
-
-### Run v0 - the first clean multi-turn run
-
-500 steps, 16,000 dialogues, full write-up in [`docs/run_v0.md`](docs/run_v0.md).
-
-| | start | end |
-|---|---|---|
-| leak rate | 0.389 | **0.187** |
-| solve rate on dialogues that did NOT leak | 0.318 | **0.320** |
-| held-out teaching gain | +0.100 | +0.100 |
-| held-out specificity (own hint vs another problem's) | -0.100 | -0.025 |
-
-**The leak penalty works and nothing in the reward improves teaching.** Leaking
-halved while honest teaching sat flat at 0.32 - the drop in overall solve rate is
-the leak-driven solves disappearing, not a regression.
-
-**Specificity is ~0**: a hint written for a *different problem* helps the student
-as much as the correct one. The +0.100 gain is generic help, not teaching. That
-is the finding that sets the agenda for v1.
-
-Two caveats recorded so they are not rediscovered: the eval at n=40 has a minimum
-detectable difference of **0.217**, larger than the effects being measured, so
-per-eval movement was noise; and two apparent mid-run trends (falling token count,
-decaying KL) were flat over the full run.
+| Throughput, 3-turn dialogue | ~25s/step, ~28s/step in v2 with a 235-item eval |
 
 ### The student
 
@@ -180,20 +247,31 @@ baseline assume it is fixed. `check_persona_safety.py` asserts this and passes
 
 Everything below assumes **one** H100.
 
+The v2 pipeline, which is the current one:
+
 ```bash
-python src/zpd_filter.py --limit 5000    # 1. build the ZPD set (openbookqa_honest)
-sbatch scripts/train_real.sbatch         # 2. train (H100, preemptable, auto-resumes)
-python src/evals.py --teacher-adapter checkpoints/adapter-latest   # 3. evaluate
-python src/train_h100.py --backend stub --steps 6                  # no-GPU smoke test
+python src/extract_ca.py                 # 1. rebuild the state items (gitignored)
+sbatch scripts/screen.sbatch             # 2. screen them -> data/state_tests/train_items.jsonl
+sbatch scripts/train_v1.sbatch           # 3. train (H100, preemptable, auto-resumes)
+python src/train_h100.py --backend stub --steps 6    # no-GPU smoke test
 ```
 
+**Clear `checkpoints/ckpt.pt` first unless you mean to resume** — including
+before the smoke test, which will otherwise append into the previous run's
+directory. Archive finished runs to `checkpoints-vN/` and leave
+`student-persona` in place, since it is an input.
+
+The v0/v1 pipeline (OpenBookQA) is still there:
+`python src/zpd_filter.py --limit 5000` then `sbatch scripts/train_real.sbatch`.
+
 Useful flags: `--turns 3` (multi-turn dialogue), `--hint-probe` (leak probe),
-`--eval-every 25 --eval-n 30` (held-out benchmark during training),
-`--eval-benchmark qasc` (evaluate on an unfiltered external set),
+`--eval-every 25 --eval-n 235` (held-out benchmark during training),
+`--eval-benchmark data/state_tests/eval_items.jsonl` (a registry name or a path),
+`--specificity difference` (pay only for question-specific help),
 `--seed 0` (see Reproducibility), `--self-stop` (the teacher ends the dialogue),
 `--student-answer-mode free` (change the reward channel - read the warning below).
 
-### The training task: leak-screened OpenBookQA
+### The v0/v1 training task: leak-screened OpenBookQA
 
 `zpd_filter.py --source` picks the corpus to curate from; all pools load through
 `benchmarks.py`, so there is one loader per corpus rather than a copy inside the
@@ -303,18 +381,24 @@ effect we are trying to measure**:
 | 400 | 0.024 | 0.069 |
 
 Run v0 measured `teaching_gain` ~ +0.10 and `specificity` ~ 0.00, so its per-eval
-movement (+0.05 to +0.175) was noise. **Eval wants ~200 items.**
+movement (+0.05 to +0.175) was noise. **Eval wants ~200 items.** v2 uses all 235
+Pennsylvania items, which puts the minimum detectable difference at 0.089.
 
-Training wants **~300-500**. v0 plateaued after roughly one pass over 549
-problems, so more than that is wasted - but below ~200 the teacher sees each
-problem 6-13 times and can learn per-problem hints instead of how to tutor.
+Training wants **~300-500**. v2 ran 308 items at 3.2 exposures each and its
+held-out numbers stayed flat, so there is no memorisation signal at that size —
+but below ~200 the teacher sees each problem 6-13 times and can learn
+per-problem hints instead of how to tutor.
+
+**250 steps is more than enough.** All three runs plateaued by roughly step 150,
+and v2's last 50 steps actively degraded.
 
 ### Real state assessments
 
-Grade 3-8 items from public state tests, extracted from released PDFs. These are
-here because run v0 traced specificity ~0 back to answer *shape*: when the gold
-answer is a single word, "correct the misconception" and "reveal the answer" are
-the same action, so no non-leaking tutoring move exists.
+The v2 training corpus. Items from public state tests, extracted from released
+PDFs. They are here because run v0 traced specificity ~0 back to answer *shape*:
+when the gold answer is a single word, "correct the misconception" and "reveal
+the answer" are the same action. v2 confirmed the corpus fixes the generic-help
+problem and refuted the answer-shape explanation for it — see the results above.
 
 | corpus | gold answer length | single-word |
 |---|---|---|
@@ -331,8 +415,8 @@ reading, correctly rather than accidentally.
 
 **The split is by state**, so held-out means a different test authored by
 different people in a different year, not a random slice of one corpus.
-Massachusetts is **sealed** - not loaded, not looked at - and is only promoted to
-a test set once there is a result worth confirming.
+v2 trained on CA + TX + MA + NJ and held out **all 235 Pennsylvania items**,
+which are never screened, so the eval baseline is real (0.489 for this student).
 
 > **These files are NOT in git and must not be.** State assessment items are
 > state-copyright (Texas: "reproduction prohibited"; Pennsylvania: duplication
@@ -340,9 +424,27 @@ a test set once there is a result worth confirming.
 > public. `data/staar/` and `data/state_tests/` are gitignored. The extractors
 > are ours and are committed; the content is not. Rebuild it locally.
 
-Caveat: state items carry **no oracle hint**, so `zpd_filter.py` cannot screen
-them as it stands - its test is "fails alone but solves *with the hint*". Either
-screen on baseline failure alone, or use them where no hint is needed.
+State items carry **no oracle hint**, so `zpd_filter.py` cannot screen them - its
+test is "fails alone but solves *with the hint*". `src/baseline_screen.py` is the
+replacement: it drops only what the student can already answer unaided. Skipping
+it is expensive, and measurably so - an unscreened attempt opened at
+`solved=0.97, zero_adv_frac=0.75`, meaning three quarters of the groups produced
+no gradient at all. Screened, v2 ran at 0.27.
+
+Both of its channels are multiple choice with a 25% floor, so one correct answer
+is weak evidence. The free-text channel therefore samples **3 seeded trials and
+drops an item only if all three name gold** — 187 items passed one trial and 59
+passed all three, so a single sample was mostly measuring luck. `choose()` is
+deterministic and cannot be resampled; a confidence margin was measured as a
+substitute and **rejected**, because raising it makes the grade profile invert.
+Every item's raw measurements land in `data/state_tests/screen_report.jsonl`, so
+a different rule can be re-derived offline with `--replay` and no GPU.
+
+The reframe worth keeping: knowledge is the wrong question for this screen. GRPO
+needs variance *within the group*, and since `choose()` is deterministic, an item
+it gets right by a surface fluke it gets right at every step. That group yields
+no gradient whether the correctness is luck or knowledge, so plain argmax is the
+right rule.
 
 ### How the student commits to an answer
 
@@ -416,33 +518,46 @@ that stays flat, the reward is being gamed.
   its hints trip the leak rule versus **10.1%** in the pool, and 47% of its
   answers are one word versus 31%. The `*_honest` sources drop those items up
   front, but **`data/zpd_problems.jsonl` has not been rebuilt** - that needs a
-  GPU, and run v0 trained on the contaminated set. See `docs/dataset_choice.md`.
+  GPU, and v0 and v1 both trained on the contaminated set. Moot for v2, which
+  uses state assessments and `baseline_screen.py` instead, and which is the
+  reason that screen does not chase "solves with help" at all.
+  See `docs/dataset_choice.md`.
 - **Self-stop and the free answer channel are stub-tested only.** `--self-stop`
   and `--student-answer-mode free` run end to end in stub mode; neither has been
   through a GPU run, so there is no evidence yet that the 3B teacher emits
   `[DONE]` at sensible moments or that the free channel's mapping holds up on
   real replies.
-- **Generic-filler hack is unsolved.** At eval, ~70% of the teacher's gain survived
-  swapping hints between problems, i.e. much of it is not question-specific. No
-  detector catches this; the check is `teaching_gain` vs `transfer_gain` in
-  `evals.py`. A specificity-adjusted reward (`solved(own) - solved(swapped)`) is the
-  proposed fix and is **not implemented**.
-- **No full training run has been done yet** - only smoke tests up to 6 steps. The
-  encouraging early numbers are far too short to call a trend.
+- **Teaching does not improve, in any run so far.** Three runs, two reward
+  configurations and two corpora: the solve rate on non-leaked dialogues has
+  never moved. The generic-filler half of this *is* solved — on state
+  assessments 91% of the gain is question-specific — but the magnitude is stuck.
+  The live hypothesis is signal density, not the corpus: `solved(own) −
+  solved(other)` is a difference of two rare binary events and 85% of dialogues
+  carry no information about teaching at all.
+- **`eval/clean_gain` is defined wrong.** It subtracts the whole-set baseline
+  from a numerator that counts every leaked dialogue as a failure, so it reads
+  −0.098 to −0.191 and looks like tutoring actively hurting. Ignore it until the
+  baseline is restricted to non-leaked items. `eval/clean_solved` is fine.
+- **A stale `checkpoints/ckpt.pt` silently adopts the previous run.**
+  `run_meta.json` is reused whenever a checkpoint exists, so a new job inherits
+  the old run directory *and* resumes from the old weights. Archive finished runs
+  to `checkpoints-vN/` — v2 would otherwise have loaded v1's LoRA at step 249.
+- **The tail of v2 degraded.** With `kl_coef` lowered to 0.03, the last 50 steps
+  were the worst window on every quality measure while KL accelerated past 0.05.
+  Three runs now where nothing after ~150 steps changed a conclusion.
 - **`eval/teaching_gain` equals `eval/teacher_acc` on the default eval set.** The
   ZPD filter keeps only problems the student fails alone, so held-out
   `baseline_acc` is 0.0 by construction and the baseline term subtracts nothing.
   Pass `--eval-benchmark qasc` (or any set above) to get a real baseline.
-- **The leak probe is missing its control and is currently uninterpretable.**
-  `hint_only_leak` (0.33-0.40 on QASC) is a partial-input baseline, and we never
-  measured what the student scores on *choices alone*. LLMs beat majority
-  baselines on choices-only prompts routinely, so an unknown share of that number
-  is the student exploiting the distractors, not the teacher leaking. It also
-  cannot distinguish leaking from legitimately nudging a student who already
-  half-knew the answer. See `docs/eval_leakage.md` for the controls needed.
-- **Multi-turn is verified in stub mode only.** `--turns > 1` runs the dialogue loop
-  (student asks -> teacher guides -> student retries), masks loss to teacher tokens,
-  and shares the terminal reward across turns, but it has not yet run on a GPU.
+- **The leak probe still disagrees with the leak rule.** The choices-only control
+  is now measured (0.260 on Pennsylvania), which was the missing piece, but the
+  two measures still part company: at the end of v2 the rule reads 0.281 while
+  `hint_only_leak` reads 0.447. Both fell, so they agree on direction and
+  disagree on level, in all three runs. Unresolved; see `docs/eval_leakage.md`.
+- **The eval used to flatter itself.** `heldout_eval` ran the oracle
+  `stop_when_solved`, giving the own-problem condition a solve check every turn
+  while the swapped condition got one shot at a fixed transcript. Fixed in v2 —
+  but it means v1's specificity is inflated and is not comparable to v0 or v2.
 - Multi-GPU support was **removed**, not just disabled: 2-GPU queue times made it
   untestable, and untested concurrency code is worse than none. Single GPU is the
   only configuration.
