@@ -152,7 +152,14 @@ class HFStudent:
                 for g in gen]
 
     @torch.no_grad()
-    def choose(self, question, choices, hint=""):
+    def score_choices(self, question, choices, hint=""):
+        """Length-normalized log-prob of each choice as a continuation.
+
+        Exposed separately from choose() because the GAP between the top two
+        scores is the only confidence this channel has: argmax alone cannot tell
+        a coin flip from knowledge, and the call is deterministic so resampling
+        it says nothing.
+        """
         head = f"Fact: {hint}\n" if hint else ""
         prompt = f"{head}Question: {question}\nAnswer:"
         p_ids = self.tok(prompt, return_tensors="pt").input_ids.to(self.device)
@@ -168,6 +175,10 @@ class HFStudent:
                 tok_lp = logp.gather(-1, tgt.unsqueeze(-1)).squeeze(-1)[0]
                 choice_lp = tok_lp[p_ids.shape[1] - 1:]      # only the choice tokens
                 scores.append(choice_lp.mean().item())       # length-normalized
+        return scores
+
+    def choose(self, question, choices, hint=""):
+        scores = self.score_choices(question, choices, hint=hint)
         return int(max(range(len(scores)), key=lambda i: scores[i]))
 
     # ---- second answering channel (OFF by default; see set_answer_mode) ----
