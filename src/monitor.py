@@ -255,11 +255,35 @@ class Monitor:
 
         blocks = []
         for r in rows:
+            # a transcript is unreadable without the options: whether a turn is a
+            # leak, a hint or a non-sequitur only makes sense against the choices
+            # the student is picking between
+            choices = ""
+            if r.get("choices"):
+                gold_idx = r.get("gold_idx")
+                lines = []
+                for i, c in enumerate(r["choices"]):
+                    mark = "  <== gold" if i == gold_idx else ""
+                    cls = "gold" if i == gold_idx else ""
+                    if r.get("student_answer") is not None and str(c) == str(r["student_answer"]):
+                        mark += "  <== student answered"
+                        cls = "gold" if i == gold_idx else "wrong"
+                    lines.append(f"<span class='{cls}'>{chr(65 + i)}. "
+                                 f"{html.escape(str(c))}{mark}</span>")
+                choices = "<pre class='ch'>" + "\n".join(lines) + "</pre>"
+
+            flags = []
+            for k, label in (("solved", "solved"), ("leaked", "LEAKED")):
+                if r.get(k):
+                    flags.append(label)
+            flag_html = (" &middot; " + " &middot; ".join(flags)) if flags else ""
+
             blocks.append(
                 "<div class='c'>"
                 f"<div class='h'>step {r.get('step')} &middot; reward "
-                f"<b>{r.get('reward', 0.0):.3f}</b></div>"
+                f"<b>{r.get('reward', 0.0):.3f}</b>{flag_html}</div>"
                 f"<pre class='p'>{html.escape(str(r.get('prompt', ''))[-800:])}</pre>"
+                f"{choices}"
                 f"<pre class='g'>{html.escape(str(r.get('completion', '')))}</pre>"
                 "</div>"
             )
@@ -271,6 +295,8 @@ h1{{font-size:18px}} .c{{border:1px solid #333;border-radius:8px;margin:12px 0;o
 .h{{background:#1b1b1b;padding:8px 12px;border-bottom:1px solid #333}}
 pre{{margin:0;padding:10px 12px;white-space:pre-wrap;word-break:break-word}}
 .p{{color:#8aa;background:#151515;max-height:160px;overflow:auto}}
+.ch{{color:#9a9;background:#181818;border-bottom:1px solid #333}}
+.ch .gold{{color:#7c7}} .ch .wrong{{color:#c77}}
 .g{{color:#cfe}} ul{{color:#f9a}}
 </style>
 <h1>GRPO traces - {html.escape(self.dir)}</h1>
