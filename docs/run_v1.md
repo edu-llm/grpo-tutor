@@ -1,4 +1,7 @@
-# Run v1-controlled — v0 plus the specificity reward
+# Run v1 — v0 plus the specificity reward
+
+Launched from `scripts/train_v1_controlled.sbatch`; weights archived in
+`checkpoints-v1/`. The state-assessment run that followed it is v2.
 
 Job `19392772` · 250 steps · 17:07-19:55, 2h11m of compute across three
 segments · 8,064 dialogues ·
