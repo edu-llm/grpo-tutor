@@ -234,7 +234,8 @@ def rollout_real(cfg, engine, rewarder, student, sampler, rng, tok=None):
 
 
 def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
-                  keep_turns: bool = False, stop_when_solved: bool | None = None):
+                  keep_turns: bool = False, stop_when_solved: bool | None = None,
+                  states: list | None = None):
     """Run `turns` rounds of tutor<->student dialogue, one conversation per entry
     of problem_of. Shared by training rollouts and the held-out eval so that the
     eval measures the SAME behaviour that is being trained - evaluating a
@@ -246,7 +247,8 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
     fixed transcript, and specificity = teacher_acc - swapped_acc then measures
     the stop rather than the hint.
 
-    Returns (transcripts, turns_of, tutor_texts, self_stopped). `tutor_texts`
+    Returns (transcripts, turns_of, tutor_texts, self_stopped, student_ready,
+    tutor_turn_views). `tutor_texts`
     holds ONLY the teacher's turns: leak attribution must not charge the teacher
     for the answer when it was the student who said it. turns_of is only populated
     when keep_turns, since the eval has no use for per-turn token ids.
@@ -254,13 +256,21 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
     n = len(problem_of)
     transcripts = ["" for _ in range(n)]
     tutor_only = ["" for _ in range(n)]
+    # (conversation BEFORE this turn, the turn itself) per tutor message. The
+    # reward model was fitted on exactly that pair - one turn, rated against the
+    # prefix it answered - so scoring needs the prefix as it stood at generation
+    # time, not the finished transcript.
+    tutor_turn_views = [[] for _ in range(n)]
     turns_of = [[] for _ in range(n)]
     done = [False] * n            # dialogues that ended early (solved, or teacher stopped)
     self_stopped = [0.0] * n      # ...of those, the ones the TEACHER ended
+    student_ready = [0.0] * n     # ...and the ones the STUDENT ended
     self_stop = getattr(cfg, "self_stop", False)
 
     # --- the student speaks first ---
-    openers = student.reply([tasks.student_opening_view(problem_of[d]) for d in range(n)])
+    openers = student.reply([tasks.student_opening_view(problem_of[d],
+                                                        states[d] if states else None)
+                             for d in range(n)])
     for d in range(n):
         transcripts[d] += f"Student: {openers[d].strip()}\n"
 
@@ -287,6 +297,7 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
             text, wants_stop = (tasks.strip_self_stop(c.text) if self_stop
                                 else (c.text.strip(), False))
             if text:      # a turn that was ONLY the marker adds no tutoring to read
+                tutor_turn_views[d].append((transcripts[d], text))
                 transcripts[d] += f"Tutor: {text}\n"
                 tutor_only[d] += text + "\n"
             if wants_stop:
@@ -316,12 +327,25 @@ def run_dialogues(cfg, engine, student, problem_of, tok, turns, temperature,
                 break
 
         # --- student turn ---
-        views = [tasks.student_dialogue_view(problem_of[d], transcripts[d]) for d in live]
+        ready_on = getattr(cfg, "student_ready", False)
+        views = [tasks.student_dialogue_view(problem_of[d], transcripts[d],
+                                             state=states[d] if states else None)
+                 for d in live]
         replies = student.reply(views)
         for d, rep in zip(live, replies):
             transcripts[d] += f"Student: {rep.strip()}\n"
 
-    return transcripts, turns_of, tutor_only, self_stopped
+        # the STUDENT ending the dialogue is the honest version of the oracle
+        # stop: no gold is consulted, so it measures whether the tutoring landed
+        # rather than whether the answer happened to be reachable
+        if ready_on:
+            for d in live:
+                if student.feels_ready(problem_of[d]["question"], transcripts[d]):
+                    done[d] = True
+                    student_ready[d] = 1.0
+
+    return (transcripts, turns_of, tutor_only, self_stopped, student_ready,
+            tutor_turn_views)
 
 
 def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
@@ -337,9 +361,11 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
     n_dialogues = cfg.batch_prompts * cfg.group_size
     # flat index d = prompt_i * K + k
     problem_of = [picks[d // cfg.group_size] for d in range(n_dialogues)]
-    transcripts, turns_of, tutor_texts, self_stopped = run_dialogues(
+    (transcripts, turns_of, tutor_texts, self_stopped, student_ready,
+     tutor_turn_views) = run_dialogues(
         cfg, engine, student, problem_of, tok, cfg.turns, cfg.temperature,
-        keep_turns=True)
+        keep_turns=True,
+        states=[p.get("student_state") for p in problem_of])
 
     # --- terminal: student answers with the whole conversation as context ---
     use_spec = getattr(cfg, "specificity", "off") not in (None, "off")
@@ -386,6 +412,55 @@ def rollout_multiturn(cfg, engine, rewarder, student, sampler, rng, tok=None):
                 row["hint_only_leak"] = hint_only_leak(
                     student, tutor_texts[d], problem["choices"], problem["gold_idx"])
             traces.append(row)
+        # The learned teaching score is added AFTER the group is complete, because
+        # it is z-scored within the group: only its spread across these
+        # completions survives GRPO's centring, and raw 1-5 values would let a
+        # problem the head rates high everywhere dominate the batch.
+        scorer = getattr(cfg, '_scorer', None)
+        if scorer is not None:
+            # One view per TUTOR TURN, each against the conversation as it stood
+            # before that turn - the head was fitted on single turns rated in
+            # context, and feeding it the finished transcript plus every tutor
+            # turn concatenated is text of a shape it never saw. A dialogue's
+            # score is the mean over its turns, since the reward is terminal and
+            # all of them earned it.
+            views, owner = [], []
+            for k in range(cfg.group_size):
+                d = i * cfg.group_size + k
+                for prefix, text in tutor_turn_views[d]:
+                    views.append(scorer.view(problem["question"], gold, prefix, text))
+                    owner.append(k)
+            per_turn = scorer.score(views) if views else []
+            sums = [0.0] * cfg.group_size
+            counts = [0] * cfg.group_size
+            for k, v in zip(owner, per_turn):
+                sums[k] += v
+                counts[k] += 1
+            # a dialogue with no tutor turn at all gets the group mean, i.e. no
+            # advantage either way, rather than a fabricated 0.0
+            seen = [s / c for s, c in zip(sums, counts) if c]
+            fallback = sum(seen) / len(seen) if seen else 0.0
+            raw = [sums[k] / counts[k] if counts[k] else fallback
+                   for k in range(cfg.group_size)]
+            from reward_model import group_normalize
+            for k, (z, r) in enumerate(zip(group_normalize(raw), raw)):
+                row = traces[-cfg.group_size + k]
+                row["teach_score"] = r
+                row["teach_z"] = z
+                # a leaked turn keeps its -1: paying for teaching quality on top
+                # of a leak would reward a well-phrased give-away
+                if not row["leaked"]:
+                    # Floor it strictly above the leak penalty. Without this the
+                    # specificity term (-1 when the hint solved the OTHER problem
+                    # and not its own) plus a negative teaching score drops an
+                    # honest turn below -1, and the policy is told that leaking
+                    # would have scored better - inverting the one invariant
+                    # LeakGuard exists to enforce. Measured at 8.2% of non-leaked
+                    # turns before the floor was added.
+                    floor = cfg.leak_penalty + 0.05
+                    grp[k] = max(grp[k] + cfg.teach_coef * z, floor)
+                    row["reward"] = grp[k]
+                    row["reward_floored"] = bool(grp[k] == floor)
         advs = grpo.group_normalized_advantages(grp, cfg.group_size)
         for turns, a in zip(grp_turns, advs):
             for turn in turns:              # terminal reward shared by every teacher turn
@@ -412,10 +487,10 @@ def heldout_eval(cfg, engine, student, held_out, tok, n: int = 30):
         # shown the full transcript; leak checks see only the tutor's turns.
         # The one deliberate divergence is the oracle stop, disabled here so the
         # own-problem and swapped conditions are scored on equal terms.
-        hints, _, tutor_texts, self_stopped = run_dialogues(cfg, engine, student, items,
-                                                            tok, cfg.turns,
-                                                            temperature=0.0,
-                                                            stop_when_solved=False)
+        hints, _, tutor_texts, self_stopped, _, _ = run_dialogues(
+            cfg, engine, student, items, tok, cfg.turns, temperature=0.0,
+            stop_when_solved=False,
+            states=[p.get("student_state") for p in items])
     else:
         prompts = [tasks.teacher_prompt(p, tokenizer=tok) for p in items]
         gens = engine.generate(prompts, n=1,
@@ -491,6 +566,17 @@ def main():
     ap.add_argument("--micro-batch", type=int, default=None)
     ap.add_argument("--save-every", type=int, default=None, help="checkpoint every N steps")
     ap.add_argument("--hint-probe", action="store_true", help="log the hint-only leak probe")
+    ap.add_argument("--save-dir", default=None,
+                    help="checkpoint directory. Give each experiment its own: the "
+                         "resume path keys off ckpt.pt living here, so a new run "
+                         "sharing a directory with a finished one silently resumes "
+                         "it and exits at once")
+    ap.add_argument("--teach-head", default=None,
+                    help="linear reward-model head; adds a dense teaching score "
+                         "to the reward, z-scored within each group")
+    ap.add_argument("--teach-coef", type=float, default=0.5,
+                    help="weight on the teaching score. 0.5 makes its contribution "
+                         "comparable to solved, whose within-group sd is ~0.4")
     ap.add_argument("--specificity", default=None, choices=["difference", "gated", "off"],
                     help="pay only for question-specific help: "
                          "solved(own problem) - solved(other problem | same hint)")
@@ -546,6 +632,10 @@ def main():
     if args.persona_adapter:
         cfg.persona_adapter = args.persona_adapter
     cfg.eval_benchmark = args.eval_benchmark
+    if args.save_dir:
+        cfg.save_dir = args.save_dir
+    cfg.teach_head = args.teach_head
+    cfg.teach_coef = args.teach_coef
     cfg.stop_when_solved = not args.no_early_stop
     cfg.self_stop = args.self_stop
     if cfg.self_stop:
@@ -578,7 +668,15 @@ def main():
     # ---- reward + (for real mode) the student and the ZPD problem set ----
     problems = student = sampler = None
     if args.reward == "real":
-        rewarder = build_real_rewarder(specificity=cfg.specificity, leak_penalty=-1.0)
+        cfg.leak_penalty = -1.0
+        rewarder = build_real_rewarder(specificity=cfg.specificity,
+                                       leak_penalty=cfg.leak_penalty)
+        cfg._scorer = None
+        if getattr(cfg, "teach_head", None):
+            from reward_model import TeachingScorer
+            cfg._scorer = TeachingScorer(cfg.teach_head, device=device)
+            print(f"[reward] + learned teaching score from {cfg.teach_head} "
+                  f"(coef {cfg.teach_coef}, z-scored within group)", flush=True)
         print(f"[reward] LeakGuard o SpecificityGuard({cfg.specificity!r}) o SolveReward",
               flush=True)
         all_problems = tasks.load_zpd(args.problems)
