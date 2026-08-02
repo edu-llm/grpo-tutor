@@ -5,14 +5,30 @@ LeakGuard    - wraps ANY RewardModel: if the teacher gave the answer away, the
                reward is slammed to a large negative value.
 
 Leak detection is deliberately RULE-BASED (not a learned judge), so the policy
-cannot hack it the way it could hack a reward model. It covers three modes seen
-in real traces:
+cannot hack it the way it could hack a reward model. Four signals are computed;
+only two are wired into the decision:
 
-  verbatim    "the answer is copper wire"          - gold text stated outright
-  paraphrase  gold "weigh the same"                - same content words, reworded
-              hint "doesn't change its weight"
-  elimination gold "polar opposite"                - names the WRONG options so
-              hint "not wooden, salty, or wind"      the student can rule them out
+  verbatim    "the answer is copper wire"          - gold text stated outright   ON
+  identifying names a content word or number that
+              belongs to gold and to no distractor                               ON
+  overlap     fraction of gold's content words the tutor said                    off
+  elimination names the WRONG options so the student can rule them out           off
+
+`overlap` and `elimination` are computed and logged but DO NOT fire the penalty.
+Both were measured against 1,104 rated turns (docs/leak_calibration.md) and both
+are net negative. `_content()` drops tokens of two characters or fewer, so a gold
+of "8 hours" reduces to {hour} and so does every distractor: on the 437 math
+items `overlap` degenerates into "did the tutor say the unit" and `elimination`
+into "did the tutor say the unit three times". `elimination` scores AUC 0.493 -
+chance - with precision 0.118 against a base rate of 0.208, i.e. it fires
+slightly MORE often on turns that do not leak. Dropping both is worth +0.066 F1
+held out, and five-fold CV selected this exact rule in 5 of 5 folds. It cuts the
+penalty rate from 17.9% to 10.9% of turns against a true give-away rate of 6.4%,
+and more than doubles precision on math (0.191 -> 0.476).
+
+This matters more than a detector metric usually would: the penalty overrides the
+whole reward, so a false positive does not just add noise, it discards the
+outcome and teaching terms for that completion entirely.
 
 What it deliberately does NOT flag: conceptual hints that point at the mechanism
 without naming the option ("think about what melts snow" for `heat lamp`). That
@@ -197,20 +213,24 @@ def leak_signals(teacher_text: str, gold: str, distractors=(), question: str = "
 
 def leaked_answer(teacher_text: str, gold: str, distractors=(),
                   overlap_thresh: float = 0.6, elim_thresh: float = 0.5,
-                  question: str = "", ident_hits: int = 1) -> float:
-    """Combined 0/1 leak decision. Any single mode firing counts as a leak.
+                  question: str = "", ident_hits: int = 1,
+                  use_overlap: bool = False, use_elimination: bool = False) -> float:
+    """Combined 0/1 leak decision. Any enabled mode firing counts as a leak.
 
     `ident_hits` is an absolute count, not a fraction, on purpose: a fraction
     would reintroduce the very length dilution `identifying` exists to remove.
     Naming one word that belongs to gold alone is a leak whether gold has one
     such word or six.
+
+    `overlap` and `elimination` default OFF - see the module docstring. Pass
+    use_overlap=True, use_elimination=True to reproduce the pre-calibration rule.
     """
     s = leak_signals(teacher_text, gold, distractors, question)
     return float(
         s["verbatim"] >= 1.0
-        or s["overlap"] >= overlap_thresh
-        or s["elimination"] >= elim_thresh
         or s["identifying_hits"] >= ident_hits
+        or (use_overlap and s["overlap"] >= overlap_thresh)
+        or (use_elimination and s["elimination"] >= elim_thresh)
     )
 
 
@@ -328,9 +348,14 @@ class LeakGuard:
     normalization can carry.
     """
 
-    def __init__(self, inner, penalty: float = -1.0):
+    def __init__(self, inner, penalty: float = -1.0,
+                 use_overlap: bool = False, use_elimination: bool = False,
+                 ident_hits: int = 1):
         self.inner = inner
         self.penalty = penalty
+        self.use_overlap = use_overlap
+        self.use_elimination = use_elimination
+        self.ident_hits = ident_hits
 
     def score(self, trajectory) -> dict:
         out = dict(self.inner.score(trajectory))
@@ -346,8 +371,11 @@ class LeakGuard:
         distractors = info.get("distractors", ())
         question = info.get("question", "")
         sig = leak_signals(teacher_text, gold, distractors, question)
-        leaked = float(sig["verbatim"] >= 1.0 or sig["overlap"] >= 0.6
-                       or sig["elimination"] >= 0.5 or sig["identifying_hits"] >= 1.0)
+        leaked = float(
+            sig["verbatim"] >= 1.0
+            or sig["identifying_hits"] >= self.ident_hits
+            or (self.use_overlap and sig["overlap"] >= 0.6)
+            or (self.use_elimination and sig["elimination"] >= 0.5))
         out.update({"leaked": leaked, "leak_verbatim": sig["verbatim"],
                     "leak_overlap": sig["overlap"], "leak_elimination": sig["elimination"],
                     "leak_identifying": sig["identifying"],
