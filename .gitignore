@@ -42,3 +42,18 @@ data/staar/
 data/state_tests/
 
 .gitignore
+# the labelling bundle is built from state-assessment traces (state copyright);
+# rebuild with: python src/build_label_set.py
+label_app/data/
+label_app/.firebase/
+
+# Same reason: these carry the question and answer text inline, so they fall
+# under the same copyright as the PDFs that were deleted. The RATINGS are ours
+# and are committed - data/labels_all.json, data/agent_labels.json,
+# data/label_slices/ - keyed by turn id, and these rejoin them to the items:
+#   python src/build_rm_data.py
+data/rm_dataset.json
+data/rm_agent.json
+data/rm_human.json
+data/leak_calibration.json
+data/rm_embeddings.pt
