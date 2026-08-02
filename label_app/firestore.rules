@@ -1,0 +1,109 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: labels
+// Document ID: auto-generated
+// Written by: anonymous-auth browser clients (labellers have no accounts;
+//             anonymous sign-in gives every submission a uid without asking
+//             a volunteer to register)
+// Read by:    nobody through the SDK. Export with the Admin SDK or the console.
+//
+// Fields:
+//   - uid: string (optional) - request.auth.uid when the client is signed in
+//   - who: string (required, 1..40) - self-entered labeller name, NOT identity
+//   - source: string (required, 1..120) - run directory the items came from
+//   - itemId: string (required, 1..60) - id of the turn or pair being labelled
+//   - kind: string (required, one of 'turn' | 'pair')
+//   - leak: int (turn only, 1..3, higher = more of the answer given away)
+//   - goodness: int (turn only, 1..5, higher = better teaching)
+//   - winner: string (pair only, one of 'a' | 'b' | 'tie') - legacy, pairs are
+//     no longer served, but old clients in an open tab must not start failing
+//   - note: string (optional, 0..600) - free text from the labeller
+//   - createdAt: timestamp (required, must be within 5 minutes of server time)
+//
+// Documents are write-once: no update, no delete, no client read. A label is an
+// observation, and an observation that can be edited later is not one.
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    function validStr(field, maxLen) {
+      return request.resource.data[field] is string
+        && request.resource.data[field].size() > 0
+        && request.resource.data[field].size() <= maxLen;
+    }
+    function optStr(field, maxLen) {
+      return !(field in request.resource.data)
+        || (request.resource.data[field] is string
+            && request.resource.data[field].size() <= maxLen);
+    }
+    // every string field is length-capped: an uncapped string field is a 1MB
+    // write waiting to happen
+    function isRecent(t) {
+      return t is timestamp
+        && t > request.time - duration.value(5, 'm')
+        && t <= request.time;
+    }
+
+    // A submitter may be signed in anonymously or not signed in at all. Anonymous
+    // sign-in is a console toggle that is currently OFF, and volunteers cannot be
+    // asked to register, so unauthenticated creates are permitted DELIBERATELY.
+    // When Anonymous sign-in is enabled, tighten this to `request.auth != null`:
+    // the client already attempts sign-in, so nothing else has to change.
+    function uidMatchesCaller() {
+      return (!('uid' in request.resource.data) && request.auth == null)
+        || (request.auth != null
+            && request.resource.data.uid is string
+            && request.resource.data.uid == request.auth.uid);
+    }
+
+    // ---------- domain validator ----------
+    function isValidLabel(d) {
+      return hasOnlyAllowedFields(['uid', 'who', 'source', 'itemId', 'kind',
+                                   'leak', 'goodness', 'winner', 'note', 'createdAt'])
+        && hasRequiredFields(['who', 'source', 'itemId', 'kind', 'createdAt'])
+        && uidMatchesCaller()
+        && validStr('who', 40)
+        && validStr('source', 120)
+        && validStr('itemId', 60)
+        && optStr('note', 600)
+        && isRecent(d.createdAt)
+        && d.kind in ['turn', 'pair']
+        && (
+             (d.kind == 'turn'
+               && d.leak is int && d.leak >= 1 && d.leak <= 3
+               && d.goodness is int && d.goodness >= 1 && d.goodness <= 5
+               && !('winner' in d))
+             ||
+             (d.kind == 'pair'
+               && d.winner in ['a', 'b', 'tie']
+               && !('leak' in d)
+               && !('goodness' in d))
+           );
+    }
+
+    match /labels/{labelId} {
+      allow create: if isValidLabel(request.resource.data);
+      // write-once, and never readable from a client: the collection holds the
+      // judgements a reward model will be trained on, and nothing in the app
+      // needs to read them back
+      allow read, update, delete: if false;
+    }
+
+    // default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

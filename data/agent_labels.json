@@ -1,0 +1,770 @@
+{
+ "note": "Ratings produced by the coding agent on the same items sz labelled, using the app's scales: leak 1-3 (1 none, 2 hints, 3 gives it away) and goodness 1-5 (1 useless, 5 excellent). Graded from the question, gold, prior context and the tutor turn - the same view a human labeller gets. Used to measure agent-human agreement before spending money on an LLM labeller at scale.",
+ "labels": {
+  "t237_3": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "names birds outright, though the seed-dispersal mechanism is explained well"
+  },
+  "t1259_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "asks for the formula first - the right diagnostic move"
+  },
+  "t56_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "points at relative frequency without naming a colour"
+  },
+  "t1333_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "'one of the things it takes in carries carbon' is a strong hint, still leaves the step"
+  },
+  "t1232_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "hands over a sorting rule rather than an answer"
+  },
+  "t992_1": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "asks about animal respiration; gold is about producers, so it aims off-target"
+  },
+  "t987_5": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "conduction by contact, taught by analogy, magma never mentioned"
+  },
+  "t477_5": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "'win without battling everyone at once' paraphrases two fronts closely"
+  },
+  "t460_3": {
+   "leak": 1,
+   "goodness": 3,
+   "why": "correct background on germs but never reaches cleanliness"
+  },
+  "t1284_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "etymology hint, student still supplies slavery"
+  },
+  "t1253_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "fixes the direction of the conversion without doing it"
+  },
+  "t1028_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "the cars-in-water analogy all but states 'slower'"
+  },
+  "t1323_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "'preventing Germany from rearming' is the gold restated"
+  },
+  "t125_5": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "accepts the student's wrong 32.5 framing; $3.25 is 13 quarters, so this misleads"
+  },
+  "t1365_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "states the relation, leaves the matching to the student"
+  },
+  "t1194_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "restates the question as an analogy, adds nothing"
+  },
+  "t1253_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "clean opening diagnostic"
+  },
+  "t1018_3": {
+   "leak": 1,
+   "goodness": 3,
+   "why": "frequency analogy is fine but never gets to wavelength"
+  },
+  "t549_3": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "'know and love African American culture' is the option"
+  },
+  "t70_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "teaches rounding on a parallel example instead of this one"
+  },
+  "t1371_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "points straight at public memory of the war"
+  },
+  "t1258_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "unpacks 'revolves around' - the actual confusion"
+  },
+  "t118_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "walks one day of the pattern so the student builds the expression"
+  },
+  "t201_5": {
+   "leak": 2,
+   "goodness": 2,
+   "why": "the candy analogy is garbled and hard to follow"
+  },
+  "t532_1": {
+   "leak": 3,
+   "goodness": 1,
+   "why": "names Catholicism, and the reasoning is wrong - immigrants arrive Catholic, they do not convert"
+  },
+  "t849_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "teacher-and-toys analogy never reaches state versus federal authority"
+  },
+  "t40_5": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "exact procedure, no answer given, minimal words"
+  },
+  "t466_1": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "'what do you need to change in yourself' is unrelated to the question"
+  },
+  "t733_5": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "endorses the student's wrong 1.9 groups and builds on it"
+  },
+  "t260_3": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "says pressure explicitly, though the Play-Doh explanation is good"
+  },
+  "t681_1": {
+   "leak": 3,
+   "goodness": 1,
+   "why": "names the Whiskey Rebellion in the first sentence"
+  },
+  "t1145_3": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "rain-as-container is close to the option's wording"
+  },
+  "t1371_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "'costly and pointless' hands over the sentiment but is honest teaching"
+  },
+  "t93_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "equilateral is named"
+  },
+  "t812_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "states the reaction force is the ball on the bat, which is the option"
+  },
+  "t8_3": {
+   "leak": 3,
+   "goodness": 1,
+   "why": "writes 807 out"
+  },
+  "t679_5": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "truck-versus-car analogy never connects to economic capacity"
+  },
+  "t618_1": {
+   "leak": 1,
+   "goodness": 3,
+   "why": "defines mass, then asks the right multiplication question"
+  },
+  "t151_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "equal-chance criterion given, option left to the student"
+  },
+  "t889_5": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "rules out the under-35 option explicitly"
+  },
+  "t1286_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "'13 to 26 - what happened' isolates the doubling"
+  },
+  "t1344_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "sugar is named, the coral's benefit is left to infer"
+  },
+  "t408_7": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "confirms the student's correct guess with 'Exactly!'"
+  },
+  "t1271_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "decomposes a three-clue question into the easiest clue"
+  },
+  "t1231_5": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "'troops against Americans over a tax' identifies it uniquely"
+  },
+  "t223_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "'something that moves when electricity goes through it' is a strong but fair hint"
+  },
+  "t1031_1": {
+   "leak": 2,
+   "goodness": 2,
+   "why": "pool analogy points the wrong way (sinking faster) and never lands"
+  },
+  "t1108_1": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "asks about attract-vs-repel; the question is about distance dependence"
+  },
+  "t1359_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "names the operation and the place-value method"
+  },
+  "t1236_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "percent-to-decimal is exactly the blocked step"
+  },
+  "t1022_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "colder means slower means less KE, then sets up the comparison"
+  },
+  "t65_1": {
+   "leak": 1,
+   "goodness": 3,
+   "why": "correct but barely more than 'add them up'"
+  },
+  "t718_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "juice-box anchor makes the litre-to-millilitre conversion concrete"
+  },
+  "t1319_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "exact operation plus an estimate to catch a slipped decimal"
+  },
+  "t1103_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "talks about the caterpillar's experience; gold is about gene expression"
+  },
+  "t1010_3": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "ruler analogy gives the direction but is hard to follow"
+  },
+  "t234_3": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "says 'that's what an ecosystem is'"
+  },
+  "t1267_5": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "rules out two options, then narrows to one - good physics, open elimination"
+  },
+  "t1158_1": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "answers a question about surface temperature that was not asked"
+  },
+  "t1277_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "weather-vs-climate distinction is the whole question"
+  },
+  "t1258_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "eliminates three options and asks what is left"
+  },
+  "t541_3": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "'fixing big problems in society' is the option reworded"
+  },
+  "t1099_5": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "points at photosynthesis when the answer is decomposition"
+  },
+  "t1297_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "gives a usable test - could a stone do this?"
+  },
+  "t1318_5": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "'claims silicon matches a genuine metal conductor' identifies the option"
+  },
+  "t788_1": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "names sodium and magnesium"
+  },
+  "t1230_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "names speed as the changing property, leaves the direction"
+  },
+  "t43_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "the exact division, asked as a question"
+  },
+  "t1335_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "reframes one-in-ten against an even chance, which is the whole judgement"
+  },
+  "t1269_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "who was settling and what institution - straight at it"
+  },
+  "t823_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "orients on voting rights without naming the workaround"
+  },
+  "t38_1": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "counts back to 17; the question wants the expression, not the value"
+  },
+  "t379_3": {
+   "leak": 2,
+   "goodness": 2,
+   "why": "just reads the option list back as a question"
+  },
+  "t875_1": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "says a litre is like a cup of water, which is wrong and will mislead"
+  },
+  "t418_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "says 'missions'"
+  },
+  "t277_3": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "divide 9 by 2 - the exact step, phrased as a question"
+  },
+  "t1339_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "'could they leave if they wanted to' is the defining property of serfdom"
+  },
+  "t1231_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "unpacks 'domestic' and turns it into a filter"
+  },
+  "t1153_3": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "states both halves of the answer, though clearly"
+  },
+  "t1249_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "'forty tens is 400, not 40' is the trap, handed over"
+  },
+  "t1017_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "race-without-obstacles analogy never touches wavelength"
+  },
+  "t1020_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "turns kinetic energy into which feels coldest"
+  },
+  "t1147_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "sandbox analogy maps cleanly onto dissolving"
+  },
+  "t1272_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "'per what?' is precisely the missing idea"
+  },
+  "t1324_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "asks what must be true of who ends up in the sample"
+  },
+  "t1074_3": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "says 90 + 40 outright"
+  },
+  "t1300_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "substitution as a general test, not an answer"
+  },
+  "t1053_1": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "race analogy conflates wavelength with distance per minute"
+  },
+  "t107_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "names the deciding digit and the rule, leaves the reading"
+  },
+  "t784_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "eye colour as an anchor for inherited, then back to the list"
+  },
+  "t618_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "one bucket plus another never sets up multiplying by 20"
+  },
+  "t1067_1": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "explains undefined slope but ignores the zero half of the pair"
+  },
+  "t417_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "says missions"
+  },
+  "t1370_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "erosion versus deposition is the sorting rule the item turns on"
+  },
+  "t423_1": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "a voting analogy for abolition - wrong mechanism entirely"
+  },
+  "t894_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "warmth by touching, then back to the options"
+  },
+  "t1303_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "says outright that you must test each one, and starts the first"
+  },
+  "t1327_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "estimate first so a slipped decimal is caught"
+  },
+  "t1029_1": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "ball-on-sponge bounce is not refraction; the analogy misleads"
+  },
+  "t512_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "understocked-store framing points at production and selling"
+  },
+  "t1348_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "gives the irreversibility test, which decides the item"
+  },
+  "t211_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "one worker versus three, stated as the exact question"
+  },
+  "t1280_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "'who could tell a king he was wrong and survive' is the whole item"
+  },
+  "t966_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "builds from what a quadrilateral is, which is the missing piece"
+  },
+  "t1275_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "more or fewer than 20 - fixes the direction before the expression"
+  },
+  "t1310_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "70 to 700 to one place further left, cleanly"
+  },
+  "t1364_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "names the trap: how much MORE, not how much"
+  },
+  "t1323_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "puts the student at the table in 1919 after two invasions"
+  },
+  "t242_1": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "nudges toward what a tree provides but wanders through seeds first"
+  },
+  "t1143_3": {
+   "leak": 1,
+   "goodness": 3,
+   "why": "explains bending correctly, never connects it to the options"
+  },
+  "t734_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "asks what whole n is counting - the actual confusion"
+  },
+  "t433_5": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "kitchen analogy is about keeping things in, the answer is about selling out"
+  },
+  "t1274_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "same speed in a vacuum, and says it halves the options"
+  },
+  "t1079_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "names the deciding place and asks for its digit"
+  },
+  "t1367_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "'a great deal of unsettled land nearby' is the answer's mechanism"
+  },
+  "t1304_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "trace the chain from the decision - exactly the right decomposition"
+  },
+  "t531_5": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "says Catholic"
+  },
+  "t1058_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "heat moves from greater to lesser - the rule the item tests"
+  },
+  "t1196_1": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "toy analogy for non-renewable is fine but thin"
+  },
+  "t1338_3": {
+   "leak": 3,
+   "goodness": 3,
+   "why": "'meant to spread, Russia as the first spark' is the option"
+  },
+  "t475_5": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "hide-and-seek in a park has nothing to do with trench stalemate"
+  },
+  "t601_3": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "factually wrong - claims radio reached more people than television"
+  },
+  "t1245_1": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "sorts the names by era, which eliminates without naming"
+  },
+  "t1255_3": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "4x25 then replace the zeros - the exact trick for this arithmetic"
+  },
+  "t1246_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "more coins means more money in circulation - the causal chain"
+  },
+  "t1076_1": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "gifts-under-a-tree is confusing; the hundreds question arrives late"
+  },
+  "t1330_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "substitute and test, and starts the first one"
+  },
+  "t1287_1": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "tombs and burial goods point at the purpose without naming it"
+  },
+  "t1349_3": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "16 ounces to a pound is the conversion being skipped"
+  },
+  "t1192_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "swing-and-tire analogy never touches which materials are magnetic"
+  },
+  "t184_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "per-hour rate first, asked as a question"
+  },
+  "t790_5": {
+   "leak": 2,
+   "goodness": 2,
+   "why": "names magnesium and drags in zinc, which is not in the pair"
+  },
+  "t1056_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "warmer versus cooler sets up the direction of flow"
+  },
+  "t1373_3": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "add the distances first, convert once - avoids the double conversion"
+  },
+  "t853_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "asks what the communities had in common, which is the item"
+  },
+  "t1362_5": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "whole school versus self-selected group is the criterion"
+  },
+  "t1345_5": {
+   "leak": 2,
+   "goodness": 3,
+   "why": "restates the riddle's clues rather than adding to them"
+  },
+  "t1351_5": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "'which option describes the group' adds nothing"
+  },
+  "t1138_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "five parts totalling 30 is the step everyone misses"
+  },
+  "t1290_3": {
+   "leak": 2,
+   "goodness": 4,
+   "why": "gives the word alloy and the mixture-versus-element test"
+  },
+  "t145_5": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "says multiply radius by pi - circumference is 2*pi*r, so this is wrong"
+  },
+  "t1259_5": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "the division plus an estimate that brackets the answer"
+  },
+  "t1145_5": {
+   "leak": 2,
+   "goodness": 2,
+   "why": "dust-in-air analogy points away from rocks, which is the answer"
+  },
+  "t116_5": {
+   "leak": 1,
+   "goodness": 4,
+   "why": "walks day one so the pattern becomes the expression"
+  },
+  "t871_3": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "a friend drawing a sad picture is unrelated to disenfranchising leaders"
+  },
+  "t2_1": {
+   "leak": 1,
+   "goodness": 1,
+   "why": "incoherent - 'numbers across the line on one side' means nothing"
+  },
+  "t1274_1": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "asks whether anything makes light travel at different speeds in vacuum"
+  },
+  "t907_7": {
+   "leak": 3,
+   "goodness": 2,
+   "why": "confirms and restates 14 centimetres"
+  },
+  "t121_3": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "unit rate first, then scale - the standard method, as a question"
+  },
+  "t1351_1": {
+   "leak": 2,
+   "goodness": 5,
+   "why": "left side or right side of the table is exactly the metal/nonmetal split"
+  },
+  "t250_3": {
+   "leak": 1,
+   "goodness": 2,
+   "why": "muddled, and steers away from rain when rain is the answer"
+  },
+  "t1137_3": {
+   "leak": 1,
+   "goodness": 5,
+   "why": "total parts first, then split - the ratio method"
+  },
+  "t62_5": {
+   "leak": 3,
+   "goodness": 1,
+   "why": "swaps who owes whom AND states the $2 answer"
+  }
+ }
+}

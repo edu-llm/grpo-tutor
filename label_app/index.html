@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow">
+<title>Grade an AI tutor</title>
+<meta name="description" content="Label AI tutor turns: did it give the answer away, and did it teach.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📝</text></svg>">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header id="topbar" hidden>
+  <div class="bar-inner">
+    <p class="tally" id="tally" role="status" aria-live="polite">Ready when you are</p>
+    <div class="bar-actions">
+      <button type="button" class="btn btn-ghost" id="btn-save-top">
+        <span aria-hidden="true">↓</span>&nbsp;Save my work
+      </button>
+    </div>
+  </div>
+  <div class="banner" id="banner" role="status" hidden>
+    <p id="banner-text"></p>
+    <button type="button" class="btn-x" id="banner-close" aria-label="Dismiss">✕</button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ─────────────────────────── landing ─────────────────────────── -->
+  <section id="screen-landing" class="screen">
+    <h1>Grade an AI tutor</h1>
+    <p class="lede">
+      An AI tutor was trained to help a small AI "student" with test questions
+      <strong>without telling it the answer</strong>. It got much better at not
+      telling — and no better at teaching. We need human judgement to work out why.
+    </p>
+
+    <ol class="how">
+      <li><span class="step-n" aria-hidden="true">1</span>
+        <div><strong>Rate one tutor message.</strong> Did it give the answer away?
+        Would it actually help someone learn? Two taps.</div></li>
+      <li><span class="step-n" aria-hidden="true">2</span>
+        <div><strong>Sometimes, pick a winner.</strong> Two tutors, same question —
+        which one taught better? One tap.</div></li>
+    </ol>
+
+    <p class="callout">
+      <strong>Judge only the tutor's words.</strong> The student's replies are there
+      for context, but a leak is only a leak if the <em>tutor</em> said it.
+    </p>
+
+    <p class="callout callout-quiet">
+      <strong>There is no target.</strong> Do five or do fifty. Your work saves as you
+      go and you can come back to it.
+    </p>
+
+    <form id="name-form" novalidate>
+      <label for="name">Your name or initials</label>
+      <p class="hint" id="name-hint">Used to label your answers and give you your own
+        shuffle. Use the same one if you come back.</p>
+      <input id="name" name="name" type="text" autocomplete="nickname" required
+             maxlength="40" spellcheck="false" aria-describedby="name-hint"
+             placeholder="e.g. Sam R">
+      <p class="field-error" id="name-error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-primary btn-lg" id="btn-start">Start</button>
+    </form>
+
+    <p class="resume-line" id="resume-line" hidden></p>
+    <p class="foot-note" id="landing-count"></p>
+  </section>
+
+  <!-- ─────────────────────────── rate one turn ─────────────────────────── -->
+  <section id="screen-turn" class="screen" hidden>
+    <div class="card">
+      <h2 class="question" id="t-question"></h2>
+      <ul class="choices" id="t-choices" aria-label="Answer choices"></ul>
+
+      <details class="ctx-wrap" id="t-ctx-wrap">
+        <summary id="t-ctx-summary">Show the conversation before this</summary>
+        <div class="dialogue" id="t-context" aria-label="Conversation so far"></div>
+      </details>
+
+      <div class="focus-turn">
+        <span class="focus-label">the tutor said</span>
+        <p id="t-turn"></p>
+      </div>
+
+      <div class="judge">
+        <fieldset class="qgroup" id="q-leak">
+          <legend>Does this give the answer away?</legend>
+          <div class="opts" role="radiogroup" id="opts-leak"></div>
+        </fieldset>
+
+        <fieldset class="qgroup" id="q-help">
+          <legend>Would it help a student learn?</legend>
+          <div class="opts" role="radiogroup" id="opts-help"></div>
+        </fieldset>
+
+        <details class="note-wrap" id="t-note-wrap">
+          <summary>Add a note (optional)</summary>
+          <label class="sr-only" for="t-note">Optional note</label>
+          <textarea id="t-note" rows="2" maxlength="600"
+                    placeholder="anything odd or interesting about this one"></textarea>
+        </details>
+      </div>
+
+      <div class="row-actions row-split">
+        <button type="button" class="btn btn-ghost" id="t-skip">Skip</button>
+        <button type="button" class="btn btn-primary btn-lg" id="t-next" disabled>
+          Next <kbd class="kbd-inline">↵</kbd>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── pick a winner ─────────────────────────── -->
+  <section id="screen-pair" class="screen" hidden>
+    <div class="card">
+      <p class="pair-tag">Two tutors, same question</p>
+      <h2 class="question" id="p-question"></h2>
+      <ul class="choices" id="p-choices" aria-label="Answer choices"></ul>
+
+      <div class="pair-grid">
+        <div class="pair-col">
+          <h3 class="pair-h">A</h3>
+          <div class="dialogue" id="p-a"></div>
+        </div>
+        <div class="pair-col">
+          <h3 class="pair-h">B</h3>
+          <div class="dialogue" id="p-b"></div>
+        </div>
+      </div>
+
+      <div class="judge">
+        <fieldset class="qgroup">
+          <legend>Which one taught better?</legend>
+          <p class="hint">Not which student got it right — which tutor did the better
+            job of building understanding.</p>
+          <div class="opts" role="radiogroup" id="opts-pair"></div>
+        </fieldset>
+
+        <details class="note-wrap">
+          <summary>Add a note (optional)</summary>
+          <label class="sr-only" for="p-note">Optional note</label>
+          <textarea id="p-note" rows="2" maxlength="600"
+                    placeholder="what made the winner better"></textarea>
+        </details>
+      </div>
+
+      <div class="row-actions row-split">
+        <button type="button" class="btn btn-ghost" id="p-skip">Skip</button>
+        <button type="button" class="btn btn-primary btn-lg" id="p-next" disabled>
+          Next <kbd class="kbd-inline">↵</kbd>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────── done ─────────────────────────── -->
+  <section id="screen-done" class="screen" hidden>
+    <h1>That's the lot — thank you</h1>
+    <p class="lede" id="done-summary"></p>
+    <p class="status" id="submit-status" role="status"></p>
+    <button type="button" class="btn btn-primary btn-lg" id="btn-download">
+      Download my labels (.json)
+    </button>
+    <div class="done-extra">
+      <button type="button" class="btn btn-ghost" id="btn-again">Do the ones I skipped</button>
+      <button type="button" class="btn btn-ghost btn-danger" id="btn-reset">Start over (erases my labels)</button>
+    </div>
+  </section>
+
+  <p class="loading" id="loading">Loading…</p>
+  <p class="fatal" id="fatal" role="alert" hidden></p>
+
+</main>
+
+<footer>
+  <p id="attribution"></p>
+  <p>Your labels stay in this browser until they are sent or downloaded.</p>
+</footer>
+
+<script type="module" src="firebase-submit.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

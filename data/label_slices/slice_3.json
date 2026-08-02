@@ -1,0 +1,1087 @@
+[
+ {
+  "id": "t839_3",
+  "question": "Resolved, that the taxation of the people by themselves, or by persons chosen by themselves to represent them . . . is the only security against a burdensome taxation . . . \u2014Virginia Stamp Act Resolutions, May 30, 1765 Which statement best explains why this resolution was adopted?",
+  "gold": "Colonists were opposed to colonial laws being created only by Parliament.",
+  "context": "tutor: True, it seems unusual to want more taxes. But think about why taxes became a big issue. W / student: Wait, so they wanted stricter controls because some people didn't get their money fair?",
+  "tutor_turn": "Sometimes, people feel businesses or officials aren't giving them a fair shake. Do you think that could make people want to have a say in how taxes are decided?"
+ },
+ {
+  "id": "t104_1",
+  "question": "The total land area for the United States is 3,537,438 square miles. What is this value rounded to the nearest thousand square miles?",
+  "gold": "3,537,000",
+  "context": "student: What does that even mean by \"rounded to the nearest thousand\"?",
+  "tutor_turn": "It means you want to see the big number as close as possible to 3,537,438, but in groups of thousands. Let's imagine we're counting in thousands instead of miles. How many thousands are there in our big number?"
+ },
+ {
+  "id": "t890_3",
+  "question": "The manager of a company wants to survey a representative sample of the company\u2019s employees to choose a company logo. Which of the following is a representative sample of the company\u2019s employees?",
+  "gold": "every third employee on the company\u2019s payroll",
+  "context": "tutor: A representative sample means picking people that show the same kind of people as the whol / student: Wait, did they mean something specific by \"employees who are under the age of 35\"? I'm con",
+  "tutor_turn": "Think about it this way: If the company has a mix of ages, do you think including only young employees might give us a good view of what the whole company looks like?"
+ },
+ {
+  "id": "t1331_3",
+  "question": "Which development most enabled early peoples to form permanent settlements?",
+  "gold": "advances in agricultural production",
+  "context": "tutor: What has to be true before people can stop moving around and stay in one place? / student: People move when they feel safe, protected, or have goals.",
+  "tutor_turn": "A food supply that stays put. Hunting and gathering makes you follow the food; growing it means the food comes to you."
+ },
+ {
+  "id": "t1373_1",
+  "question": "Marisa\u2019s car gets an average of 28 miles per gallon of gas. She plans to drive 200 miles today and 220 miles tomorrow. How many gallons of gas should she expect to use in all?",
+  "gold": "15 gallons",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "She's driving two days. Do you need each day separately, or just the total distance?"
+ },
+ {
+  "id": "t1358_5",
+  "question": "The origins of checks and balances in the U.S. political system can be traced to the",
+  "gold": "Roman Republic.",
+  "context": "tutor: Rome, before the emperors. The framers read Roman history closely and worried about exactl / student: What's the name of the political system that divided power into the Senate, Assembly, and ",
+  "tutor_turn": "Which option names that system? Note that a monarchy and an aristocracy concentrate power rather than dividing it."
+ },
+ {
+  "id": "t698_3",
+  "question": "Which answer choice does NOT describe the number 7,140?",
+  "gold": "The sum of seven thousands, one hundred, and forty tens",
+  "context": "tutor: Think of how each choice breaks down the number 7,140 into parts. Which one doesn't add up / student: I get confused by choices like 34,289 and 34,289 too. Confused!",
+  "tutor_turn": "Remember, 7,140 is made up of 7 thousands, 1 hundred, and how many tens? Let's check the tens part."
+ },
+ {
+  "id": "t1344_3",
+  "question": "Photosynthetic algae live inside the cells of coral, a marine animal. Which of the following describes how photosynthesis performed by the algae helps the coral?",
+  "gold": "The algae make glucose during photosynthesis that the coral can use to produce energy.",
+  "context": "tutor: What does photosynthesis actually produce? Name the product the plant makes for itself. / student: Photosynthesis produces glucose and oxygen as products for its own use!",
+  "tutor_turn": "Sugar - glucose. That's the point of the process; oxygen is a by-product."
+ },
+ {
+  "id": "t250_5",
+  "question": "A city has a temperature of 75 \u00b0F, with partly cloudy skies. Weather forecasters are predicting that the air pressure and temperature will drop during the day. Which type of weather is most likely for this area in the late afternoon?",
+  "gold": "rainy",
+  "context": "tutor: Oh, partly cloudy doesn\u2019t always mean thunderstorms. Think more about how clouds work to c / student: Still confused, does it mean something else happening?",
+  "tutor_turn": "Think about how less sunny, cloud-covered days often feel cooler in the afternoon. Does that sound like it might make the weather more likely to be rainy instead?"
+ },
+ {
+  "id": "t216_5",
+  "question": "Sterling silver is a combination of silver and copper. Which of the following is also a combination of two or more metals?",
+  "gold": "brass",
+  "context": "tutor: Oh, I see you're mixing up different metals. Think of it this way: aluminum, lead, and gol / student: Does that mean brass is a combination of multiple metals again? Confused.",
+  "tutor_turn": "Yes, exactly! Brass is made by mixing copper and zinc together. So let's pick one that has more than one metal in it. What do you think now?"
+ },
+ {
+  "id": "t210_1",
+  "question": "A utility company estimates that a power line repair job will take a total of 24 person-hours. If 3 workers are assigned to the job, how long will it take them to complete the job according to this estimate?",
+  "gold": "8 hours",
+  "context": "student: What does \"total of 24 person-hours\" even mean here?",
+  "tutor_turn": "Think of it like this: If one worker can do the job in 24 hours, and that's the same as 24 \"worker hours,\" then 3 workers working together can finish in less time. How many \"worker hours\" are there if you have 3 workers?"
+ },
+ {
+  "id": "t586_5",
+  "question": "Japanese attempts to create an empire prior to World War II were in conflict with the U.S. goal of",
+  "gold": "maintaining an open trade policy in Asia.",
+  "context": "tutor: Exactly! The U.S. didn't want other countries to get too strong in a certain area. It's li / student: I still don\u2019t get why they\u2019d worry about sharing, though.",
+  "tutor_turn": "Think about it this way: If you and your friend were in charge of a sandbox, but your friend only wanted the best parts of the sandbox for themselves, would that be fair? That's kind of what the U.S. wanted to prevent. Can you picture why they wanted to share or maintain an open playground?"
+ },
+ {
+  "id": "t1228_5",
+  "question": "Mr. Wilfred used a full 2-liter bottle of liquid soap to fill two soap containers. \u2022 He put 0.475 liter of soap in the first container. \u2022 He put 0.35 liter of soap in the second container. How many liters of liquid soap remained in the bottle?",
+  "gold": "1.175 L",
+  "context": "tutor: Right, both pours come out of that one bottle, so you need the total poured before you can / student: To solve the problem, add together the amounts in each pour. That way, you don\u2019t have fien",
+  "tutor_turn": "Now take that total away from 2.000. Go one column at a time and tell me the number you land on."
+ },
+ {
+  "id": "t1284_5",
+  "question": "The main goal of abolitionists like William Lloyd Garrison was to",
+  "gold": "end slavery immediately.",
+  "context": "tutor: Slavery. The other options are real reform movements of the same era - schools, temperance / student: Abolitionist movements fought for the end of slavery, emphasizing the abolition of all for",
+  "tutor_turn": "Which option names the goal that matches the word 'abolition' itself?"
+ },
+ {
+  "id": "t1235_5",
+  "question": "Phyllis put $1,000 in the bank and received 10% in compound interest at the end of the year. Now she has $1,100. Which formula describes how much she will have at the end of next year?",
+  "gold": "next = now \u00d7 1.10",
+  "context": "tutor: It added 10% of the balance. Here's the key idea: 10% of $1,000 is $100, but next year 10% / student: Understood! The answer is that the bank increased the balance by 10%.",
+  "tutor_turn": "So which formula multiplies the current amount rather than adding a fixed number? Say why the fixed-number ones fail."
+ },
+ {
+  "id": "t148_1",
+  "question": "Wendy wants to take a survey to determine which flavor of ice cream is the most popular at her school. Which of the following methods is the best way for her to choose a random sample of the students at her school?",
+  "gold": "selecting ten students from each homeroom",
+  "context": "student: Wait, what does \"random sample\" even mean here? Like, how do we pick that?",
+  "tutor_turn": "A random sample means picking students in a way that each student has an equal chance of being chosen, no matter who they are. It's like picking names from a hat where everyone has a fair shot, right?"
+ },
+ {
+  "id": "t1245_3",
+  "question": "In the struggle to gain control of the Soviet Union in the 1920s, Stalin\u2019s chief political rival was",
+  "gold": "Trotsky.",
+  "context": "tutor: Which of these names belonged to the era you'd expect - the fight for control after Lenin  / student: What did the name \"Saratov\" mean before it changed to \"Saratov State\"?",
+  "tutor_turn": "Rule out by era first. Romanov is the imperial dynasty, and Kerensky led the government Lenin overthrew - both are before this fight, not in it."
+ },
+ {
+  "id": "t439_5",
+  "question": "During Reconstruction, the Freedmen\u2019s Bureau",
+  "gold": "established schools for former slaves.",
+  "context": "tutor: Think about what might happen if you moved to a place where you didn't have friends or kne / student: I still feel confused, do we even count as friends here?",
+  "tutor_turn": "Well, let's pretend you moved to a new school. What if all your old friends were left behind? Would you feel more connected at your new school, or less?"
+ },
+ {
+  "id": "t1362_1",
+  "question": "Wendy wants to take a survey to determine which flavor of ice cream is the most popular at her school. Which of the following methods is the best way for her to choose a random sample of the students at her school?",
+  "gold": "selecting ten students from each homeroom",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "What would make her survey misleading? Think about who she'd be leaving out."
+ },
+ {
+  "id": "t795_3",
+  "question": "Which statement best describes evidence that a chemical reaction occurs as a cake bakes?",
+  "gold": "The cake rises as gas bubbles form in the baking cake.",
+  "context": "tutor: Think of 'evidence' like clues you use to figure out what's happening. Can you tell what's / student: I still get confused by all the layers though. What if the cake is just melting?",
+  "tutor_turn": "Remember, the cake isn't melting. What do you notice most when a cake bakes? Does it change size, shape, or color?"
+ },
+ {
+  "id": "t1302_5",
+  "question": "Eight activities that use energy are listed in the box. 1. A bus driver starts a bus. 2. A soccer player kicks a ball. 3. A teacher writes notes on a chalkboard. 4. A chef stirs soup on a stove. 5. A bird flaps its wings and chirps to attract a mate. 6. A basketball referee blows a whistle. 7. A waiter pours water into a glass. 8. A person changes the channel on a TV. Each of these activities requires the use of which kind of energy?",
+  "gold": "Mechanical",
+  "context": "tutor: Something is being moved. Motion is the common thread, even in the quieter ones like writi / student: To find out what\u2019s happening in every single action, think of it as seeing all parts toget",
+  "tutor_turn": "Which kind of energy is the energy of movement?"
+ },
+ {
+  "id": "t1019_3",
+  "question": "In a vacuum, radio waves have a lower frequency than infrared radiation. Which of the following best compares radio waves and infrared radiation in a vacuum?",
+  "gold": "In a vacuum, radio waves and infrared radiation have the same speed. Therefore, radio waves have a longer wavelength than infrared radiation.",
+  "context": "tutor: Think of it like a race in the vacuum. If radio waves have a lower frequency, does that me / student: I still don't get it exactly how lower frequency means faster/race in vacuum.",
+  "tutor_turn": "Imagine you have two friends running a race. One friend is running very slowly, but has super long steps. The other friend is running a bit faster, but takes short steps. Who covers more distance in the same time?"
+ },
+ {
+  "id": "t66_3",
+  "question": "On Thursday Chris drove 167 miles, on Friday he drove 68 miles, and on Saturday he drove 73 miles. Approximately how many miles did Chris drive in the three days?",
+  "gold": "300 miles",
+  "context": "tutor: \"Approximately\" means about the closest you can get. It\u2019s like when your mom says \"come he / student: I guess we need to add them all up? I'm still confused though.",
+  "tutor_turn": "Right, you add them up to find the total. Start by adding 167 and 68. What do you get?"
+ },
+ {
+  "id": "t681_3",
+  "question": "Which of the following is the best example of an early U.S. struggle to define the domestic authority of the central government?",
+  "gold": "The Whiskey Rebellion",
+  "context": "tutor: Think of it like when you and your siblings argue about who gets to use the computer first / student: Wait, did I get it right about the war of 1812? Confused again.",
+  "tutor_turn": "Think of the Whiskey Rebellion like a big argument between the government and some farmers. The farmers didn't want to pay the special tax on whiskey. This shows how the new government was trying to handle its first big job in a country. Can you see how that's different from a war or dealing with foreign countries?"
+ },
+ {
+  "id": "t1244_3",
+  "question": "How did the Supreme Court decision in Worcester v. Georgia affect American Indians?",
+  "gold": "The state ignored the ruling and distributed Cherokee lands to white settlers.",
+  "context": "tutor: This case is one where the Court sided with the Cherokee. So why is it remembered as a dis / student: It\u2019s confusing because they argue that the decision was unjustly impacted by their soverei",
+  "tutor_turn": "Because a court ruling only matters if someone enforces it. The Court said one thing; Georgia and the president did another."
+ },
+ {
+  "id": "t49_5",
+  "question": "There are 1,000 meters in 1 kilometer. How many meters are in 5 kilometers?",
+  "gold": "5,000 meters",
+  "context": "tutor: Remember, when the problem says there are 1,000 meters in 1 kilometer, it's like knowing t / student: I still don't get it, does it mean each meter makes 1000?",
+  "tutor_turn": "No, each kilometer means 1,000 meters all together. So, to find out how many meters are in 5 kilometers, you just multiply the number of kilometers by 1,000. How many meters are in 1 kilometer?"
+ },
+ {
+  "id": "t400_1",
+  "question": "The Great Awakening of the mid-1700s affected the British colonies by",
+  "gold": "encouraging greater religious enthusiasm and political independence.",
+  "context": "student: Like, what exactly did they mean by affecting the colonies? I guess it was religious stuff",
+  "tutor_turn": "Right! Let's think of it like this - imagine the colonies were a big classroom, and the Great Awakening was like a really popular new teacher who came to teach about different religions and faiths. What do you think the teacher might have done in a classroom?"
+ },
+ {
+  "id": "t550_5",
+  "question": "The primary objective of Harlem Renaissance writers was to",
+  "gold": "generate pride in African-American culture.",
+  "context": "tutor: Think of it like a story that makes everyone feel proud to be African-American, just like  / student: I still get confused by all these cultural movements, like why exactly they focused on Afr",
+  "tutor_turn": "Why do you think the writers wanted to help African Americans feel better about themselves and their culture? Can you imagine how that might feel good for someone?"
+ },
+ {
+  "id": "t1235_1",
+  "question": "Phyllis put $1,000 in the bank and received 10% in compound interest at the end of the year. Now she has $1,100. Which formula describes how much she will have at the end of next year?",
+  "gold": "next = now \u00d7 1.10",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Notice the answers are formulas, not numbers, so the question is really asking what operation turns this year into next year. What did the bank do to her $1,000?"
+ },
+ {
+  "id": "t272_5",
+  "question": "A student is trying to identify a mineral that has a nonmetallic luster and is black. It can also be scratched with a fingernail. According to the mineral information sheet, the unidentified mineral is most likely",
+  "gold": "mica.",
+  "context": "tutor: Sometimes things that are scratchy are not hard. Can you think of any soft things that you / student: I still feel confused, like a rock? What\u2019s the difference then?",
+  "tutor_turn": "Often, things that you can scratch with a fingernail are actually soft. Now let's think about which of these minerals we talked about before is known for being easy to scratch. Which one matches being soft and black with a bit of scratch-ability?"
+ },
+ {
+  "id": "t1078_5",
+  "question": "Which of these numbers is 231,198 rounded to the nearest thousand?",
+  "gold": "231,000",
+  "context": "tutor: Think of it this way: Which house number would you call if someone asked you about 310,000 / student: I get confused with all those places, like 300?",
+  "tutor_turn": "Right, think of it as 300. Now, is 100 (the number in the hundreds place) enough to round up to 3000?"
+ },
+ {
+  "id": "t1085_1",
+  "question": "Which of the following statements about the angles of a triangle is true?",
+  "gold": "A triangle can have 3 acute angles.",
+  "context": "student: I guess acute means less than 90 degrees? Confused, I mean.",
+  "tutor_turn": "Yep, acute means angles are less than 90 degrees. What do obtuse angles mean then?"
+ },
+ {
+  "id": "t1355_1",
+  "question": "Which of these expressions has a value less than 10?",
+  "gold": "10 \u00d7 0 \u00d7 2",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "You have to evaluate all four. Is there one you can do instantly without multiplying anything out?"
+ },
+ {
+  "id": "t1011_1",
+  "question": "A sound has a frequency of 110 Hz both in air and in water. The velocity of sound is 340 m/s in air and 1500 m/s in water. How does the wavelength of the sound in water compare to its wavelength in air?",
+  "gold": "The wavelength in water is about 4.40 times longer.",
+  "context": "student: Wait, how does the wavelength change if it's going from air to water? I get lost easily.",
+  "tutor_turn": "Think about it like this: in air, the sound waves can spread out more because air is less \"busy\" than water, right? Now, if the sound waves try to fit into the busy, crowded space of water, they have to be smaller. How many times smaller do you think they would need to be for water compared to air?"
+ },
+ {
+  "id": "t901_5",
+  "question": "A sign is in the shape of a square. Each side of the sign has a length of 6 inches. What is the area of the sign?",
+  "gold": "36 square inches",
+  "context": "tutor: Let's think about it this way. If you have a square notebook that's 6 inches wide, how man / student: I guess that means it's 36 square inches, right? Confused still.",
+  "tutor_turn": "So if you have 6 inches on one side, and you want to know how many 1-inch squares can fit inside, think of it like rows of 6 and columns of 6. How many total squares do you get?"
+ },
+ {
+  "id": "t1285_1",
+  "question": "Which of the following will best help a scientist determine if a sample of soil contains the remains of organisms?",
+  "gold": "the types of elements in the soil sample",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Living things are built out of a particular set of ingredients. What element is the backbone of everything alive?"
+ },
+ {
+  "id": "t661_1",
+  "question": "A student notices that the moon is full one evening. Which sequence of moon phases will the student observe over the next eight days?",
+  "gold": "Full, waning gibbous, third quarter",
+  "context": "student: Wait, does it mean we need to count all the times when the moon turns from blue to gray? L",
+  "tutor_turn": "Think of the moon phases like the moon changing coloring every few days, not changing color. We're just looking at these changes over time, not times of day. When the moon looks big with a lot of light, we call that \"full.\" Now, if we could look into a time machine, what would the moon look like if we watched it change phases day by day?"
+ },
+ {
+  "id": "t1272_3",
+  "question": "A mail carrier delivered mail to 84 houses in 3 hours. At what rate did the mail carrier deliver the mail?",
+  "gold": "28 houses per hour",
+  "context": "tutor: 'Rate' means per something. Per what, in this question? / student: \u0e1c\u0e2a\u0e21",
+  "tutor_turn": "Per hour. So you're splitting 84 houses evenly across 3 hours, which is division."
+ },
+ {
+  "id": "t220_5",
+  "question": "Which of the following converts electrical energy into motion?",
+  "gold": "electric fan",
+  "context": "tutor: Sure, imagine you have a toy car that runs on batteries. The batteries send a current, lik / student: Wait, a fan sends air right? So would it be like a light bulb making light? Confused again",
+  "tutor_turn": "Think of it this way, a light bulb makes light because of the glow inside it, but what makes the air move in a fan? What part needs to spin or vibrate?"
+ },
+ {
+  "id": "t1262_3",
+  "question": "How did southern states respond to the ratification of the Fifteenth Amendment?",
+  "gold": "By imposing requirements designed to deny African Americans the right to vote",
+  "context": "tutor: What did the Fifteenth Amendment guarantee, and to whom? / student: The Fifteenth Amendment guarantees equal representation of African Americans in federal el",
+  "tutor_turn": "The vote, and it's federal, so a state can't simply repeal it. That constraint is the key: any response has to work around the amendment rather than against it openly."
+ },
+ {
+  "id": "t903_3",
+  "question": "A sign is in the shape of a square. Each side of the sign has a length of 6 inches. What is the area of the sign?",
+  "gold": "36 square inches",
+  "context": "tutor: Area is the amount of space inside a shape. For a square, it's like counting all the littl / student: Wait, how many little squares? Like, exactly 48? I'm lost.",
+  "tutor_turn": "Think about a tiny checkerboard inside your square sign. How many tiny squares would cross from one side to the next on each line of the board?"
+ },
+ {
+  "id": "t225_9",
+  "question": "The digestion process begins in which of the following?",
+  "gold": "mouth",
+  "context": "tutor: Perfect! The mouth is the beginning. The train (food) enters the station (mouth) for its j / student: I think the station is like the mouth.",
+  "tutor_turn": "Very good! You just explained it yourself. The mouth is the first part where digestion begins. Great job figuring that out!"
+ },
+ {
+  "id": "t981_5",
+  "question": "Consider this system of equations. 4x \u2212 3y = \u22127 \u22124x + 3y = \u22127 Which of the following statements about the system of equations is true?",
+  "gold": "The system has no solution.",
+  "context": "tutor: You're right, it sounds confusing. Let's solve one of the equations for x and see what we  / student: I'm confused, does that mean every x value makes y the same too?",
+  "tutor_turn": "Think of it this way: If you have a balance scale and you add the same weight to both sides, it stays balanced. How does this idea help you understand these equations?"
+ },
+ {
+  "id": "t1127_3",
+  "question": "A cyclist rode her bicycle a distance of 5 miles. What is the total distance, in feet, she rode her bicycle?",
+  "gold": "26,400 feet",
+  "context": "tutor: Riding a mile and riding a foot are both types of distances, but they're measured in diffe / student: Wait, so a mile is 5280 feet? Confused still.",
+  "tutor_turn": "So, a mile has 5280 feet. How does that help you figure out how many feet are in 5 miles?"
+ },
+ {
+  "id": "t597_1",
+  "question": "Which of these was a formal statement of intention of the United States to aid any country threatened by communist aggression?",
+  "gold": "Truman Doctrine",
+  "context": "student: Like, how does stating an intention matter? I mean, if it's false, what happens?",
+  "tutor_turn": "Stating an intention can matter a lot, kind of like promise-making. If someone makes a promise but it\u2019s not really meant to be, it might look dishonest or broken. Let's think of it like this: If you promise your friend you'll share your ice cream, that makes you more trustworthy, right? Make me an example where a promise like this is important."
+ },
+ {
+  "id": "t1266_5",
+  "question": "Salt concentration, water temperature, plankton, and the whale shark might all be used in a description of an ocean",
+  "gold": "ecosystem.",
+  "context": "tutor: You have both. That's the whole point of the question - two of the items are physical cond / student: The key here lies in distinguishing between physical properties (like temperature) that al",
+  "tutor_turn": "Which of these four terms is the one that includes living things AND their non-living surroundings together?"
+ },
+ {
+  "id": "t208_5",
+  "question": "A utility company estimates that a power line repair job will take a total of 24 person-hours. If 3 workers are assigned to the job, how long will it take them to complete the job according to this estimate?",
+  "gold": "8 hours",
+  "context": "tutor: If one worker takes 24 hours, what if you split that time equally among 3 workers? How lon / student: Wait, so each worker gets 8 hours since 24/3=8? But I'm confused by the whole 3 workers th",
+  "tutor_turn": "Think of it this way: If one worker needs 24 hours, what if you had 3 workers do the job together? Would it take 1/3 of the time, 8 hours?"
+ },
+ {
+  "id": "t1282_1",
+  "question": "The economic recovery of Japan following World War II focused primarily on",
+  "gold": "developing industry and an export economy.",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "After 1945 Japan was forbidden a real military and has very few natural resources of its own. What options does that leave for making money?"
+ },
+ {
+  "id": "t393_5",
+  "question": "What was the Spanish Inquisition (1478\u20131834)?",
+  "gold": "the religious court established to find and punish heretics",
+  "context": "tutor: Think of a time when your teacher asked someone to stop doing something, because they thou / student: Wait, how exactly does making sure people believe the same thing help them?",
+  "tutor_turn": "Well, imagine if everyone in your class started talking about different things and had different ideas about important stuff. Your teacher might worry that this could be confusing or even dangerous for the whole class. So, the court was trying to make sure everyone believed in the same things to keep things clear and in control."
+ },
+ {
+  "id": "t1320_5",
+  "question": "The Maya, Aztec, and Inca civilizations each developed",
+  "gold": "complex architectural structures.",
+  "context": "tutor: Most people picture the stonework - pyramids, temples, terraces, cities. That's the common / student: When thinking of the Maya, Aztec, and Incan cultures, imagine their awe-inspiring architec",
+  "tutor_turn": "Now check the others against what you know: they had many gods, they weren't democracies, and none were seafaring empires. Which option is left standing?"
+ },
+ {
+  "id": "t834_5",
+  "question": "How did the Supreme Court decision in Worcester v. Georgia affect American Indians?",
+  "gold": "The state ignored the ruling and distributed Cherokee lands to white settlers.",
+  "context": "tutor: Think of \"relations\" like friendship. In this case, the Supreme Court was deciding how Ind / student: I still don't get it exactly right, like why would they give authority to them?",
+  "tutor_turn": "Imagine you and your friends are planning a big school project. Now, think of the American settlers as your friends, and the tribes as different groups of friends. What if one group said, \"We want to decide how everyone else uses their space in the playground, including our space\"? How would that make the other groups feel?"
+ },
+ {
+  "id": "t732_5",
+  "question": "Which situation could be represented by the equation 10.75 = 5.5n?",
+  "gold": "Ricardo ran a total of 10.75 miles. He ran 5.5 miles each hour. What is n, the number of hours Ricardo ran?",
+  "context": "tutor: Look at the question again. Could 'n' be the number of miles Ricardo ran in the evening? H / student: I still confuse 'n' being the distance. Can we just solve it together?",
+  "tutor_turn": "Sure, let's break it down. If 'n' is the distance Ricardo ran in the evening, it would mean the total miles done in the morning plus evening equals 10.75 miles. Can you see which situation matches this?"
+ },
+ {
+  "id": "t1341_1",
+  "question": "For the school festival, Polly wants to make a snack mixture with 2 parts of dried fruit to every 3 parts of assorted nuts.How much dried fruit will she need to make 30 pounds of the mixture?",
+  "gold": "12 pounds",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "The ratio is 2 parts fruit to 3 parts nuts. How many parts are in one whole batch?"
+ },
+ {
+  "id": "t287_3",
+  "question": "A piece of pine wood floats on the surface of a lake because the water exerts",
+  "gold": "an upward force equal to the weight of the displacement water.",
+  "context": "tutor: Think of 'exert' as when you push or pull something. In this case, it means the water push / student: I still don't get how the water pushes or pulls!",
+  "tutor_turn": "Imagine the water is like a gentle hug. The water is pushing up on the wood to make it float. Now, if you try to push an empty bucket with your hands, what do you feel? It pushes back right? It's the same with the water. It pushes back with a force equal to how heavy the wood is. Which option do you think best describes this?"
+ },
+ {
+  "id": "t1159_5",
+  "question": "Which of the following is true about the planets in the solar system?",
+  "gold": "All planets have an elliptical orbit.",
+  "context": "tutor: Think of the planets we know for sure\u2014like Earth and Mars. Do you know if they have moons? / student: Wait, how can a planet have no moons? Like, does that mean they don't have a whole moon or",
+  "tutor_turn": "Remember, not all planets need to have moons. Think of Mercury and Venus, what do you know about them? Do you think they have moons?"
+ },
+ {
+  "id": "t1289_5",
+  "question": "Which of the following statements best explains why air on Earth circulates between the equator and the poles?",
+  "gold": "Earth\u2019s surface temperature is greater near the equator than at the poles.",
+  "context": "tutor: Sunlight hits the equator nearly head-on and the poles at a glancing angle, so the same en / student: Is there a specific equation or formula in class that helps explain this concept?",
+  "tutor_turn": "Now the link to circulation: warm air rises, cool air sinks, and that keeps a loop going. Which option gives the temperature difference as the cause?"
+ },
+ {
+  "id": "t1284_3",
+  "question": "The main goal of abolitionists like William Lloyd Garrison was to",
+  "gold": "end slavery immediately.",
+  "context": "tutor: The word 'abolitionist' comes from 'abolish'. Abolish what? / student: Abolish slavery.",
+  "tutor_turn": "Slavery. The other options are real reform movements of the same era - schools, temperance, suffrage - which is exactly why they're here as distractors."
+ },
+ {
+  "id": "t1350_5",
+  "question": "Which number has the same digit in both the ones place and the hundreds place?",
+  "gold": "6242",
+  "context": "tutor: The ones is the last digit; the hundreds is the second from the left in a four-digit numbe / student: The concept of position in numbers is confusing for someone new to math!",
+  "tutor_turn": "Check each number: is its last digit the same as its second digit? Which one matches?"
+ },
+ {
+  "id": "t435_5",
+  "question": "What is one reason that the Union strategy for defeating the South included a naval blockade of Southern ports?",
+  "gold": "to prevent Southern efforts to sell cotton in Europe in exchange for war supplies",
+  "context": "tutor: Think about what would happen if the South couldn't sell its cotton. Could that make a big / student: I still get confused about exactly what kind of answer they wanted. Like, does it mean lik",
+  "tutor_turn": "Well, let's think of it more like keeping the South from selling cotton. If they couldn't sell their cotton, how might that affect them? Would they have less money to buy war supplies or do something else?"
+ },
+ {
+  "id": "t955_3",
+  "question": "A piece of wire has a length of 110 inches. Which of the following measures is equivalent to the length of the wire?",
+  "gold": "9 feet 2 inches",
+  "context": "tutor: Think about it this way: how many inches are in 1 foot? / student: I'm still not sure, like, is that just the length again?",
+  "tutor_turn": "Let's make it easier. Can you tell me how many inches are in 1 foot?"
+ },
+ {
+  "id": "t1347_5",
+  "question": "Marshall wants to finish typing his English paper before class starts. If he still has 550 words left to type and class starts in 25 minutes, at least how fast must Marshall type to finish his paper on time?",
+  "gold": "22 words per minute",
+  "context": "tutor: Division. 550 divided by 25. Estimate: 20 words a minute would give 500 in that time, whic / student: To calculate the effective rate per minute when reading through instructions, we need to d",
+  "tutor_turn": "So the answer is a bit above 20. Compute it exactly and pick the matching option."
+ },
+ {
+  "id": "t1354_1",
+  "question": "Gabriel deposits $2,500 into each of two savings accounts. \u2022 Account I earns 4% annual simple interest. \u2022 Account II earns 4% interest compounded annually. Gabriel does not make any additional deposits or withdrawals. What is the sum of the balances of Account I and Account II at the end of 3 years?",
+  "gold": "$5,612.16",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Two accounts, two rules. What's the difference between simple and compound interest?"
+ },
+ {
+  "id": "t1031_5",
+  "question": "When a light wave passes from air into clear syrup, its direction is shifted toward the normal. Which of the following best explains why this occurs?",
+  "gold": "The speed of the light wave is slower in the syrup.",
+  "context": "tutor: The \"normal\" is an imaginary line that always points straight up or down at a corner. When / student: So the light just bounces off the edge? That makes sense though.",
+  "tutor_turn": "Not quite, think of it more like light is trying to come straight through, but the edge of the syrup makes it make a gentle turn towards that imaginary normal line. Why do you think light doesn't go straight through from air to syrup?"
+ },
+ {
+  "id": "t1272_5",
+  "question": "A mail carrier delivered mail to 84 houses in 3 hours. At what rate did the mail carrier deliver the mail?",
+  "gold": "28 houses per hour",
+  "context": "tutor: Per hour. So you're splitting 84 houses evenly across 3 hours, which is division. / student: So, rate \"per\" means how much something is divided by another quantity.",
+  "tutor_turn": "84 divided by 3. Check it makes sense: 3 lots of your answer should rebuild 84. What do you get?"
+ },
+ {
+  "id": "t1321_5",
+  "question": "Which group of numbers is in order from least to greatest?",
+  "gold": "0.25 1.0 1.6",
+  "context": "tutor: 1.00, 1.60, 0.25. Now the comparison is easy: anything starting with 0 is less than one, a / student: Before comparing, rewrite numbers to have the same number of decimal places. Comparing all",
+  "tutor_turn": "Put them in order smallest to largest yourself, then find the option that matches your ordering."
+ },
+ {
+  "id": "t46_5",
+  "question": "One stamp costs 34\u00a2. Two stamps cost 68\u00a2. Three stamps cost $1.02. If the cost of each stamp remains the same, how much would 4 stamps cost?",
+  "gold": "$1.36",
+  "context": "tutor: Think about this, if one stamp costs 34 cents, how many times 34 cents would you add to ge / student: I still don't get it, can you show me how it works again?",
+  "tutor_turn": "Sure, let's break it down. If you buy 4 stamps at 34 cents each, how many groups of 34 cents do you have?"
+ },
+ {
+  "id": "t647_1",
+  "question": "A group of students is performing an investigation to measure how much liquid water is produced from a 10 L sample of snow. What must occur in order for the students to perform this investigation?",
+  "gold": "The temperature of the sample must change.",
+  "context": "student: I get confused by what exactly needs to happen before we can do an investigation.",
+  "tutor_turn": "Think of it like baking a cake. There are certain steps you need to follow. What do you think those steps are for making a cake?"
+ },
+ {
+  "id": "t1253_5",
+  "question": "There are 1,000 meters in 1 kilometer. How many meters are in 5 kilometers?",
+  "gold": "5,000 meters",
+  "context": "tutor: Bigger - 1,000 times bigger. So when you convert kilometres into metres, the number should / student: Is a kilometer bigger or smaller than a meter?",
+  "tutor_turn": "That alone tells you what to do with 5 and 1,000. Which operation, and what's the result?"
+ },
+ {
+  "id": "t1234_1",
+  "question": "The Nazis blamed most of Germany\u2019s pre\u2013 World War II social and economic problems on Jews and the",
+  "gold": "communists.",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "What do you know about who the Nazis treated as enemies inside Germany before the war?"
+ },
+ {
+  "id": "t988_5",
+  "question": "An unfertilized egg from the European frog Rana esculenta has 13 chromosomes. A zygote of this species has 26 chromosomes. What causes the increase in chromosome number?",
+  "gold": "The unfertilized egg joins with a male gamete.",
+  "context": "tutor: Remember, meiosis usually halves the number of chromosomes in sperm or egg cells. What do  / student: I get it now, so more cells or somethin'? Still confuseated tho.",
+  "tutor_turn": "Think of it like this: If you have a sandwich with 12 slices of bread, and you make two smaller sandwiches from it, each with 6 slices, which makes more slices total?"
+ },
+ {
+  "id": "t1085_5",
+  "question": "Which of the following statements about the angles of a triangle is true?",
+  "gold": "A triangle can have 3 acute angles.",
+  "context": "tutor: Sure! Imagine a big pizza slice. That's what a triangle with an obtuse angle looks like. H / student: I get confused, like how does an obtuse angle even count as part of a whole triangle?",
+  "tutor_turn": "Think of it like this: if you slice a pizza into 3 pieces, you can make a triangle. An obtuse angle is like one of those pieces being bigger than the rest. Can you draw a triangle with one obtuse angle and two small angles?"
+ },
+ {
+  "id": "t665_3",
+  "question": "Which statement does NOT correctly compare silicon with another element?",
+  "gold": "Silicon conducts electricity as well as copper does.",
+  "context": "tutor: Think of it this way: if argon is like a flexible balloon that can change shape, how does  / student: I still get confused with the difference between gas and solid.",
+  "tutor_turn": "Imagine you have a metal spoon and a balloon. Which one is more fixed in shape and hard to squish?"
+ },
+ {
+  "id": "t1016_3",
+  "question": "In a vacuum, radio waves have a lower frequency than infrared radiation. Which of the following best compares radio waves and infrared radiation in a vacuum?",
+  "gold": "In a vacuum, radio waves and infrared radiation have the same speed. Therefore, radio waves have a longer wavelength than infrared radiation.",
+  "context": "tutor: Think of it like a race in the park. If radio waves are running faster than infrared waves / student: But how do they match then exactly? I get confused.",
+  "tutor_turn": "Remember, in a vacuum, radio waves and infrared radiation travel at the same speed. So, how might they differ?"
+ },
+ {
+  "id": "t1241_1",
+  "question": "How much is nine times four hundred fifty-eight?",
+  "gold": "4122",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Write the problem out as digits before anything else. What does 'nine times four hundred fifty-eight' look like as a multiplication?"
+ },
+ {
+  "id": "t802_5",
+  "question": "A large rock is motionless on a flat sidewalk. Which statement best explains why the rock remains motionless?",
+  "gold": "The forces acting on the rock are all balanced.",
+  "context": "tutor: Imagine a seesaw. If one side goes up, does the other go down? If one stays still, what mu / student: I still don\u2019t get it, does the ground push harder than the sidewalk?",
+  "tutor_turn": "Think of it this way: if the rock could slide, which force would it mostly need to overcome to start moving? What about when it\u2019s not moving?"
+ },
+ {
+  "id": "t444_3",
+  "question": "Which of these groups most favored immigration to the United States between 1880 and 1910?",
+  "gold": "factory owners",
+  "context": "tutor: Think of it like this: If you had a lemonade stand, who would you want to buy the most lem / student: I still don't get it, are they just asking which side made more money?",
+  "tutor_turn": "Think about it this way: Which group would likely need more customers to make more money in a growing city with more people moving in? Remember, the factory owners need the customers to sell their goods."
+ },
+ {
+  "id": "t712_5",
+  "question": "Mr. Wilfred used a full 2-liter bottle of liquid soap to fill two soap containers. \u2022 He put 0.475 liter of soap in the first container. \u2022 He put 0.35 liter of soap in the second container. How many liters of liquid soap remained in the bottle?",
+  "gold": "1.175 L",
+  "context": "tutor: Think of \"in total\" like counting all the soap he put in both containers together. How muc / student: Wait, do we add 0.475 liter and 0.35 liter again? Confusing.",
+  "tutor_turn": "Think of it like measuring with a measuring cup. You measure 0.475 liters for the first container and then 0.35 liters for the second. What's the total amount you measure altogether?"
+ },
+ {
+  "id": "t1130_3",
+  "question": "Consider this expression. 5x + 9 Which of the following is equivalent to the expression?",
+  "gold": "9 + 5x",
+  "context": "tutor: \"Equivalent\" here means the expressions have the same value for all values of x. Let's thi / student: I'm confused, does that mean the number stays the same? I get 9+5*x though.",
+  "tutor_turn": "So, in B, 9 + 5x, the number 9 is not being multiplied by x, right? It's just there by itself. Tell me, if x is 2, does 9 + (5*2) give the same result as just 5x?"
+ },
+ {
+  "id": "t1308_1",
+  "question": "Which of the following had the greatest impact on the outcome of the Civil War?",
+  "gold": "Economic differences between the Union and the Confederacy",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Wars need supplies. Compare the two sides in 1861: which had the factories, the railways, and the larger population?"
+ },
+ {
+  "id": "t69_5",
+  "question": "The total length of a vehicle is 205.83 inches. What is the length of the vehicle rounded to the nearest whole number?",
+  "gold": "206 inches",
+  "context": "tutor: Think of it like rounding numbers to the nearest stop on a number line. Where would 205.83 / student: I get it now, they mean find whole part again? Like 12 inches then?",
+  "tutor_turn": "Exactly! Now think of it this way: How would you describe the length to your friend if you had to use whole numbers? Would you say 205 inches or 206 inches?"
+ },
+ {
+  "id": "t1030_1",
+  "question": "When a light wave passes from air into clear syrup, its direction is shifted toward the normal. Which of the following best explains why this occurs?",
+  "gold": "The speed of the light wave is slower in the syrup.",
+  "context": "student: What does that have to do with the frequency of the light?",
+  "tutor_turn": "Think about how faster or slower moving things can change direction. What would happen if you threw a ball really fast versus a ball that was moving a bit slower? How does that affect where it lands?"
+ },
+ {
+  "id": "t759_3",
+  "question": "The width of a rectangle is 4 feet, and the diagonal length of the rectangle is 13 feet. Which measurement is closest to the length of this rectangle in feet?",
+  "gold": "12.4 ft",
+  "context": "tutor: Think of the diagonal as the longest line that can be drawn inside the rectangle, connecti / student: I still get confused by the term \"diagonal\". Is it just the line?",
+  "tutor_turn": "Imagine you have a rectangle cut in half diagonally from one corner to the opposite corner. That straight line you see is the diagonal. It's like folding the rectangle in half to make a triangle. Does that help show what the diagonal is?"
+ },
+ {
+  "id": "t239_5",
+  "question": "Which animals are most likely to carry the seeds found in berries from the parent plant to another area?",
+  "gold": "birds",
+  "context": "tutor: Oh, I see you're unsure about which animals eat berries. Let's think about a simple exampl / student: I'm still not sure, like, do birds eat berries too? I guess not but I'm confused.",
+  "tutor_turn": "Birds are known for their appetite for berries. Have you seen or heard of a bird eating berries?"
+ },
+ {
+  "id": "t1350_3",
+  "question": "Which number has the same digit in both the ones place and the hundreds place?",
+  "gold": "6242",
+  "context": "tutor: In a four-digit number, which positions are the ones place and the hundreds place? Point t / student: The tens place is in the thousands digit, not necessarily the ones place.",
+  "tutor_turn": "The ones is the last digit; the hundreds is the second from the left in a four-digit number. So you're comparing the last digit with the second one."
+ },
+ {
+  "id": "t1138_3",
+  "question": "For the school festival, Polly wants to make a snack mixture with 2 parts of dried fruit to every 3 parts of assorted nuts.How much dried fruit will she need to make 30 pounds of the mixture?",
+  "gold": "12 pounds",
+  "context": "tutor: Think of the total mixture as 2 parts fruit and 3 parts nuts together, which makes 5 parts / student: I still don't get the exact number though. Can you clarify?",
+  "tutor_turn": "Sure! If 5 parts make 30 pounds, how much would 1 part be?"
+ },
+ {
+  "id": "t197_1",
+  "question": "Mr. Ogata drove 276 miles from his house to Los Angeles at an average speed of 62 miles per hour. His trip home took 6.5 hours. How did his speed on the way home compare to his speed on the way to Los Angeles?",
+  "gold": "It was about 20 miles per hour slower.",
+  "context": "student: I'm confused about how his speed changed over time. Like, did he go faster or slower?",
+  "tutor_turn": "Think about it this way: When he drove to Los Angeles, it took him a bit longer than 5 hours. Now, he drove back home faster in 6.5 hours. Does that mean he might have driven faster or slower going home compared to going to Los Angeles?"
+ },
+ {
+  "id": "t1321_1",
+  "question": "Which group of numbers is in order from least to greatest?",
+  "gold": "0.25 1.0 1.6",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Before ordering anything, make the numbers comparable. Rewrite 1.0 and 1.6 and 0.25 so they all have the same number of decimal places."
+ },
+ {
+  "id": "t629_1",
+  "question": "Which situation can be represented by the equation y = 74x?",
+  "gold": "A company uses a total of y gallons of water at a rate of 74 gallons per hour for x hours.",
+  "context": "student: I get confused when it says \"in which 74 meals\" instead of \"how many meals\". Confused.",
+  "tutor_turn": "Think about it like this: If for every hour you work, you make 74 blue drinking glasses, how many would you make in x hours? That\u2019s what the equation is showing. Can you use your example of making 74 glasses per hour to count how many you make in 2 hours?"
+ },
+ {
+  "id": "t1264_3",
+  "question": "Which of the following factors would most likely cause a hurricane to decrease in strength?",
+  "gold": "moving over a continent",
+  "context": "tutor: What does a hurricane feed on? What is the fuel? / student: A hurricane feeds on warm ocean water for nutrients and energy, just like a plant needs su",
+  "tutor_turn": "Warm ocean water - the evaporation is what powers it. So anything that cuts off that supply weakens the storm."
+ },
+ {
+  "id": "t696_1",
+  "question": "Which answer choice does NOT describe the number 7,140?",
+  "gold": "The sum of seven thousands, one hundred, and forty tens",
+  "context": "student: Why do I need to figure out which choice isn't 7,140? Like, how would I know if it's wrong",
+  "tutor_turn": "Think of it like this: You know 7,140 is really seven big groups of one thousand and some smaller groups. Now, can you count in your head how many thousands and tens are in 7,140?"
+ },
+ {
+  "id": "t463_3",
+  "question": "Louis Pasteur\u2019s research into germ theory in the nineteenth century is significant because it",
+  "gold": "proved that cleanliness helps to prevent infections.",
+  "context": "tutor: Think about it like this: If germs can make your body sick, wouldn't cleaning and keeping  / student: I'm still not sure exactly how that makes a difference though.",
+  "tutor_turn": "Okay, let's think about it this way. If you have a clean plate and a dirty plate, and you eat from the dirty one, it might make you feel yucky. Germs sometimes make you feel yucky too. Squeaky clean hands help stop those yucky germs from getting into your body. Does that help make it clearer?"
+ },
+ {
+  "id": "t1068_1",
+  "question": "A teacher wrote a word problem that could be solved using this expression. 8 \u00d7 2 Which of these could be the teacher\u2019s word problem?",
+  "gold": "There were 8 baskets. There were 2 apples in each basket. What is the total number of apples in all of the baskets?",
+  "context": "student: Wait, what does \"a teacher's word problem\" even mean? Like, how do I know which one it is?",
+  "tutor_turn": "You're right to have doubts. A word problem is like a story about numbers. The teacher wrote an expression, and now they're asking which story fits that. Can you guess why 8 \u00d7 2 might be in the problem?"
+ },
+ {
+  "id": "t234_5",
+  "question": "Salt concentration, water temperature, plankton, and the whale shark might all be used in a description of an ocean",
+  "gold": "ecosystem.",
+  "context": "tutor: Oh, I see you're mixing up different ideas! Let's think about it this way: A food web is l / student: Wait, so it's like all these little fish swimming around, right? Confused.",
+  "tutor_turn": "Exactly! It's like all those little fish swimming around, but also the big turtles, seaweed on the bottom, and the sharks. What's still confusing, though, is why we'd use more than just the foods they eat? Can you think of what else an ecosystem would include?"
+ },
+ {
+  "id": "t1059_3",
+  "question": "A block of ice at \u20134\u00b0C and a cup of 80\u00b0C water are placed in a 23\u00b0C room. Which statement describes the flow of heat in this situation?",
+  "gold": "Heat flows into the ice and out of the water.",
+  "context": "tutor: You're right; it might seem weird. But guess what? Heat does naturally move from warmer th / student: I still get confused about which way heat moves exactly.",
+  "tutor_turn": "So, think of it like a seesaw. Whoever is heavier (hotter) pulls the lighter (cooler) person. In this case, the water is warmer and the ice is colder, so what do you think happens?"
+ },
+ {
+  "id": "t1309_5",
+  "question": "Which religious group has had the greatest increase in membership due to the increasing immigration from Latin American countries to the United States over the last fifty years?",
+  "gold": "Catholics",
+  "context": "tutor: Spanish and Portuguese colonisation brought it, and it stayed. So immigrants from that reg / student: What did your parents do?",
+  "tutor_turn": "Which option names that group?"
+ },
+ {
+  "id": "t1334_3",
+  "question": "Marcus spent $3.25 to wash his car. If one quarter operates the car wash for 60 seconds, how long did it take him to wash his car?",
+  "gold": "13 minutes",
+  "context": "tutor: Two conversions hide in this one. First: how many quarters are in $3.25? / student: Two quarters make up $3.25.",
+  "tutor_turn": "13 quarters. Each one buys 60 seconds, so multiply to get the total time in seconds."
+ },
+ {
+  "id": "t1346_1",
+  "question": "Which of the following was a primary cause of the Cold War between the United States and the Soviet Union?",
+  "gold": "a competition for political influence over other countries",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "The Cold War is called 'cold' for a reason. What does that tell you it was not?"
+ },
+ {
+  "id": "t292_5",
+  "question": "Which class of elements best conducts electricity?",
+  "gold": "metals",
+  "context": "tutor: Think of it this way: Metals are like water pipes. If you fill a metal pipe with water, it / student: Wait, so if I\u9009\u91d1\u5c5e\uff0c\u5b83\u5c31\u662f\u5bfc\u7535\u7684\u5417\uff1f\u6211\u8fd8\u662f\u6709\u70b9\u61f5\u3002",
+  "tutor_turn": "Yes, imagine metals are like copper pipes. They're great at letting electricity move through them. Now, think of nonmetals like plastic or glass \u2013 does it easy for electricity to flow through them?"
+ },
+ {
+  "id": "t1338_1",
+  "question": "Lenin hoped that the Russian Revolution of 1917 would",
+  "gold": "incite similar socialist rebellions throughout Europe.",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Lenin was a Marxist. In Marxist theory, was the revolution supposed to stop at one country's border?"
+ },
+ {
+  "id": "t1303_3",
+  "question": "Which of the following equations is true?",
+  "gold": "0.56 \u00f7 0.07 = 8",
+  "context": "tutor: You can't reason your way to this one - you have to test each equation. Start with the add / student: Start by testing each equation: addition first. What's\u524a\u51cf?",
+  "tutor_turn": "Keep going. For the division, a useful trick: 0.56 divided by 0.07 is the same as 56 divided by 7, because multiplying both by 100 doesn't change a quotient."
+ },
+ {
+  "id": "t1374_1",
+  "question": "Japanese attempts to create an empire prior to World War II were in conflict with the U.S. goal of",
+  "gold": "maintaining an open trade policy in Asia.",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "What did the United States want in Asia in the early 1900s - trade, or territory?"
+ },
+ {
+  "id": "t666_7",
+  "question": "Which statement does NOT correctly compare silicon with another element?",
+  "gold": "Silicon conducts electricity as well as copper does.",
+  "context": "tutor: Got you! How about a gas at room temperature? Like oxygen. Now think, what element is alwa / student: Solid, like salt or sugar at room temperature?",
+  "tutor_turn": "Perfect! Sodium is an example. So remember, just like flavors of ice cream, elements can be solids, liquids, or gases."
+ },
+ {
+  "id": "t1343_1",
+  "question": "A student has $25 to buy walnuts and cashews. \u2022 Walnuts cost $5 per pound. \u2022 Cashews cost $7 per pound. \u2022 The student buys 3 pounds of walnuts. Which of the following inequalities can be used to find c, the possible number of pounds of cashews that the student can buy?",
+  "gold": "15 + 7c \u2264 25",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "First, how much has the student already spent on walnuts? That part is fixed."
+ },
+ {
+  "id": "t1136_5",
+  "question": "For the school festival, Polly wants to make a snack mixture with 2 parts of dried fruit to every 3 parts of assorted nuts.How much dried fruit will she need to make 30 pounds of the mixture?",
+  "gold": "12 pounds",
+  "context": "tutor: Imagine you split 30 pounds into 5 equal parts. How much is each part? Then, since dried f / student: I still get confused with the ratio though. Can you show me a concrete number?",
+  "tutor_turn": "Sure! If you split 30 pounds into 5 equal parts, how much is each part? Then, since dried fruit is 2 parts of the total, what would that be?"
+ },
+ {
+  "id": "t1076_3",
+  "question": "Which of these numbers is 231,198 rounded to the nearest thousand?",
+  "gold": "231,000",
+  "context": "tutor: You're right, it helps to think about rounding like grouping gifts under a tree! Decide ho / student: I guess you mean how many hundredths to round it? Confused.",
+  "tutor_turn": "Think of 231,198 as a big pile of coins. How many groups of 100 (hundreds) can you make from this pile?"
+ },
+ {
+  "id": "t800_3",
+  "question": "A large rock is motionless on a flat sidewalk. Which statement best explains why the rock remains motionless?",
+  "gold": "The forces acting on the rock are all balanced.",
+  "context": "tutor: Think of it like when you push a heavy wagon with your friend. Even if your friend isn't p / student: Wait, does that mean the force from the ground balances out? That makes sense though.",
+  "tutor_turn": "Exactly! So, if the ground is pushing up on the rock just as hard as the rock is pushing down (with gravity), the rock stays in place. That's balanced forces. Do you think that answers the question?"
+ },
+ {
+  "id": "t953_3",
+  "question": "A piece of wire has a length of 110 inches. Which of the following measures is equivalent to the length of the wire?",
+  "gold": "9 feet 2 inches",
+  "context": "tutor: Think about how many inches are in one foot. Can you recall that? / student: I get confused by numbers like this. Do we just pick the closest?",
+  "tutor_turn": "Let's start simple. How many inches are in one foot?"
+ },
+ {
+  "id": "t1307_5",
+  "question": "What was one effect of the Fugitive Slave Act of 1850?",
+  "gold": "Tensions among the populations of northern and southern states increased.",
+  "context": "tutor: It obliged them to help capture escaped slaves, and it punished them if they refused. That / student: The act didn't simply require surrendering but meant taking legal action against suspected",
+  "tutor_turn": "What would that do to the feeling between North and South? Pick the option describing that effect."
+ },
+ {
+  "id": "t468_1",
+  "question": "Great Britain\u2019s stated reason for declaring war on Germany in 1914 was the",
+  "gold": "German invasion of Belgium.",
+  "context": "student: I dunno, did they really declare it like that or were they fighting over some stuff?",
+  "tutor_turn": "Think of it like a playground fight. Sometimes people start fighting over a small toy, but the bigger problem might not even be there. What do you think the big problem might be here?"
+ },
+ {
+  "id": "t155_3",
+  "question": "Celia has a large container in which four different kinds of coins are thoroughly mixed. She wants to take a sample of her coins to estimate which kind of coin she has the most. Which of the following methods is the best way for her to select a sample?",
+  "gold": "taking thirty coins out of the container without looking",
+  "context": "tutor: Taking samples helps her get an idea of which kind of coin she has the most, just like how / student: I still don't get it, does that mean she's looking at the coins one-by-one?",
+  "tutor_turn": "Not looking at each coin one-by-one is important to get an estimate without checking every single coin. What if we played a game where we pick coins without looking? Would that be a good way to guess which coin type we have more of?"
+ },
+ {
+  "id": "t225_11",
+  "question": "The digestion process begins in which of the following?",
+  "gold": "mouth",
+  "context": "tutor: Very good! You just explained it yourself. The mouth is the first part where digestion beg / student: So does that mean my food goes into my tummy first then somewhere else? Confused still.",
+  "tutor_turn": "Think of it this way: At the station (mouth), your train (food) gets cleaned and has parts removed before continuing its journey. What happens to your food after it gets cleaned at the station?"
+ },
+ {
+  "id": "t1221_3",
+  "question": "Mrs. Kabel is making a new vegetable garden. She needs to add a total of 75 cubic feet of dirt to her garden. Each bag of dirt contains 2 cubic feet of dirt. Mrs. Kabel estimates that she needs about 140 bags. Which statement best describes her estimate?",
+  "gold": "It is an overestimate because she needs to add only 38 bags to cover the 75 cubic feet.",
+  "context": "tutor: Think about how many bags you would need if each one gave you just 1 cubic foot of dirt. H / student: I still get confused about how exactly she calculates it again.",
+  "tutor_turn": "Okay, if each bag gives you 1 cubic foot and you need 75 cubic feet, how many bags would you need to buy?"
+ },
+ {
+  "id": "t1376_1",
+  "question": "Four items are placed the same distance from the magnet. Which one of the objects will be the easiest for the magnet to pull?",
+  "gold": "a 3-gram steel paper clip",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Magnets don't pull on everything. Which of these materials would a magnet grab at all?"
+ },
+ {
+  "id": "t46_1",
+  "question": "One stamp costs 34\u00a2. Two stamps cost 68\u00a2. Three stamps cost $1.02. If the cost of each stamp remains the same, how much would 4 stamps cost?",
+  "gold": "$1.36",
+  "context": "student: Wait, so does that mean it's still 34 cents per stamp? Confused.",
+  "tutor_turn": "Yes, it does! Each stamp costs 34 cents. Now, if you have 4 stamps, how much would that be in total?"
+ },
+ {
+  "id": "t1229_1",
+  "question": "One stamp costs 34\u00a2. Two stamps cost 68\u00a2. Three stamps cost $1.02. If the cost of each stamp remains the same, how much would 4 stamps cost?",
+  "gold": "$1.36",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "You already have three data points sitting there. What happens to the price each time one more stamp is added?"
+ },
+ {
+  "id": "t1078_3",
+  "question": "Which of these numbers is 231,198 rounded to the nearest thousand?",
+  "gold": "231,000",
+  "context": "tutor: Rounding to the nearest thousand means you look at the hundreds place to decide if you'll  / student: Wait, so do I add 1 to 3? That seems confusing.",
+  "tutor_turn": "Think of it this way: Which house number would you call if someone asked you about 310,000?"
+ },
+ {
+  "id": "t1231_3",
+  "question": "Which of the following is the best example of an early U.S. struggle to define the domestic authority of the central government?",
+  "gold": "The Whiskey Rebellion",
+  "context": "tutor: The question says 'domestic authority' - inside the country, not abroad. Which of these fo / student: The question asks where domestic authority is exercised within the United States instead o",
+  "tutor_turn": "Good. Now narrow it further: which one was the federal government testing whether it could enforce its own law on its own citizens who were refusing to obey it?"
+ },
+ {
+  "id": "t237_1",
+  "question": "Which animals are most likely to carry the seeds found in berries from the parent plant to another area?",
+  "gold": "birds",
+  "context": "student: I get confused about which animals carry the seeds. Like, do butterflies help?",
+  "tutor_turn": "Sure, let's think about it! Imagine you have a yummy berry. Do you think it would be easier to travel if a little bug or bird got inside it?"
+ },
+ {
+  "id": "t237_5",
+  "question": "Which animals are most likely to carry the seeds found in berries from the parent plant to another area?",
+  "gold": "birds",
+  "context": "tutor: Oh, that's a good question! Birds often find berries in trees and eat the yummy parts. But / student: Wait, so birds carrying them means all the seeds go everywhere? Confused.",
+  "tutor_turn": "Birds are really good, but remember not every seed gets carried. Some seeds might be too hard for birds to swallow and pass out. What happens to seeds in bird droppings that might not be safe?"
+ },
+ {
+  "id": "t49_3",
+  "question": "There are 1,000 meters in 1 kilometer. How many meters are in 5 kilometers?",
+  "gold": "5,000 meters",
+  "context": "tutor: Think of kilometers and meters like steps and whole steps. Each kilometer is like a big st / student: I get confused by big numbers right away.",
+  "tutor_turn": "Remember, when the problem says there are 1,000 meters in 1 kilometer, it's like knowing there are 10 marks on a ruler in 1 foot. Now, if you have 5 feet, how many marks are there?"
+ },
+ {
+  "id": "t353_5",
+  "question": "How did the rise to power and reign of Alexander most affect Greece?",
+  "gold": "He ended the power of the city-states and established a unified nation.",
+  "context": "tutor: Sure! Think about it like Alexander made Macedonia into a big school. What do you think th / student: I still don't get how Macedonia became so important though, like why would Macedonia matte",
+  "tutor_turn": "Remember, Alexander's rule wasn't just for Macedonia. Think about it this way: if your school decided to become the coolest, most exciting place ever, wouldn't everyone want to know about it?"
+ },
+ {
+  "id": "t294_5",
+  "question": "Which class of elements best conducts electricity?",
+  "gold": "metals",
+  "context": "tutor: Think of metals like superheroes for electricity. Why do you think that is? / student: I still don't get it, does it have anything to do with how they move charge?",
+  "tutor_turn": "Often, metals are called \"superheroes\" for electricity because they're really good at letting charge move through them easily. Now, can you guess why this might be true for metals?"
+ },
+ {
+  "id": "t1281_3",
+  "question": "Which event most contributed to the establishment of the United States Securities and Exchange Commission (SEC)?",
+  "gold": "the 1929 crash of the stock market",
+  "context": "tutor: What does the SEC actually do? What's it there to police? / student: The SEC is known for overseeing college athletics in the United States, ensuring fair and ",
+  "tutor_turn": "The stock market. So look for the event that made people conclude the market urgently needed policing."
+ },
+ {
+  "id": "t196_3",
+  "question": "Mr. Ogata drove 276 miles from his house to Los Angeles at an average speed of 62 miles per hour. His trip home took 6.5 hours. How did his speed on the way home compare to his speed on the way to Los Angeles?",
+  "gold": "It was about 20 miles per hour slower.",
+  "context": "tutor: Think about what we know: He drove 276 miles at 62 miles per hour to get to Los Angeles. N / student: I still don't get it, does that mean he drives slower back?",
+  "tutor_turn": "So, since he drove 276 miles to Los Angeles in about 4.5 hours at 62 mph, now he needs to cover the same 276 miles in 6.5 hours. How can you find out the speed for the trip back?"
+ },
+ {
+  "id": "t428_5",
+  "question": "What was the first major goal of President Abraham Lincoln\u2019s administration?",
+  "gold": "to maintain the unity of the country",
+  "context": "tutor: Think of it this way: If you were asked to put together a team to fix a big problem, why w / student: Wait, so they started because there was a problem? Like, racism?",
+  "tutor_turn": "Exactly! Abraham Lincoln was in charge because there was a big problem affecting the whole country. Can you guess what problem he faced when he became President?"
+ },
+ {
+  "id": "t417_1",
+  "question": "While the American colonies were fighting a revolution against England and forming a new nation, New Spain was establishing new settlements in California using what type of system?",
+  "gold": "mission",
+  "context": "student: Wait, do they mean using a system where settlers have their own land? I don't get it.",
+  "tutor_turn": "Think of what kind of place the missions were - where were people sent to live far away from home?"
+ },
+ {
+  "id": "t1283_5",
+  "question": "The vice president of sales took a client out to lunch. If the lunch was $44 and she gave a 20% tip, how much money did she spend on lunch?",
+  "gold": "$52.80",
+  "context": "tutor: Both. So this is two steps: work out 20% of $44, then add it on. 20% is a fifth, so divide / student: The total includes both the lunch and tip in a single calculation.",
+  "tutor_turn": "What's the tip, and what's the total once you add it to $44? Your answer must be bigger than $44."
+ },
+ {
+  "id": "t1268_3",
+  "question": "Sedrick and James are playing a game with a single pile of 10 cards. The object of the game is to take the last card(s). A player must take at least 1 card on each turn but cannot take more than 3 cards. Sedrick starts. He takes 3 cards. Next, James takes 2 cards. James ends up winning the game. What could be the last two moves?",
+  "gold": "Sedrick takes 2; James takes 3.",
+  "context": "tutor: Track the pile. It started at 10, Sedrick took 3, James took 2. How many cards are on the  / student: Let's count them: There were 10 cards initially, and Sedrick added 3 more. James then took",
+  "tutor_turn": "Five. And the rule says a turn is 1, 2 or 3 cards - never more. That rule alone disqualifies some of these options before you think about winning."
+ },
+ {
+  "id": "t1252_1",
+  "question": "Sophie has 527 seashells in her collection. Which of these equals 527?",
+  "gold": "500 + 20 + 7",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Say the number out loud in parts: five hundred, twenty, seven. What is each digit actually worth?"
+ },
+ {
+  "id": "t197_5",
+  "question": "Mr. Ogata drove 276 miles from his house to Los Angeles at an average speed of 62 miles per hour. His trip home took 6.5 hours. How did his speed on the way home compare to his speed on the way to Los Angeles?",
+  "gold": "It was about 20 miles per hour slower.",
+  "context": "tutor: Sure, let's look at it this way. When he drove to Los Angeles, he covered 276 miles. Now,  / student: I still confuse numbers here though. So it seems he went slower, right?",
+  "tutor_turn": "Think about it this way: If he drove 276 miles in 5 hours going to LA, his speed was supposed to be about 54 miles per hour. Now, if you can do 276 miles in just 6.5 hours, how fast do you think he drove going home? Can it be more or less than 54 miles per hour?"
+ },
+ {
+  "id": "t891_1",
+  "question": "The manager of a company wants to survey a representative sample of the company\u2019s employees to choose a company logo. Which of the following is a representative sample of the company\u2019s employees?",
+  "gold": "every third employee on the company\u2019s payroll",
+  "context": "student: I mean, how do we even know which employees belong? Like, does that even count as an emplo",
+  "tutor_turn": "True, we need to know who counts as an employee first. Do you think everyone who works there is considered an employee?"
+ },
+ {
+  "id": "t97_5",
+  "question": "Which shape must have four equal sides and four right angles?",
+  "gold": "square",
+  "context": "tutor: Think of a shape where if you cut it exactly in half from corner to corner, the two halves / student: Wait, so parallelograms are just those ones? I get confused with triangles.",
+  "tutor_turn": "Right, think of a rectangle where the corners are perfectly square. Can you see how all sides would be equal and all corners would be right angles?"
+ },
+ {
+  "id": "t1320_1",
+  "question": "The Maya, Aztec, and Inca civilizations each developed",
+  "gold": "complex architectural structures.",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "What do you actually picture when you think of the Maya, Aztecs and Inca? Say the first image."
+ },
+ {
+  "id": "t587_3",
+  "question": "Japanese attempts to create an empire prior to World War II were in conflict with the U.S. goal of",
+  "gold": "maintaining an open trade policy in Asia.",
+  "context": "tutor: Sure, let's think of it this way. An empire often means a country that wants to control ot / student: I still get lost when they use terms like \"monopolize\" though. Like, why would they want o",
+  "tutor_turn": "Think of it like sharing your toys. If you want to make sure you're the only one who gets to use them, that's like monopolizing. The U.S. wanted to share the toys (trade) so all countries, including Japan, could play fairly. What do you think that means for their goal in Asia?"
+ },
+ {
+  "id": "t1154_5",
+  "question": "During a space walk, an astronaut lets go of a tool, causing it to float away and bounce off the side of the space shuttle. Why does the astronaut see the tool hit the shuttle but not hear it?",
+  "gold": "Sound waves cannot travel through a vacuum.However, light waves can.",
+  "context": "tutor: Think of it like this: when you hear a noise, it\u2019s usually because sound waves travel from / student: Wait, so it's actually light? I'm not sure what that means for hitting a wall.",
+  "tutor_turn": "So, imagine the sound wave is like a loud whisper that can travel in air, but in space, there's no air. Light, on the other hand, travels everywhere, even through space. How does light from the tool reaching the shuttle compare to hearing it?"
+ },
+ {
+  "id": "t1330_5",
+  "question": "Which inequality is true if p = 3.4?",
+  "gold": "8.5 \u2265 2.5p",
+  "context": "tutor: 10.2. Now, is 10.2 less than 10.2? Careful - a strict 'less than' is not satisfied by bein / student: To solve an equation, make sure all terms are on the same side of the equals sign. Then pe",
+  "tutor_turn": "Work through the rest the same way, minding which symbols allow equality and which don't. Which one comes out true?"
+ },
+ {
+  "id": "t417_3",
+  "question": "While the American colonies were fighting a revolution against England and forming a new nation, New Spain was establishing new settlements in California using what type of system?",
+  "gold": "mission",
+  "context": "tutor: Think of what kind of place the missions were - where were people sent to live far away fr / student: I still don't get it, like how did they move people around there?",
+  "tutor_turn": "Think of the missions like big farms, but for people instead of crops. Who controlled these farms in the missions?"
+ },
+ {
+  "id": "t1036_5",
+  "question": "Pine trees are pollinated when the wind carries pollen grains from male pinecones to female pinecones. The female pinecones contain egg cells. Which statement describes what happens in a female pinecone during fertilization?",
+  "gold": "A haploid sperm cell and a haploid egg cell fuse together to form a zygote.",
+  "context": "tutor: So, the female pinecones do have special parts inside that hold eggs, right? While the pin / student: I'm not sure, like does the sperm just push the egg in? Confused.",
+  "tutor_turn": "Not exactly, think of it like a tiny race. The sperm has to find its partner\u2014it's the egg. Once they meet, they join together to form a new life. This joining happens inside the female cones, not just popping in. What do you think joins together inside the female cone?"
+ },
+ {
+  "id": "t1349_1",
+  "question": "A watermelon that weighed 12 pounds cost $5.76. What was the cost per ounce of the watermelon?",
+  "gold": "$0.03",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "It says cost per OUNCE but gives you pounds. What has to happen first?"
+ },
+ {
+  "id": "t1312_3",
+  "question": "Which of the following most affected the course and outcome of World War I?",
+  "gold": "American military and financial intervention in the war",
+  "context": "tutor: The question asks what most affected the course AND outcome. That means something that cha / student: It's a tricky one! To better understand, consider asking \"what major events or changes in ",
+  "tutor_turn": "By 1917 both sides were exhausted and roughly deadlocked. Ask what new factor arrived that one side had and the other didn't."
+ },
+ {
+  "id": "t310_3",
+  "question": "What characteristic of carbon (C) makes it essential to living organisms?",
+  "gold": "Carbon bonds in many ways with itself to form chains.",
+  "context": "tutor: So, carbon isn't just a gas, right? It can be in different forms. What do you think it\u2019s m / student: I get confused when it says form, like does it make cells or something?",
+  "tutor_turn": "Living things are made mostly of carbon. Why do you think that is? Can you think of why carbon would be important for living things?"
+ },
+ {
+  "id": "t1266_1",
+  "question": "Salt concentration, water temperature, plankton, and the whale shark might all be used in a description of an ocean",
+  "gold": "ecosystem.",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Look at the list itself: salt concentration, temperature, plankton, a shark. Sort those into living and non-living."
+ },
+ {
+  "id": "t1290_1",
+  "question": "Sterling silver is a combination of silver and copper. Which of the following is also a combination of two or more metals?",
+  "gold": "brass",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "The question defines the pattern for you: silver plus copper makes sterling silver. What word describes a metal that is a mixture of metals?"
+ },
+ {
+  "id": "t1127_5",
+  "question": "A cyclist rode her bicycle a distance of 5 miles. What is the total distance, in feet, she rode her bicycle?",
+  "gold": "26,400 feet",
+  "context": "tutor: So, a mile has 5280 feet. How does that help you figure out how many feet are in 5 miles? / student: I still don't get it exactly how miles and feet fit together here.",
+  "tutor_turn": "Think of it like this: if one mile is 5280 feet, then to find out how many feet are in 5 miles, you just need to multiply 5280 by 5, right?"
+ },
+ {
+  "id": "t1076_5",
+  "question": "Which of these numbers is 231,198 rounded to the nearest thousand?",
+  "gold": "231,000",
+  "context": "tutor: Think of 231,198 as a big pile of coins. How many groups of 100 (hundreds) can you make fr / student: I get confused about which group to pick though, does it matter?",
+  "tutor_turn": "Not really, we pick the group that's closest to our number without going over. So, how many full groups of 100 are in 231,198?"
+ },
+ {
+  "id": "t465_1",
+  "question": "The collapse of the last Chinese Empire in 1912 was caused by the imperial government\u2019s failure to",
+  "gold": "control foreign influence.",
+  "context": "student: Wait, how can they fail to educate the masses? That sounds weird.",
+  "tutor_turn": "Exactly, it doesn't make sense for an empire to fail at something it could control, right? Think of education like learning to ride a bike. If the government is in charge, they should be able to make sure everyone learns, or at least try. What do you think might have made it hard for them to do that?"
+ },
+ {
+  "id": "t1242_1",
+  "question": "In which of the following water samples do the water molecules have the least average kinetic energy?",
+  "gold": "300 mL of water at 15\u00b0C",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Kinetic energy of molecules - what does that have to do with a thermometer reading?"
+ },
+ {
+  "id": "t986_3",
+  "question": "Which of the following is the best example of thermal energy being transferred primarily through conduction?",
+  "gold": "when magma touches surrounding rock",
+  "context": "tutor: Think about what \"conduction\" means. It's when something gets hot or cold, passing that he / student: I still don't get how conduction works exactly though. Can you give me another example?",
+  "tutor_turn": "Sure! Think of how your hand feels warm when you pick up a steaming cup of coffee. The heat moves from the cup, through your palm, to your fingers. This is conduction. Can you see how the heat is passing directly from one layer to another in your hand?"
+ },
+ {
+  "id": "t1313_3",
+  "question": "The United States supported a revolution in Panama at the turn of the 20th century in order to",
+  "gold": "secure the right to build a canal through Central America.",
+  "context": "tutor: Look at a map of Panama. What is geographically special about that strip of land? / student: Panama's strip of land in the Caribbean Sea is notable for its long narrow coastline with ",
+  "tutor_turn": "It's the narrowest point between the two oceans. For a country with coastlines on both, cutting through there saves an enormous journey around South America."
+ },
+ {
+  "id": "t1283_1",
+  "question": "The vice president of sales took a client out to lunch. If the lunch was $44 and she gave a 20% tip, how much money did she spend on lunch?",
+  "gold": "$52.80",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "She pays for the lunch and she pays a tip. Does the total include both, or just one?"
+ },
+ {
+  "id": "t122_5",
+  "question": "It takes a machine 12 minutes to fill 200 bottles of soda. At this rate, how many minutes will it take the machine to fill 500 bottles of soda?",
+  "gold": "30 minutes",
+  "context": "tutor: Think of it like a race. If it takes 1 lap to run 200 meters, how long would it take to ru / student: Ready, ready, ready, but what exactly makes it take longer?",
+  "tutor_turn": "Imagine you're eating cookies. If it takes you 5 minutes to eat 10 cookies, how long would it take you to eat 15 cookies? Would it take less, the same, or more time?"
+ },
+ {
+  "id": "t1304_5",
+  "question": "Which three human-body systems coordinate to cause an arm to move?",
+  "gold": "nervous, muscular, skeletal",
+  "context": "tutor: A signal from the brain, travelling along nerves. Then something has to pull, and somethin / student: So, after fear triggers in the brain, muscles get excited, which pulls at the shoulder and",
+  "tutor_turn": "Name the system that sends the signal, the one that does the pulling, and the one that gets pulled. Which option lists exactly those three?"
+ },
+ {
+  "id": "t1081_1",
+  "question": "In a science experiment, Corine rounded the mass of a chemical to the nearest hundredth of a gram. The rounded mass of the chemical is 21.65 grams. Which of the following could be the actual mass of the chemical?",
+  "gold": "21.647 grams",
+  "context": "student: I mean, what even is that supposed to mean by \"rounding to the nearest hundredth\"? It soun",
+  "tutor_turn": "You're right, it might sound tricky. Think of it like this: If we had a ruler and we had to mark 21.65 grams, where would you place a dot to show it's rounded to the nearest hundredth?"
+ },
+ {
+  "id": "t1325_5",
+  "question": "Which of the following is a reproductive advantage that bacteria have but viruses do not?",
+  "gold": "Bacteria can replicate their DNA without a host cell.",
+  "context": "tutor: Inside a host cell - it can't copy itself alone. A bacterium can divide by itself in a pud / student: Inside a host cell - it can't copy itself alone. A bacterium can divide by itself in a pud",
+  "tutor_turn": "Which option states that independence? Watch out for the ones that credit bacteria with structures they don't actually have."
+ },
+ {
+  "id": "t203_1",
+  "question": "How many millimeters are in 20 centimeters?",
+  "gold": "200 millimeters",
+  "context": "student: I guess it's asking how many mm is that? I'm confused, they're both same.",
+  "tutor_turn": "Think of it like this: A centimeter is taller than a millimeter, right? Now, if you have 20 centimeters, how many of those tiny millimeters would you need to line up side by side to reach 20 centimeters tall?"
+ }
+]

@@ -1,0 +1,1087 @@
+[
+ {
+  "id": "t814_1",
+  "question": "A pitcher throws a ball toward a player holding a softball bat. The player uses the bat to hit the ball. The bat applies a 10-newton force to the ball. Which statement correctly describes the reaction force between the bat and ball?",
+  "gold": "The reaction force is the force of the ball on the bat.",
+  "context": "student: I get confused when it's like a bat hitting a ball and not just moving it. What do I even ",
+  "tutor_turn": "Think of it like a push and a pull. When the bat pushes on the ball, what do you think might happen to the ball?"
+ },
+ {
+  "id": "t1326_3",
+  "question": "Atoms of which two elements have a combined total of 23 protons?",
+  "gold": "Sodium, Na, and magnesium, Mg",
+  "context": "tutor: You need a periodic table for this one, or memory. What is an element's atomic number? / student: To understand the concept of an element\u2019s atomic number, it could be confusing as it seems",
+  "tutor_turn": "The number of protons. So this is really asking which pair of atomic numbers adds to 23."
+ },
+ {
+  "id": "t1238_3",
+  "question": "Which of the following best describes the inheritance of a sex-linked trait?",
+  "gold": "an allele carried on an X chromosome that can affect males or females",
+  "context": "tutor: What makes a trait 'sex-linked' in the first place - where does the gene sit? / student: Sex-linked traits are inherited from the mother or father, typically in pairs. They are as",
+  "tutor_turn": "It sits on a sex chromosome, and almost always the X. Now the important part: males have one X and females have two, so a recessive allele on the X shows up in males far more often."
+ },
+ {
+  "id": "t1251_5",
+  "question": "Plants grow in many different shapes and sizes. Much of their shape depends on an internal structure that is composed of carbon-containing molecules such as cellulose and lignin. Plants that have a strong internal structure can grow larger than other plants because their structure can support their size. Plants obtain the majority of the carbon necessary for building these structural molecules from \u2014",
+  "gold": "air",
+  "context": "tutor: Most people say soil, and it's the wrong instinct. Think about photosynthesis instead: nam / student: Plants capture sunlight through chlorophyll absorption, which then powers the process of p",
+  "tutor_turn": "One of the things it takes in contains carbon. Where does the plant get that from?"
+ },
+ {
+  "id": "t654_3",
+  "question": "A science class has an aquarium in which fish and aquatic plants are growing. How is carbon dioxide directly involved in the survival of organisms in the aquarium?",
+  "gold": "The plants need carbon dioxide to make sugar.",
+  "context": "tutor: Think of what you learned about oxygen and plants. How do plants use oxygen? Now, imagine  / student: I still don't get it, does it mean they need less CO2 or more? I'm confused.",
+  "tutor_turn": "Remember how plants make their own food using energy from the sun? What if we said they need a different gas to do that instead? Which gas do plants use from the air to make food?"
+ },
+ {
+  "id": "t72_3",
+  "question": "The sales tax for an item is $0.47. What is the amount of tax rounded to the nearest dime?",
+  "gold": "$0.50",
+  "context": "tutor: It means you want to round the tax amount to the nearest whole number or half of a dollar. / student: I still get lost between rounding down and rounding up. Which one should I use?",
+  "tutor_turn": "Think of it like quarters. Which quarter is closer to $0.47 - the quarter at $0.25 or the one at $0.50?"
+ },
+ {
+  "id": "t1320_3",
+  "question": "The Maya, Aztec, and Inca civilizations each developed",
+  "gold": "complex architectural structures.",
+  "context": "tutor: What do you actually picture when you think of the Maya, Aztecs and Inca? Say the first im / student: Sure! The first image that comes to mind is the vibrant cultures of Mesoamerica, where anc",
+  "tutor_turn": "Most people picture the stonework - pyramids, temples, terraces, cities. That's the common thread across all three, despite them being far apart and unconnected."
+ },
+ {
+  "id": "t1357_1",
+  "question": "The primary objective of Harlem Renaissance writers was to",
+  "gold": "generate pride in African-American culture.",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "The Harlem Renaissance was an explosion of writing, music and art. What were those writers celebrating?"
+ },
+ {
+  "id": "t1331_5",
+  "question": "Which development most enabled early peoples to form permanent settlements?",
+  "gold": "advances in agricultural production",
+  "context": "tutor: A food supply that stays put. Hunting and gathering makes you follow the food; growing it  / student: People leave their homes for safety, shelter, and sustenance.",
+  "tutor_turn": "Which option names that change? The others are things that tend to arrive after settlement, not before it."
+ },
+ {
+  "id": "t585_5",
+  "question": "Japanese attempts to create an empire prior to World War II were in conflict with the U.S. goal of",
+  "gold": "maintaining an open trade policy in Asia.",
+  "context": "tutor: Think of it like this: Japan wanted to be the boss in parts of Asia, just like if you want / student: I'm still not sure, like what exactly did 'playgroup' mean here?",
+  "tutor_turn": "Think about it this way: If you and your friends were in charge of a sandbox, but other kids wanted to play, would that make you happy or the others? Japan wanted to control certain areas in Asia, but the U.S. thought it was better for everyone to decide what areas everyone could play in, wherever they chose."
+ },
+ {
+  "id": "t526_3",
+  "question": "What would be considered a significant social effect of the First Great Awakening?",
+  "gold": "The colonists began to challenge the hierarchical structure of existing religious denominations.",
+  "context": "tutor: Significant means it had a big impact, right? Like, something that had many people talking / student: I get confused by terms like \"big impact,\" but then again, what else could it be?",
+  "tutor_turn": "Think of it like this: if a change made a story on the news, it likely had a big impact on people's lives. Now, can you see how the First Great Awakening might have made the church stories more exciting or different?"
+ },
+ {
+  "id": "t1065_3",
+  "question": "Which of the following statements about the slopes of two perpendicular lines could be true?",
+  "gold": "One slope is 0; the other is undefined.",
+  "context": "tutor: Perpendicular lines are like a corner or a 90-degree angle where they meet. Imagine lines  / student: I get confused by these angles and stuff. Can you give me a concrete example?",
+  "tutor_turn": "Sure! Think of a road going straight up and down, and another going straight side to side. They cross like an L. That\u2019s perpendicular. Now, let\u2019s draw a simpler example with lines on a piece of paper."
+ },
+ {
+  "id": "t371_5",
+  "question": "China\u2019s influence on Medieval Japan is illustrated by Japan\u2019s development of",
+  "gold": "a writing system.",
+  "context": "tutor: Remember, having a special type of warrior, like the samurai, doesn't always mean they mak / student: I still don\u2019t get it, like do they use anything like swords there again?",
+  "tutor_turn": "Think about if the samurai had any written documents or records. Does that sound like something your sentence could be?"
+ },
+ {
+  "id": "t807_5",
+  "question": "A student observes several species of plants growing in a drainage ditch. Some species have short roots, while others have long roots. During periods of heavy rain, the ditch fills with fast-moving water, which uproots more plants that have short roots than long roots. Which short-term effect will most likely result from a year with more heavy rain than normal?",
+  "gold": "Most plants in the ditch will be plants with long roots.",
+  "context": "tutor: Imagine a toy boat floating in a cup of water. Now, if you started splashing the water qui / student: So if there's more water, does that make them root less or more? Confusing.",
+  "tutor_turn": "Think of it this way: if you push on a toy boat that's in still water, it doesn't move much, right? But if you push on it in fast-moving water, it's harder to keep it still, and it moves around more. Which would be easier with the same force: moving a heavy object in still or fast-moving water?"
+ },
+ {
+  "id": "t1333_1",
+  "question": "A student planted an oak tree that was three meters tall. The tree was exposed to sunlight, water, and air. One year later, the tree was four meters tall. Where did the tree obtain most of the carbon necessary for its growth?",
+  "gold": "from the air",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "The tree gained a metre of solid wood. Where do you think that material physically came from?"
+ },
+ {
+  "id": "t708_5",
+  "question": "Dion ran 3.75 kilometers each day to prepare for a race. What was the number of kilometers that Dion ran during 28 days?",
+  "gold": "105 km",
+  "context": "tutor: Think of it like this: if you have 3.75 candies and you get 28 more candies every day for  / student: No, you'd add 3.75 twenty-eight times.",
+  "tutor_turn": "Perfect! So, you need to multiply 3.75 by 28. What do you think the answer might be around?"
+ },
+ {
+  "id": "t1045_1",
+  "question": "A student planted an oak tree that was three meters tall. The tree was exposed to sunlight, water, and air. One year later, the tree was four meters tall. Where did the tree obtain most of the carbon necessary for its growth?",
+  "gold": "from the air",
+  "context": "student: Wait, how does growing trees get their carbon from the soil? I get confused always.",
+  "tutor_turn": "You're right, it can be tricky. Let's think about where plants get their food and energy. Was the tree eating anything while growing?"
+ },
+ {
+  "id": "t1258_3",
+  "question": "Which of these revolves around a planet?",
+  "gold": "a moon",
+  "context": "tutor: What does 'revolves around' mean - which thing is at the centre and which is going around  / student: Revolution means_FRIENDLY movement of something in circles around someone or something els",
+  "tutor_turn": "The question fixes the centre as a planet. So you need something that orbits a planet, not something that orbits a star."
+ },
+ {
+  "id": "t1200_1",
+  "question": "How does the leaf of a plant help the plant to survive?",
+  "gold": "Leaves produce the food.",
+  "context": "student: I get confused by all those questions. What exactly do leaves do?",
+  "tutor_turn": "Leaves are like nature's solar panels for plants. What happens when you put food on a plate in the sun? It gets cooked! Leaves do something similar but on a tiny scale."
+ },
+ {
+  "id": "t1346_5",
+  "question": "Which of the following was a primary cause of the Cold War between the United States and the Soviet Union?",
+  "gold": "a competition for political influence over other countries",
+  "context": "tutor: Not direct fighting between the two of them. So the competition happened somewhere else -  / student: It suggests that the rivalry involved mutual support rather than conflict, emphasizing coo",
+  "tutor_turn": "Which option describes competing for influence rather than fighting directly?"
+ },
+ {
+  "id": "t1346_3",
+  "question": "Which of the following was a primary cause of the Cold War between the United States and the Soviet Union?",
+  "gold": "a competition for political influence over other countries",
+  "context": "tutor: The Cold War is called 'cold' for a reason. What does that tell you it was not? / student: It's because the term \"cold war\" has been used in various contexts, but \"cold\" specificall",
+  "tutor_turn": "Not direct fighting between the two of them. So the competition happened somewhere else - through allies, aid, influence over third countries."
+ },
+ {
+  "id": "t860_1",
+  "question": "What was one result of the election of Andrew Jackson in 1828?",
+  "gold": "Increased levels of voter participation",
+  "context": "student: Like, what's one thing he might have done after winning?",
+  "tutor_turn": "Andrew Jackson became very popular among many people because they liked how he treated ordinary folks. Think about it like when you get praised at school for helping someone - that makes you feel good and want to help more. Now, can you guess which effect we're looking for, where more people seemed to vote for him?"
+ },
+ {
+  "id": "t675_1",
+  "question": "We [New Englanders] look upon the states, not as separated, but as united. We love to dwell on that union, and on the mutual happiness which it has so much promoted. . . . In our contemplation, Carolina and Ohio are parts of the same country. . . . We do not impose geographical limits to our patriotic feeling or regard. . . . \u2014Senator Daniel Webster, reply to Senator Robert Hayne, In this reply, Daniel Webster is reacting to \u2014",
+  "gold": "an attempted nullification of a federal law by a state",
+  "context": "student: Like, what does he mean by \"parts of the same country\"? I get confused.",
+  "tutor_turn": "Think of it like having many friends who all live in one big neighborhood. Even though each friend's house is separate, they're all part of the same neighborhood where they all play and visit. Does that help show how Daniel Webster sees the states?"
+ },
+ {
+  "id": "t1256_3",
+  "question": "Which of these numbers is 231,198 rounded to the nearest thousand?",
+  "gold": "231,000",
+  "context": "tutor: Rounding to the nearest thousand means the answer will end in three zeros. Which digit dec / student: When rounding to the nearest thousand, if the number ends in zero or one, you round up; ot",
+  "tutor_turn": "The hundreds digit. Look at 231,198 - the thousands digit is 1 and the hundreds digit is 1. What does a hundreds digit of 1 tell you to do?"
+ },
+ {
+  "id": "t217_5",
+  "question": "Sterling silver is a combination of silver and copper. Which of the following is also a combination of two or more metals?",
+  "gold": "brass",
+  "context": "tutor: Brass is made from two metals mixed together. Do you know which two metals make up brass? / student: I still don't get it, what makes silver unique again?",
+  "tutor_turn": "Think of brass like when you mix play-doh colors. What two main metals are mixed to make brass?"
+ },
+ {
+  "id": "t48_3",
+  "question": "There are 1,000 meters in 1 kilometer. How many meters are in 5 kilometers?",
+  "gold": "5,000 meters",
+  "context": "tutor: Think of it like this: If 1 kilometer is like 10 kids holding hands (that's how long it us / student: I still don't get it, like what does that have to do with meters?",
+  "tutor_turn": "Imagine you have 5 big jumps instead of 1 jump. If one jump is 10 meters, how many meters would 5 jumps be?"
+ },
+ {
+  "id": "t1156_5",
+  "question": "Which of the following is true about the planets in the solar system?",
+  "gold": "All planets have an elliptical orbit.",
+  "context": "tutor: Think of it like baking a cake. The surface temperature is how warm it feels on the outsid / student: I still don't get it, like why would some planets be hotter than others?",
+  "tutor_turn": "Imagine you have three cups of water, and you heat them up to three different temperatures. Which cup do you think would feel the warmest when you touch it?"
+ },
+ {
+  "id": "t1090_5",
+  "question": "Consider this expression. \u20130.25 \u00f7 0.50 Which of the following is equivalent to the expression?",
+  "gold": "\u20130.50",
+  "context": "tutor: Imagine you have 10 apples and share them equally among 2 friends. Each gets 5 apples. Now / student: I still don't get it exactly how the numbers turn into the same thing though.",
+  "tutor_turn": "Maybe you're thinking about sharing isn't exactly the same as dividing. But remember, dividing by a number is like sharing equally. So, let's think of \u20130.25 divided by 0.5 as sharing \u20130.25 equally among 0.5 groups. How might you figure that out?"
+ },
+ {
+  "id": "t1311_1",
+  "question": "Fatima paid for 5 pallets of grass to be delivered. \u2022 Each pallet of grass cost $129.95. \u2022 Fatima paid $76.20 for delivery. What is the total amount Fatima paid?",
+  "gold": "$725.95",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Two different kinds of cost here. Which one repeats five times, and which happens once?"
+ },
+ {
+  "id": "t1281_5",
+  "question": "Which event most contributed to the establishment of the United States Securities and Exchange Commission (SEC)?",
+  "gold": "the 1929 crash of the stock market",
+  "context": "tutor: The stock market. So look for the event that made people conclude the market urgently need / student: What happened next sounds complicated! It might be worth asking more specific questions so",
+  "tutor_turn": "Which of these was a market collapse severe enough to trigger that? Check the dates too - the SEC is a 1930s creation."
+ },
+ {
+  "id": "t1328_5",
+  "question": "What was the Spanish Inquisition (1478\u20131834)?",
+  "gold": "the religious court established to find and punish heretics",
+  "context": "tutor: To question or investigate. This was an institution that investigated people's beliefs, ru / student: Inquisitive minds often delve into mysteries, investigating and questioning beliefs to lea",
+  "tutor_turn": "Which option describes a court investigating belief? Read each one and ask whether it is about religion or about money and territory."
+ },
+ {
+  "id": "t1355_5",
+  "question": "Which of these expressions has a value less than 10?",
+  "gold": "10 \u00d7 0 \u00d7 2",
+  "context": "tutor: Anything multiplied by zero is zero, no matter what else is in the product. Zero is certai / student: Is it challenging? Let's break down this expression step-by-step: (6 x 8) \u00f7 2 + 9 - 4. Thi",
+  "tutor_turn": "Check the rest to be sure only one qualifies, then say which expression has a value under 10."
+ },
+ {
+  "id": "t1364_3",
+  "question": "Leah\u2019s car has a gasoline tank that holds 20 gallons of gas. On Monday, Leah paid $2.23 per gallon of gas. If gas goes up $0.11 per gallon, how much more will Leah pay for 20 gallons of gas?",
+  "gold": "$2.20",
+  "context": "tutor: Careful - it asks how much MORE she pays, not how much she pays. / student: To understand how much more she pays, we need to know her original price first.",
+  "tutor_turn": "So you only need the extra bit: the price rose by $0.11 on each of 20 gallons."
+ },
+ {
+  "id": "t1018_5",
+  "question": "In a vacuum, radio waves have a lower frequency than infrared radiation. Which of the following best compares radio waves and infrared radiation in a vacuum?",
+  "gold": "In a vacuum, radio waves and infrared radiation have the same speed. Therefore, radio waves have a longer wavelength than infrared radiation.",
+  "context": "tutor: Sure! Think of frequency like the number of steps a runner takes in a certain time. If rad / student: Wait, so it's like they're running more slowly then? That makes sense.",
+  "tutor_turn": "Exactly! So if radio waves are running more slowly than infrared radiation, does that mean they're taking bigger steps or smaller steps? Since they're slower, their steps must be bigger. Can you see how this connects to their wavelength now?"
+ },
+ {
+  "id": "t1356_5",
+  "question": "The United Nations statement of principles was based on the belief that",
+  "gold": "an international peacekeeping organization could settle disputes without warfare.",
+  "context": "tutor: Another war - and their idea was that if countries argued in a room together, they might n / student: The UN was founded because countries had different interests and were more likely to engag",
+  "tutor_turn": "Which option describes settling disputes by talking rather than by force?"
+ },
+ {
+  "id": "t1374_3",
+  "question": "Japanese attempts to create an empire prior to World War II were in conflict with the U.S. goal of",
+  "gold": "maintaining an open trade policy in Asia.",
+  "context": "tutor: What did the United States want in Asia in the early 1900s - trade, or territory? / student: What did the United States want in Asia during the early 1900s - trade, or territory?",
+  "tutor_turn": "Trade, and specifically the ability to trade everywhere rather than being shut out. That was the point of the Open Door policy."
+ },
+ {
+  "id": "t257_5",
+  "question": "Which of these revolves around a planet?",
+  "gold": "a moon",
+  "context": "tutor: Imagine the Earth orbits the Sun. Now, if an asteroid is like a big rock, does it think it / student: I still get confused by the word 'revolves'. Like, does it move around itself or something",
+  "tutor_turn": "Think of a whirlpool in a bathtub. The water moves around something in the middle, right? Now, imagine a rock-like thing in space moving around something big in the middle. Does that help with the idea of revolve?"
+ },
+ {
+  "id": "t952_5",
+  "question": "A piece of wire has a length of 110 inches. Which of the following measures is equivalent to the length of the wire?",
+  "gold": "9 feet 2 inches",
+  "context": "tutor: Let's think about this: Can you tell me how many inches are in 1 foot? / student: I get that 10 ft is about 30 yds which is like 90' but I\u2019m still not sure exactly what\u2019s b",
+  "tutor_turn": "So, how many inches are there in 1 foot? Can you count them out if you had 1 foot of a string?"
+ },
+ {
+  "id": "t1343_3",
+  "question": "A student has $25 to buy walnuts and cashews. \u2022 Walnuts cost $5 per pound. \u2022 Cashews cost $7 per pound. \u2022 The student buys 3 pounds of walnuts. Which of the following inequalities can be used to find c, the possible number of pounds of cashews that the student can buy?",
+  "gold": "15 + 7c \u2264 25",
+  "context": "tutor: First, how much has the student already spent on walnuts? That part is fixed. / student: The student wonders exactly how much they've already spent on walnuts.",
+  "tutor_turn": "3 pounds at $5 is $15, which is why 15 appears in some of the options. Then cashews add $7 for each pound, which is the 7c term."
+ },
+ {
+  "id": "t1295_5",
+  "question": "The digestion process begins in which of the following?",
+  "gold": "mouth",
+  "context": "tutor: Chewing - and saliva starts working on it too, which means digestion is already underway b / student: What's next after swallowing? How does the saliva help digest the food further?",
+  "tutor_turn": "So which part of the body is that? Look for the one that comes first in the sequence, not the one that does the most work."
+ },
+ {
+  "id": "t806_3",
+  "question": "A student observes several species of plants growing in a drainage ditch. Some species have short roots, while others have long roots. During periods of heavy rain, the ditch fills with fast-moving water, which uproots more plants that have short roots than long roots. Which short-term effect will most likely result from a year with more heavy rain than normal?",
+  "gold": "Most plants in the ditch will be plants with long roots.",
+  "context": "tutor: Think of it like when you water your plants. Sometimes they grow more leaves or flowers wh / student: Wait, so more rain makes plants taller too? That seems random though.",
+  "tutor_turn": "Got it, so rain affects plants differently. If short roots are uprooted more, that means the plants with long roots might be better at staying in the ground during strong water. So, what do you think happens to plants with long roots when there's more rain than normal?"
+ },
+ {
+  "id": "t812_1",
+  "question": "A pitcher throws a ball toward a player holding a softball bat. The player uses the bat to hit the ball. The bat applies a 10-newton force to the ball. Which statement correctly describes the reaction force between the bat and ball?",
+  "gold": "The reaction force is the force of the ball on the bat.",
+  "context": "student: wait, what does \"reaction force\" mean here exactly? Like, what's it doing there?",
+  "tutor_turn": "Think of it like a push and a pull. When you push on something, something pushes back, right? The ball's push on the bat is like that push, and the bat's push on the ball is the reaction. Which option talks about the ball pushing back?"
+ },
+ {
+  "id": "t296_1",
+  "question": "In a comparison of metals to nonmetals, metals tend to have",
+  "gold": "greater conductivity and higher melting points than nonmetals.",
+  "context": "student: I guess it's about how they react differently? I get confused about the numbers.",
+  "tutor_turn": "So, imagine metals and nonmetals are like different types of cookies in a jar. Metals are the soft ones that stick to a magnet, while nonmetals are crunchy. Which do you think has a higher melting point? Metal cookies or crunchy nonmetal cookies?"
+ },
+ {
+  "id": "t734_5",
+  "question": "Which situation could be represented by the equation 10.75 = 5.5n?",
+  "gold": "Ricardo ran a total of 10.75 miles. He ran 5.5 miles each hour. What is n, the number of hours Ricardo ran?",
+  "context": "tutor: Imagine you have 10.75 cookies, and that's the whole thing. Now, if you share these cookie / student: I still feel confused about what part 'n' means exactly.",
+  "tutor_turn": "Think of it like splitting a cake. If you have one whole cake and you want to cut it into pieces, with each piece being the same size, and you want 5.5 pieces, how many pieces will each be?"
+ },
+ {
+  "id": "t956_3",
+  "question": "Newton\u2019s universal law of gravitation and Coulomb\u2019s law have mathematical formulas that look similar. Which of the following is a difference between the forces described by these two laws?",
+  "gold": "The force due to gravity is only attractive, but the force due to electric charge can be attractive or repulsive.",
+  "context": "tutor: Think about what makes gravity and electric charge different. What do you need to know abo / student: Wait, I still don't get it, is there some formula or explanation?",
+  "tutor_turn": "Let's think about what each force tells us. Gravity is like the force that makes things fall down, while electric charge is about things like a battery that gives off electricity. What do you think makes these different from each other?"
+ },
+ {
+  "id": "t1230_5",
+  "question": "When a light wave passes from air into clear syrup, its direction is shifted toward the normal. Which of the following best explains why this occurs?",
+  "gold": "The speed of the light wave is slower in the syrup.",
+  "context": "tutor: It's the speed - light moves at different rates through different materials, and the bendi / student: When light crosses from one material into a different one, it changes its color or wavelen",
+  "tutor_turn": "So connect the two. The beam bent toward the normal going in. What does that tell you about how fast it is travelling once it is inside the syrup?"
+ },
+ {
+  "id": "t999_5",
+  "question": "Which of the following is a reproductive advantage that bacteria have but viruses do not?",
+  "gold": "Bacteria can replicate their DNA without a host cell.",
+  "context": "tutor: Right, bacteria need host cells to grow and reproduce. What do factories, like bacteria, u / student: But viruses don't have cells, so how do they reproduce then?",
+  "tutor_turn": "Viruses are tiny invaders that don't have their own way to reproduce. They use host cells' machinery to make copies of themselves. How does this help bacteria more than viruses do? Can you think of any advantages that make bacteria's life easier?"
+ },
+ {
+  "id": "t289_1",
+  "question": "What do the elements sulfur (S), nitrogen (N), phosphorus (P), and bromine (Br) have in common?",
+  "gold": "They are nonmetals.",
+  "context": "student: Wait, what's the big deal with those elements? Confused.",
+  "tutor_turn": "It's okay to feel confused! Think of these elements as a group of friends. What do you think makes them similar?"
+ },
+ {
+  "id": "t1301_1",
+  "question": "Which of the following processes moves carbon from organisms to the nonliving environment?",
+  "gold": "decomposition",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Carbon is in every living thing. When something dies, how does that carbon get back out into the soil and air?"
+ },
+ {
+  "id": "t1331_1",
+  "question": "Which development most enabled early peoples to form permanent settlements?",
+  "gold": "advances in agricultural production",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "What has to be true before people can stop moving around and stay in one place?"
+ },
+ {
+  "id": "t157_5",
+  "question": "Emil wants to find out the most popular football team at a game between the home team and the visiting team. Which of the following methods will give him the most accurate results?",
+  "gold": "surveying a group of people standing in line for tickets",
+  "context": "tutor: Imagine you're at a party and want to know which flavor most people like. Would you ask th / student: Wait, so they pick the visitor then? Like how do I know which one they mean exactly?",
+  "tutor_turn": "Right, you want people who will see plenty about both teams. If they see lots of visiting team stuff, that tells you people like the visiting team. Now, you see why not just the cheerleaders or ticket buyers might give you the right answer?"
+ },
+ {
+  "id": "t1257_5",
+  "question": "Which of the following is the best example of heat being transferred by conduction?",
+  "gold": "rocks buried in sand absorbing heat from surrounding sand",
+  "context": "tutor: Direct contact between things that are touching, with no fluid carrying the heat around an / student: What does direct contact mean in terms of materials?",
+  "tutor_turn": "Now test each option for touching-without-flowing. Two involve moving fluids and one involves sunlight crossing a gap. Which is left?"
+ },
+ {
+  "id": "t29_1",
+  "question": "How much is nine times four hundred fifty-eight?",
+  "gold": "4122",
+  "context": "student: I mean, how do you even multiply numbers? Like, does it go up or down?",
+  "tutor_turn": "Remember, multiplying is like having groups of the same number. So if you have 9 groups of 458, how many do you get in total?"
+ },
+ {
+  "id": "t887_3",
+  "question": "One evening, the temperature decreased by 5\u00b0F during the first hour after sunset, and then decreased by 2\u00b0F each hour for the next 7 hours. The temperature increased by 14.5\u00b0F the next morning and then increased by 11\u00b0F that afternoon. What was the total change in temperature?",
+  "gold": "The temperature increased by a total of 6.5\u00b0F.",
+  "context": "tutor: Think about what happens to the temperature in the morning. Does it ever go lower than it  / student: I still don't get it, did they mean 14.5\u00b0F increase or decrease?",
+  "tutor_turn": "Remember, when something increases, it gets higher or warmer. So, what do you think happened with the temperature in the morning? It went higher, didn't it?"
+ },
+ {
+  "id": "t923_3",
+  "question": "Which of the following cellular structures store the instructions that determine the color of a cat\u2019s fur?",
+  "gold": "chromosomes",
+  "context": "tutor: Yes, it does have to do with DNA. DNA holds the instructions for everything in an organism / student: Wait, so if DNA tells them the colors, where are they stored exactly?",
+  "tutor_turn": "DNA is often stored inside special structures within the cell called the nucleus. It's like the cell's big information room. Now, can you guess why DNA wouldn't be in each of the other options like flagella or vacuoles?"
+ },
+ {
+  "id": "t551_1",
+  "question": "The primary objective of Harlem Renaissance writers was to",
+  "gold": "generate pride in African-American culture.",
+  "context": "student: Like, what exactly did they aim to improve? Literacy rates?",
+  "tutor_turn": "Not exactly. Think about why education and reading are important, and how they might be linked to feeling proud of your culture. How might improving how you see yourself affect others around you?"
+ },
+ {
+  "id": "t1229_3",
+  "question": "One stamp costs 34\u00a2. Two stamps cost 68\u00a2. Three stamps cost $1.02. If the cost of each stamp remains the same, how much would 4 stamps cost?",
+  "gold": "$1.36",
+  "context": "tutor: You already have three data points sitting there. What happens to the price each time one  / student: So, when you add another stamp to a piece of art, how does its value change?",
+  "tutor_turn": "Exactly - it climbs by the same amount every time, because every stamp costs the same. So starting from three stamps at $1.02, what single step gets you to four stamps?"
+ },
+ {
+  "id": "t1370_3",
+  "question": "Which statement correctly describes how a landform is formed?",
+  "gold": "A delta is formed at the mouth of a river when flowing water slows and deposits sediment.",
+  "context": "tutor: Erosion and deposition are opposites. Which one carves material away, and which one drops  / student: Deposition removes material from the surface, while erosion takes in minerals deep beneath",
+  "tutor_turn": "Erosion carves, deposition drops. Now think about a river reaching the sea: it slows down, and slow water can't carry sediment any more."
+ },
+ {
+  "id": "t534_1",
+  "question": "Which religious group has had the greatest increase in membership due to the increasing immigration from Latin American countries to the United States over the last fifty years?",
+  "gold": "Catholics",
+  "context": "student: Wait, so they're talking about immigrants? Like, how do they count that up?",
+  "tutor_turn": "Sure! Imagine you have a big cookie jar, and every time someone new comes from Latin America and gets a cookie, that counts as a member joining your group. Over 50 years, if lots of people are coming every year, the jar gets fuller faster. Who gets the cookies more often?"
+ },
+ {
+  "id": "t1316_1",
+  "question": "An athlete can run 9 kilometers in 1 hour. If the athlete runs at that same average speed for 30 minutes, how far will the athlete travel?",
+  "gold": "4.5 kilometers",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "9 kilometres in one hour. How much of an hour is 30 minutes?"
+ },
+ {
+  "id": "t992_5",
+  "question": "Which of the following best describes how carbon is cycled from the atmosphere to living organisms?",
+  "gold": "Producers make organic compounds using light energy and carbon dioxide from the air.",
+  "context": "tutor: Animals need oxygen to breathe, which they get from the air. What happens to the air they  / student: I still confuse exhalation more than inhalation though.",
+  "tutor_turn": "When animals take a breath, they inhale air which includes carbon dioxide. Then, after using the oxygen for energy in the cells, what happens to the carbon dioxide?"
+ },
+ {
+  "id": "t317_3",
+  "question": "Which of the following structures is not found in bacteria?",
+  "gold": "nuclear membrane",
+  "context": "tutor: So, imagine cells are like little houses. All living things have cells as their basic unit / student: I still don\u2019t get it, does that mean they have different types of houses or somethin'?",
+  "tutor_turn": "Think of it like this: All living things have a cell that's their main unit, just like a house has a foundation. Now, bacteria have a cell too, but it's simpler. They don't have a special \"nuclear membrane\" \u2014 that's like a separate room for their DNA. Does that help?"
+ },
+ {
+  "id": "t896_1",
+  "question": "Which of the following statements best explains why air on Earth circulates between the equator and the poles?",
+  "gold": "Earth\u2019s surface temperature is greater near the equator than at the poles.",
+  "context": "student: Um, so why does the air circle around them? Like, how do they stay that way?",
+  "tutor_turn": "Think about why warm air might try to go somewhere. What's warmer in your house? Near the fire or near the window? What might be outside your window?"
+ },
+ {
+  "id": "t573_5",
+  "question": "Social Security was a New Deal program designed to",
+  "gold": "provide a minimum retirement income.",
+  "context": "tutor: Think of it like this: do you think old people need extra money to live comfortably when t / student: I guess I get that union part but Social Security seems like a whole bunch of numbers and ",
+  "tutor_turn": "Right, Social Security might look like numbers, but it's about money for older folks. How about we look at an example? If Social Security was a giant piggy bank, and we had a grandparent who's 70 years old and retired, what would the numbers be for them?"
+ },
+ {
+  "id": "t251_1",
+  "question": "A city has a temperature of 75 \u00b0F, with partly cloudy skies. Weather forecasters are predicting that the air pressure and temperature will drop during the day. Which type of weather is most likely for this area in the late afternoon?",
+  "gold": "rainy",
+  "context": "student: Wait, what does \"partly cloudy\" even mean? Like, how does it affect temperature?",
+  "tutor_turn": "Partly cloudy means it's partly sunny and partly cloudy at the same time. It's not completely sunny or completely cloudy. Now, think about if it's going to get cloudier as it gets later. Might that make it more likely for rain?"
+ },
+ {
+  "id": "t1295_1",
+  "question": "The digestion process begins in which of the following?",
+  "gold": "mouth",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Trace a bite of food from the moment it enters you. What is the very first thing that happens to it?"
+ },
+ {
+  "id": "t1356_3",
+  "question": "The United Nations statement of principles was based on the belief that",
+  "gold": "an international peacekeeping organization could settle disputes without warfare.",
+  "context": "tutor: The UN was founded right after a catastrophic war. What would its founders most want to pr / student: The founders of the United Nations (UN) were primarily concerned with preventing wars and ",
+  "tutor_turn": "Another war - and their idea was that if countries argued in a room together, they might not have to fight."
+ },
+ {
+  "id": "t92_3",
+  "question": "What kind of a triangle always has 3 acute angles and 3 sides the same length?",
+  "gold": "equilateral",
+  "context": "tutor: Exactly! So, which one always fits this description where all angles are less than 90 degr / student: I still don't get it, can we draw a picture for help?",
+  "tutor_turn": "Sure, let's think of drawing an equilateral triangle. How many angles does an equilateral triangle have?"
+ },
+ {
+  "id": "t821_3",
+  "question": "How did southern states respond to the ratification of the Fifteenth Amendment?",
+  "gold": "By imposing requirements designed to deny African Americans the right to vote",
+  "context": "tutor: Think of it like a big argument about who gets to vote. What do you think they might do if / student: Wait, so they got to vote again? Why would they change their stance on this?",
+  "tutor_turn": "Imagine if you suddenly could vote, but your friend didn't. How might you feel? What if it was important for your friend to vote too?"
+ },
+ {
+  "id": "t773_3",
+  "question": "A zookeeper sets up a habitat for a certain species of rabbit. Which answer choice describes the rabbit as it interacts with two nonliving parts of the rabbit\u2019s habitat?",
+  "gold": "The rabbit breathing air while running down a rocky path",
+  "context": "tutor: Think of a habitat like a special place where rabbits live. It's not just any place, but a / student: I still don't get what makes them nonliving parts? Like, if they\u2019re in the ground, does th",
+  "tutor_turn": "Imagine your favorite toy box. What does your toy box have that helps you play? Sometimes, it\u2019s not the toys themselves, but things that make playing easier, right? Habits for animals are like that. What might plants and a rocky path do for the rabbit that makes them \u201cnonliving\u201d?"
+ },
+ {
+  "id": "t1339_3",
+  "question": "During medieval times, which of these groups was legally tied to the land?",
+  "gold": "serfs",
+  "context": "tutor: In the feudal system, who worked the land, and could they leave if they wanted to? / student: The feudal lord was responsible for overseeing his subjects and their labor, but he had fe",
+  "tutor_turn": "They could not - that's the defining feature. They weren't slaves exactly, but they came with the land when it changed hands."
+ },
+ {
+  "id": "t427_3",
+  "question": "States\u2019 rights played a major role in all of the following except the",
+  "gold": "Monroe Doctrine.",
+  "context": "tutor: Think about what each of those situations had to do with. What's different about the Monro / student: Wait, does that mean they weren't talking about things like treaties or states' roles?",
+  "tutor_turn": "Think of the Monroe Doctrine like a big rule made by the President about how to treat new countries. Now, picture the other situations. Which one is more about deciding how states take care of their own business?"
+ },
+ {
+  "id": "t61_5",
+  "question": "Kira owes Mark $5, and Mark owes Kira $7. Which statement means the same thing?",
+  "gold": "Mark owes Kira $2.",
+  "context": "tutor: Think of it like a seesaw. When Kira owes Mark, she\u2019s giving him something (like toys), an / student: I still get confused, like which one counts as 'ready'? I'm not sure exactly.",
+  "tutor_turn": "Imagine Kira has 5 cookies to give to Mark. To make things even, Mark needs to give her some cookies too. How many cookies does Mark owe Kira so she\u2019s not behind in cookies anymore?"
+ },
+ {
+  "id": "t1335_3",
+  "question": "Miriam put 10 marbles in a paper sack. Six of the marbles were black, three were gray, and one was white. Miriam closed her eyes and took one marble out of the sack. Is it certain, likely, unlikely, or impossible that the marble she picked was white?",
+  "gold": "unlikely",
+  "context": "tutor: How many marbles are white, out of how many altogether? / student: How many total marbles are there?",
+  "tutor_turn": "One out of ten. Now place that on the scale: 'certain' means it must happen, 'impossible' means it can't, and the middle two are for whether it's more or less than a coin flip."
+ },
+ {
+  "id": "t1336_1",
+  "question": "The atmosphere normally exerts a pressure of about 15 pounds per square inch on surfaces at sea level. About how much pressure does the atmosphere exert on a surface 30 square inches in area?",
+  "gold": "450 pounds",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Read the units carefully: pounds per square inch. What does 'per square inch' tell you about how the pressure adds up over a bigger area?"
+ },
+ {
+  "id": "t270_5",
+  "question": "Moving water was the most important factor in forming which of these?",
+  "gold": "the Grand Canyon",
+  "context": "tutor: OK, let's think of moving water as tiny hammers instead of trucks. How do you think the ha / student: I'm still not sure about the exact changes though. What if it doesn't move fast enough?",
+  "tutor_turn": "Good question! Sometimes you might think moving water has to be super fast and powerful. But remember, even slow moving water can still wear things away, just not as fast. Try thinking of the Grand Canyon as a slow, steady drip in the same sandbox. How do you think this drip would change the sand over time?"
+ },
+ {
+  "id": "t1333_3",
+  "question": "A student planted an oak tree that was three meters tall. The tree was exposed to sunlight, water, and air. One year later, the tree was four meters tall. Where did the tree obtain most of the carbon necessary for its growth?",
+  "gold": "from the air",
+  "context": "tutor: The tree gained a metre of solid wood. Where do you think that material physically came fr / student: Where did the tree gain its substantial amount of wood, if at all, from its surroundings?",
+  "tutor_turn": "Almost everyone says the soil, and it's the wrong instinct - the soil barely loses any mass as a tree grows. Think about photosynthesis: what does the plant take in?"
+ },
+ {
+  "id": "t1264_5",
+  "question": "Which of the following factors would most likely cause a hurricane to decrease in strength?",
+  "gold": "moving over a continent",
+  "context": "tutor: Warm ocean water - the evaporation is what powers it. So anything that cuts off that suppl / student: A hurricane relies on warm ocean waters and evaporated water from the oceans to provide it",
+  "tutor_turn": "Which option takes the storm away from its fuel source?"
+ },
+ {
+  "id": "t1273_1",
+  "question": "During Reconstruction, the Freedmen\u2019s Bureau",
+  "gold": "established schools for former slaves.",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "What did people freed from slavery need most urgently in 1865, beyond food and shelter?"
+ },
+ {
+  "id": "t1030_5",
+  "question": "When a light wave passes from air into clear syrup, its direction is shifted toward the normal. Which of the following best explains why this occurs?",
+  "gold": "The speed of the light wave is slower in the syrup.",
+  "context": "tutor: Yes, it's linked to things being shorter and faster versus longer and slower. Imagine you' / student: I got confused by \"wavelength\" again, seems hard for me to understand.",
+  "tutor_turn": "Think about light moving through different materials. If light moves slower, do you think it has more time to bend or less? How does that affect the direction it goes?"
+ },
+ {
+  "id": "t1353_1",
+  "question": "The total length of a vehicle is 205.83 inches. What is the length of the vehicle rounded to the nearest whole number?",
+  "gold": "206 inches",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Rounding to a whole number means the decimal part disappears. Which digit decides whether 205 stays or becomes 206?"
+ },
+ {
+  "id": "t1286_3",
+  "question": "An unfertilized egg from the European frog Rana esculenta has 13 chromosomes. A zygote of this species has 26 chromosomes. What causes the increase in chromosome number?",
+  "gold": "The unfertilized egg joins with a male gamete.",
+  "context": "tutor: 13 to 26 - what has happened to the number, exactly? / student: What specific events or outcomes have occurred regarding the number in question? It might ",
+  "tutor_turn": "It doubled. So you need an event that brings in a second complete set of chromosomes, not one that copies or divides what's already there."
+ },
+ {
+  "id": "t1332_5",
+  "question": "Which number means 1000 + 600 + 8?",
+  "gold": "1608",
+  "context": "tutor: None - and that's the whole trap. A missing place still needs a digit holding its spot, an / student: A simple arithmetic mistake! The correct translation would be: \"One thousand, six hundred ",
+  "tutor_turn": "Write the digits in order: thousands, hundreds, tens, ones. Which option matches what you wrote?"
+ },
+ {
+  "id": "t1306_3",
+  "question": "A company manufactures outdoor benches made of wood. Which action represents a finishing step in the manufacturing process of a wood bench?",
+  "gold": "applying waterproof paint to the wood",
+  "context": "tutor: 'Finishing step' - what does finishing mean in making something? When in the process does  / student: \"Finishing step\" in this context is likely referring to the final or completed stage of a ",
+  "tutor_turn": "At the end, once the object is built. It's usually about protecting or improving the surface rather than shaping the thing."
+ },
+ {
+  "id": "t1105_1",
+  "question": "Photosynthetic algae live inside the cells of coral, a marine animal. Which of the following describes how photosynthesis performed by the algae helps the coral?",
+  "gold": "The algae make glucose during photosynthesis that the coral can use to produce energy.",
+  "context": "student: Wait, so algae making CO2 helps corals? Like, how exactly?",
+  "tutor_turn": "Think about what photosynthesis does. What does it make that things like corals might use?"
+ },
+ {
+  "id": "t1312_5",
+  "question": "Which of the following most affected the course and outcome of World War I?",
+  "gold": "American military and financial intervention in the war",
+  "context": "tutor: By 1917 both sides were exhausted and roughly deadlocked. Ask what new factor arrived that / student: What significant event caused the war to become a stalemate between Germany and Austria-Hu",
+  "tutor_turn": "Which option describes fresh troops and money entering the war on one side?"
+ },
+ {
+  "id": "t1189_1",
+  "question": "Which of the following would best tell you if something is a living thing?",
+  "gold": "It produces offspring.",
+  "context": "student: Like, what even makes a plant a living thing? Confused.",
+  "tutor_turn": "A plant is considered living because it can perform some important life functions. What do you think plants can do that non-living things can't?"
+ },
+ {
+  "id": "t651_3",
+  "question": "One type of fuel was used for thousands of years before other fuels were commonly used. Which fuel is an alternative resource that was most likely the first fuel used by humans?",
+  "gold": "Wood",
+  "context": "tutor: Think of it like this: An alternative resource is one that can be used instead of others.  / student: I still don't get it, like how would coal help? Isn't there already coal?",
+  "tutor_turn": "Remember, an 'alternative' resource isn't necessarily the first to be used. It's just one that can replace others. Let's think about why wood could be the first choice for fuel. Imagine you live in a forest a long time ago. What would you use to cook food first?"
+ },
+ {
+  "id": "t543_1",
+  "question": "The followers of the Social Gospel movement believed that organized religion must place greater emphasis on",
+  "gold": "reconstructing American society.",
+  "context": "student: Like, what does \"Social Gospel\" even mean? It's weird I guess.",
+  "tutor_turn": "Think of it like this: Imagine you're in charge of painting a big mural on the side of a building. That mural is like what the Social Gospel movement wanted to do for society."
+ },
+ {
+  "id": "t1271_5",
+  "question": "Which of the following acquisitions secured control of North America\u2019s longest river, added substantially to the Native American, Spanish, and French populations of the country, and essentially doubled the size of the United States?",
+  "gold": "Louisiana Purchase",
+  "context": "tutor: The Mississippi. So you need a purchase that gave control of that river and the land aroun / student: The Mississippi is indeed the longest river in North America, controlling the land around ",
+  "tutor_turn": "Between the two that remain, one was a small strip in the southwest. Which one doubled the country?"
+ },
+ {
+  "id": "t1362_3",
+  "question": "Wendy wants to take a survey to determine which flavor of ice cream is the most popular at her school. Which of the following methods is the best way for her to choose a random sample of the students at her school?",
+  "gold": "selecting ten students from each homeroom",
+  "context": "tutor: What would make her survey misleading? Think about who she'd be leaving out. / student: Don't forget the demographic breakdown of your target audience and ensure their presence i",
+  "tutor_turn": "Any group that shares a taste. A sports team, or people who already agree with her, would all skew the result the same direction."
+ },
+ {
+  "id": "t1369_1",
+  "question": "The sales tax for an item is $0.47. What is the amount of tax rounded to the nearest dime?",
+  "gold": "$0.50",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "A dime is how many cents? So rounding to the nearest dime means rounding to the nearest what?"
+ },
+ {
+  "id": "t1268_1",
+  "question": "Sedrick and James are playing a game with a single pile of 10 cards. The object of the game is to take the last card(s). A player must take at least 1 card on each turn but cannot take more than 3 cards. Sedrick starts. He takes 3 cards. Next, James takes 2 cards. James ends up winning the game. What could be the last two moves?",
+  "gold": "Sedrick takes 2; James takes 3.",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Track the pile. It started at 10, Sedrick took 3, James took 2. How many cards are on the table now?"
+ },
+ {
+  "id": "t292_3",
+  "question": "Which class of elements best conducts electricity?",
+  "gold": "metals",
+  "context": "tutor: Think of it like this: Which types of materials are often used in wires at home? Those are / student: Wait, so just saying which type conds electricity makes sense, but I'm still confused abou",
+  "tutor_turn": "Think of it this way: Metals are like water pipes. If you fill a metal pipe with water, it's super easy for the water to move through, right? Now, electricity is kind of like water flowing in a pipe. Which type of material do you think is best at letting this \"flow\" easily?"
+ },
+ {
+  "id": "t54_1",
+  "question": "Miriam put 10 marbles in a paper sack. Six of the marbles were black, three were gray, and one was white. Miriam closed her eyes and took one marble out of the sack. Is it certain, likely, unlikely, or impossible that the marble she picked was white?",
+  "gold": "unlikely",
+  "context": "student: What does \"certain\" even mean here? I thought white was rare though.",
+  "tutor_turn": "\"Certain\" means it's for sure to happen, like if you told me it was going to rain tomorrow, and it did. But in this case, we need to figure out if getting a white marble is for sure, or just a small chance. What do you think about the white marble being rare or not?"
+ },
+ {
+  "id": "t623_1",
+  "question": "Four students each wrote down a number between 30 and 40. The list shows the numbers they wrote. \u2022 Elly\u201435 \u2022 Ulysses\u201439 \u2022 Maggie\u201437 \u2022 Palmer\u201433 Which student wrote down a prime number?",
+  "gold": "Maggie",
+  "context": "student: What does \"prime number\" even mean here? Like how can 35 be prime?",
+  "tutor_turn": "A prime number is a special kind of number that can only be divided by 1 and itself without leaving a remainder. Think of it like having a box of candy where you can only share it with 1 kid or the kid who gave it to you. Can you list the numbers Elly, Ulysses, Maggie, and Palmer wrote down and then check them for prime?"
+ },
+ {
+  "id": "t1292_1",
+  "question": "There are 12 gumballs in a gumball machine. There are 1 red, 6 yellow, 2 green, and 3 blue gumballs. What color is MOST likely to come out of the machine next?",
+  "gold": "yellow",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Count them off: 1 red, 6 yellow, 2 green, 3 blue. Which count is biggest?"
+ },
+ {
+  "id": "t1243_1",
+  "question": "In designing the legislative branch, the writers of the Constitution mainly based their ideas on the",
+  "gold": "English Parliament.",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "Where were the writers of the Constitution from, and whose political system had they lived under their whole lives?"
+ },
+ {
+  "id": "t1104_5",
+  "question": "Photosynthetic algae live inside the cells of coral, a marine animal. Which of the following describes how photosynthesis performed by the algae helps the coral?",
+  "gold": "The algae make glucose during photosynthesis that the coral can use to produce energy.",
+  "context": "tutor: So, imagine if you had a special plant that could make sure you have lots of energy. What  / student: Wait, it sounds like they're making ATP instead of CO2? That\u2019s weird.",
+  "tutor_turn": "Maybe think of it this way: if you ate a big cookie for lunch, you couldn't use the sugar from the cookie to breathe, right? But you could get energy from it. What might the algae make that helps the coral in a similar way?"
+ },
+ {
+  "id": "t93_1",
+  "question": "What kind of a triangle always has 3 acute angles and 3 sides the same length?",
+  "gold": "equilateral",
+  "context": "student: I get confused by 'sides' length though. Can we have some examples?",
+  "tutor_turn": "Sure, let's think about a triangle with all sides the same length. How does that make the angles look?"
+ },
+ {
+  "id": "t873_3",
+  "question": "A case of soda has 12 cans. Each can holds 360 milliliters of soda. What is the total number of liters of soda in the case?",
+  "gold": "4.32 liters",
+  "context": "tutor: Think of it this way: How many milliliters are in a liter? / student: I still get confused by milliliters vs liters, even after thinking about it.",
+  "tutor_turn": "Remember, there are 1000 milliliters in 1 liter. So, if you have 360 milliliters, how many liters is that?"
+ },
+ {
+  "id": "t1159_3",
+  "question": "Which of the following is true about the planets in the solar system?",
+  "gold": "All planets have an elliptical orbit.",
+  "context": "tutor: Remember, not all planets have the same surface temperature. How many planets have been me / student: I still get confused about whether there are any without moons. What exactly do I look for",
+  "tutor_turn": "Think of the planets we know for sure\u2014like Earth and Mars. Do you know if they have moons? Can you name a planet that doesn't have any moons?"
+ },
+ {
+  "id": "t1242_3",
+  "question": "In which of the following water samples do the water molecules have the least average kinetic energy?",
+  "gold": "300 mL of water at 15\u00b0C",
+  "context": "tutor: Kinetic energy of molecules - what does that have to do with a thermometer reading? / student: Molecules collide with each other and exchange kinetic energy, which increases the tempera",
+  "tutor_turn": "Temperature IS the average kinetic energy of the molecules. That's the whole link. Now notice the trap: the question says 'average', so the amount of water is deliberately there to distract you."
+ },
+ {
+  "id": "t1374_5",
+  "question": "Japanese attempts to create an empire prior to World War II were in conflict with the U.S. goal of",
+  "gold": "maintaining an open trade policy in Asia.",
+  "context": "tutor: Trade, and specifically the ability to trade everywhere rather than being shut out. That w / student: What did the United States hope to achieve through the Open Door Policy?",
+  "tutor_turn": "Japan building an exclusive empire would block exactly that. Which option names the American goal it conflicted with?"
+ },
+ {
+  "id": "t1082_3",
+  "question": "In a science experiment, Corine rounded the mass of a chemical to the nearest hundredth of a gram. The rounded mass of the chemical is 21.65 grams. Which of the following could be the actual mass of the chemical?",
+  "gold": "21.647 grams",
+  "context": "tutor: You're right to have doubts. Think of it like this: if the actual mass was 21.65 grams, it / student: I still get confused, like what teeny bit?",
+  "tutor_turn": "Imagine a line on a ruler marked at 21.65 grams. Can you think of a number just a little bit above 21.65, and another just a little bit below 21.65?"
+ },
+ {
+  "id": "t667_5",
+  "question": "Which statement does NOT correctly compare silicon with another element?",
+  "gold": "Silicon conducts electricity as well as copper does.",
+  "context": "tutor: Think of it this way: water vapor is in the air and can be seen as mist or dew. But argon, / student: Wait, so it's like it's invisible but takes up less space? Confusing.",
+  "tutor_turn": "Imagine you can hold a snowball. That's solid, right? Now think tiny silicon atoms are like millions of teeny snowballs packed closely together. This tight packing gives silicon its solid form. That\u2019s why it\u2019s different from argon, which is like light, invisible sprinkles floating around."
+ },
+ {
+  "id": "t851_3",
+  "question": "Which constitutional issue led to the Nullification Crisis of 1832?",
+  "gold": "Do states have the power to declare a federal law unconstitutional?",
+  "context": "tutor: Think of it like this: imagine you're in a big game, and your friend brings in a new rule  / student: Wait, so they thought the army couldn't do anything but I'm confused why they got into a c",
+  "tutor_turn": "Remember, it's about a state (like a friend) saying a rule by the federal government (like the parents in the game) doesn't apply. What might a big argument about rules sound like between your friend (the state) and your parents (the federal government)?"
+ },
+ {
+  "id": "t382_3",
+  "question": "How did the Crusades affect the economies of Central and Western Europe?",
+  "gold": "Cloth and spices brought back by crusaders led to greater interest in trade.",
+  "context": "tutor: Think of the Crusades as big trips for some noble folks to a faraway land. What do you thi / student: I still get confused about what came back, like if gold was there or something.",
+  "tutor_turn": "Were the Crusaders more interested in acquiring things that were valuable and important for their own regions?"
+ },
+ {
+  "id": "t68_3",
+  "question": "The total length of a vehicle is 205.83 inches. What is the length of the vehicle rounded to the nearest whole number?",
+  "gold": "206 inches",
+  "context": "tutor: It's like guessing which number a friend is thinking of. If they're almost at 205, you'd s / student: I still don't get it, do I pick the next whole number after 205 or something?",
+  "tutor_turn": "Think of it this way, if someone asked you to choose between 205 inches or 206 inches for a ruler that's exactly 205.83 inches long, which would you pick? Would you pick 205 or say it's closer to 206?"
+ },
+ {
+  "id": "t1347_1",
+  "question": "Marshall wants to finish typing his English paper before class starts. If he still has 550 words left to type and class starts in 25 minutes, at least how fast must Marshall type to finish his paper on time?",
+  "gold": "22 words per minute",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "550 words in 25 minutes. What operation gives you a per-minute rate?"
+ },
+ {
+  "id": "t1207_5",
+  "question": "Sedrick and James are playing a game with a single pile of 10 cards. The object of the game is to take the last card(s). A player must take at least 1 card on each turn but cannot take more than 3 cards. Sedrick starts. He takes 3 cards. Next, James takes 2 cards. James ends up winning the game. What could be the last two moves?",
+  "gold": "Sedrick takes 2; James takes 3.",
+  "context": "tutor: If Sedrick starts by taking 3 cards, how many cards are left for James to take from? / student: I got confused because if he starts by taking 3, aren't there still 7 cards left after tha",
+  "tutor_turn": "If Sedrick starts by taking 3 cards, how many cards are left for James to take next?"
+ },
+ {
+  "id": "t1052_1",
+  "question": "A musical instrument produces a sound with a frequency of 1318 Hz. The speed of the sound wave is 340 m/s. What is the wavelength of the sound that the instrument produces?",
+  "gold": "0.258 m",
+  "context": "student: wtf even is the wavelenth? It's not supposed to be a number right?",
+  "tutor_turn": "You're right, it's not a number yet. We're about to find out! Let's think about this: What do you think the wavelength might be related to?"
+ },
+ {
+  "id": "t242_3",
+  "question": "Many animals depend on plants for",
+  "gold": "shelter.",
+  "context": "tutor: Plants help make their seeds grow! But why do animals need plants for those things? Think  / student: I still get confused by \"depend\" sometimes. What does that even mean again?",
+  "tutor_turn": "\"Depend\" means animals need plants, just like how you depend on food and a place to stay. Let's think of a shelter. Can a plant give you a place to stay?"
+ },
+ {
+  "id": "t517_1",
+  "question": "Which of the following was a primary cause of the Cold War between the United States and the Soviet Union?",
+  "gold": "a competition for political influence over other countries",
+  "context": "student: I mean, what exactly caused that cold war? Like, were there wars happening then?",
+  "tutor_turn": "Think of a big fight between two friends you know. They're not actually fighting, but they don't like each other and keep arguing a lot. What do you think makes them not be friends anymore?"
+ },
+ {
+  "id": "t646_1",
+  "question": "A group of students is performing an investigation to measure how much liquid water is produced from a 10 L sample of snow. What must occur in order for the students to perform this investigation?",
+  "gold": "The temperature of the sample must change.",
+  "context": "student: Wait, so they need to do it in a lab instead of outdoors? Confused.",
+  "tutor_turn": "Think about what happens when snow melts. What does it need to be like for this to happen?"
+ },
+ {
+  "id": "t977_1",
+  "question": "Consider these angle measures. 50\u00b0, 50\u00b0, 100\u00b0 Which of the following describes the number of unique triangles that can be drawn using all three angle measures as interior angles?",
+  "gold": "no triangles",
+  "context": "student: Like, how does having a total of more than three triangles even work?",
+  "tutor_turn": "Imagine you have a big pizza cut into slices. You can make a triangle from any slice, right? Now, think about how you could use your three angle measures to make triangles. Can you start with one angle and try to make a triangle with it?"
+ },
+ {
+  "id": "t267_3",
+  "question": "A student is trying to identify a mineral that has a nonmetallic luster and is black. It can also be scratched with a fingernail. According to the mineral reference sheet, the unidentified mineral is most likely",
+  "gold": "mica.",
+  "context": "tutor: So, nonmetallic means it's not shiny like metals, right? Let's think of some shiny and not / student: It still looks metallic, isn't it? Confused still.",
+  "tutor_turn": "Think of a shiny metal object and a dull, non-metallic object. Which would mica more closely match?"
+ },
+ {
+  "id": "t1301_3",
+  "question": "Which of the following processes moves carbon from organisms to the nonliving environment?",
+  "gold": "decomposition",
+  "context": "tutor: Carbon is in every living thing. When something dies, how does that carbon get back out in / student: Carbon remains in organic matter for thousands of years before it eventually decays back i",
+  "tutor_turn": "Something has to break the body down. Two of these options are about water moving, not carbon."
+ },
+ {
+  "id": "t1330_3",
+  "question": "Which inequality is true if p = 3.4?",
+  "gold": "8.5 \u2265 2.5p",
+  "context": "tutor: There's no shortcut here - you substitute 3.4 into each one and see which statement surviv / student: Hmmm, I'm not entirely sure how to approach this yet.",
+  "tutor_turn": "10.2. Now, is 10.2 less than 10.2? Careful - a strict 'less than' is not satisfied by being equal."
+ },
+ {
+  "id": "t808_3",
+  "question": "Plants grow in many different shapes and sizes. Much of their shape depends on an internal structure that is composed of carbon-containing molecules such as cellulose and lignin. Plants that have a strong internal structure can grow larger than other plants because their structure can support their size. Plants obtain the majority of the carbon necessary for building these structural molecules from \u2014",
+  "gold": "air",
+  "context": "tutor: Think of \"majority\" like when you have more of one thing compared to others. What do you t / student: I still get confused, does that mean all the food stuff?",
+  "tutor_turn": "Remember, plants get food too, but from where do they most commonly get their nutrients, like water and air? Can you think of where plants could find these essentials in nature?"
+ },
+ {
+  "id": "t1126_5",
+  "question": "A cyclist rode her bicycle a distance of 5 miles. What is the total distance, in feet, she rode her bicycle?",
+  "gold": "26,400 feet",
+  "context": "tutor: Imagine you have a big playground that's 1 mile long. How many steps would it take to walk / student: Wait, so how do we count feet really? And does it matter how many steps you take?",
+  "tutor_turn": "Think of it like this: If you laid down a long ribbon that's exactly 1 mile long, how many pieces would you need to cut it into to make each piece 1 foot long? That would tell you how many feet are in one mile!"
+ },
+ {
+  "id": "t1275_3",
+  "question": "Which expression shows 3 less than 20?",
+  "gold": "20 \u2212 3",
+  "context": "tutor: Read it as English first: '3 less than 20'. Are you ending up with more than 20 or fewer? / student: To find out whether the result is greater or smaller than 20, we need to subtract 3 from 2",
+  "tutor_turn": "Fewer - 'less than' means something is being taken away. That rules out the ones that grow the number."
+ },
+ {
+  "id": "t1270_1",
+  "question": "How many millimeters are in 20 centimeters?",
+  "gold": "200 millimeters",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "Which is the bigger unit, a centimetre or a millimetre?"
+ },
+ {
+  "id": "t1001_5",
+  "question": "A human gamete typically contains 23 chromosomes. Two human gametes combine to produce a zygote. Which of the following is the best evidence that an error occurred during the formation of one of these gametes?",
+  "gold": "The zygote has three copies of chromosome 21.",
+  "context": "tutor: So, if two gametes are supposed to combine to make a zygote with 46 chromosomes, what woul / student: I still don't get it, like what kind of mistake could cause more or less?",
+  "tutor_turn": "Think of it like a game where you're supposed to pick two cards, and you should always have 2 cards in your hand. Now, if you end up with 3 cards or no cards, something went wrong, right? How many chromosomes should be in the zygote if the process is successful?"
+ },
+ {
+  "id": "t1263_5",
+  "question": "A block of ice at \u20134\u00b0C and a cup of 80\u00b0C water are placed in a 23\u00b0C room. Which statement describes the flow of heat in this situation?",
+  "gold": "Heat flows into the ice and out of the water.",
+  "context": "tutor: Always from hotter to colder. Now compare each object to the room: the ice is at -4, the r / student: The ice, being at -4 degrees, will melt into the room's 23-degree temperature, while the w",
+  "tutor_turn": "Do that comparison for each and say which direction heat moves for the ice and for the water. Then find the option that matches both."
+ },
+ {
+  "id": "t1273_5",
+  "question": "During Reconstruction, the Freedmen\u2019s Bureau",
+  "gold": "established schools for former slaves.",
+  "context": "tutor: Among other things, literacy - reading and writing had been denied to them by law. The Bur / student: Could you explain why someone might have needed so much more than just basic necessities d",
+  "tutor_turn": "Two of these options describe things that did not actually happen. Which option names something the Bureau really built?"
+ },
+ {
+  "id": "t1251_1",
+  "question": "Plants grow in many different shapes and sizes. Much of their shape depends on an internal structure that is composed of carbon-containing molecules such as cellulose and lignin. Plants that have a strong internal structure can grow larger than other plants because their structure can support their size. Plants obtain the majority of the carbon necessary for building these structural molecules from \u2014",
+  "gold": "air",
+  "context": "student: hmm i'm not sure where to start",
+  "tutor_turn": "Plants are mostly built from carbon. Where do you think a plant physically gets its carbon from? Say your first instinct."
+ },
+ {
+  "id": "t73_3",
+  "question": "The sales tax for an item is $0.47. What is the amount of tax rounded to the nearest dime?",
+  "gold": "$0.50",
+  "context": "tutor: It means you want to round the tax amount to the nearest whole number or half of a dime. C / student: I still get confused by the word \"half a dime.\" So would it be $0.50 or $0.48?",
+  "tutor_turn": "Think of it like quarters. $0.47 is closer to $0.50 than to $0.48, right? Which one is it closer to?"
+ },
+ {
+  "id": "t952_3",
+  "question": "A piece of wire has a length of 110 inches. Which of the following measures is equivalent to the length of the wire?",
+  "gold": "9 feet 2 inches",
+  "context": "tutor: Think about it this way: how many inches are in 1 foot? / student: I'm confused, does that mean it's just as long?",
+  "tutor_turn": "Let's think about this: Can you tell me how many inches are in 1 foot?"
+ },
+ {
+  "id": "t912_1",
+  "question": "A watermelon that weighed 12 pounds cost $5.76. What was the cost per ounce of the watermelon?",
+  "gold": "$0.03",
+  "context": "student: I get confused by the conversion from pounds to ounces. Like, how many ounces is that?",
+  "tutor_turn": "Sure! Let's think about how many ounces are in a pound. Can you recall how many ounces are in one pound?"
+ },
+ {
+  "id": "t1314_1",
+  "question": "A student is trying to identify a mineral that has a nonmetallic luster and is black. It can also be scratched with a fingernail. According to the mineral reference sheet, the unidentified mineral is most likely",
+  "gold": "mica.",
+  "context": "student: I don't really get what it's asking.",
+  "tutor_turn": "You're given two clues. Which one tells you about hardness?"
+ },
+ {
+  "id": "t118_5",
+  "question": "The Sojourn family went on a vacation. They started with $2000. If they spent $150 each day, which expression represents how much money they had after x days?",
+  "gold": "2000 \u2212 150x",
+  "context": "tutor: Sure! Let's think of it like this: if they have $2000 and spend $150 each day, after one d / student: I get confused by adding negative numbers for spending stuff, how do I know exactly how mu",
+  "tutor_turn": "Think of it like starting with $2000 and then taking away $150 each day. How much would you have left after one day?"
+ },
+ {
+  "id": "t902_1",
+  "question": "A sign is in the shape of a square. Each side of the sign has a length of 6 inches. What is the area of the sign?",
+  "gold": "36 square inches",
+  "context": "student: What's an area? Like, does it just multiply the sides together?",
+  "tutor_turn": "Area is the space inside a shape, measured in square units. For a square, you multiply the length of one side by itself. Let's try a simpler example first. If you had a rectangle that was 3 inches long and 2 inches wide, how would you find its area?"
+ },
+ {
+  "id": "t286_5",
+  "question": "A piece of pine wood floats on the surface of a lake because the water exerts",
+  "gold": "an upward force equal to the weight of the displacement water.",
+  "context": "tutor: Think of it like this: When you put a toy boat in the bathtub, does the water move the boa / student: Wait, so it really means both sides push equally then they cancel out? That makes sense th",
+  "tutor_turn": "Exactly! Both the boat and the water move a tiny bit, but what's important is the pushing (or force) from the water on the boat. Now, how would that force relate to the weight of the boat?"
+ },
+ {
+  "id": "t737_5",
+  "question": "The area of a rectangle is 45.5 square inches. The base of the rectangle is 7 inches. What is the height of the rectangle in inches?",
+  "gold": "6.5 in.",
+  "context": "tutor: If you think of the rectangle's base as 7 inches long and the area as 45.5 square inches,  / student: I still get confused even though the tutors' explanations were clear.",
+  "tutor_turn": "Okay, let's break it down. If the base is 7 inches and the area is 45.5 square inches, can the height be a whole number? What if it\u2019s not whole, like 6.5 inches? Try to figure out by multiplying 7 by 6.5 in your head."
+ },
+ {
+  "id": "t995_1",
+  "question": "Which of the following best describes how carbon is cycled from the atmosphere to living organisms?",
+  "gold": "Producers make organic compounds using light energy and carbon dioxide from the air.",
+  "context": "student: Wait, does that mean carbon moves up through trees? Confused.",
+  "tutor_turn": "Think about where the carbon comes in the first place. Where does carbon dioxide first enter trees? Think light and air."
+ },
+ {
+  "id": "t778_5",
+  "question": "A student raises a parrot from the time it hatches. Which of these behaviors did the parrot most likely learn from living in the student\u2019s home?",
+  "gold": "The parrot imitates the family dog barking.",
+  "context": "tutor: Imagine if you spent all your time watching your friend brush their teeth. What might you  / student: I get confused, how can I pick an answer when the tutor just explained it again?",
+  "tutor_turn": "Think of what the parrot sees the student do every day. Maybe the student opens a bottle of water or says goodnight to family. What might the parrot copy from these actions?"
+ },
+ {
+  "id": "t1297_3",
+  "question": "Which of the following would best tell you if something is a living thing?",
+  "gold": "It produces offspring.",
+  "context": "tutor: What can every living thing do that no rock or puddle can? / student: Every living thing can grow taller than its parent trees and flowers; they can learn to fl",
+  "tutor_turn": "Several things - grow, use energy, respond, reproduce. The strongest single test is the one that no non-living thing manages at all."
+ },
+ {
+  "id": "t651_5",
+  "question": "One type of fuel was used for thousands of years before other fuels were commonly used. Which fuel is an alternative resource that was most likely the first fuel used by humans?",
+  "gold": "Wood",
+  "context": "tutor: Remember, an 'alternative' resource isn't necessarily the first to be used. It's just one  / student: I still get confused with choices though, like which one doesn't even make sense?",
+  "tutor_turn": "Well said! Sometimes, a choice might not make sense. How about we think about wood more closely. If survival depended on cooking, why might wood be the first choice?"
+ },
+ {
+  "id": "t876_5",
+  "question": "Polar bears hunt seals from sea ice in the Arctic. Warming Arctic temperatures have reduced the amount of ice, making it hard for polar bears to find food. How has the reduced amount of sea ice most likely affected polar bears?",
+  "gold": "Their population size is decreasing.",
+  "context": "tutor: Think about it this way: if there's less ice, polar bears might find fewer seals on pieces / student: I still don't get it, can't seal be found on land too?",
+  "tutor_turn": "Imagine if your favorite playground was cut down partly. Would you still have as many swings and slides to play on? How would you balance your playtime? Can you see how the change in ice affects their hunting spots or \"play areas\"?"
+ },
+ {
+  "id": "t51_5",
+  "question": "There are 1,000 meters in 1 kilometer. How many meters are in 5 kilometers?",
+  "gold": "5,000 meters",
+  "context": "tutor: Imagine you have 5 big bags. Each bag is as long as 1 kilometer. How long would all 5 bags / student: I still feel confused, can anyone explain again?",
+  "tutor_turn": "Sure, think of it this way: If you have 1 bag that's 1 kilometer long, how many kilometers are in 5 of those bags?"
+ },
+ {
+  "id": "t801_5",
+  "question": "A large rock is motionless on a flat sidewalk. Which statement best explains why the rock remains motionless?",
+  "gold": "The forces acting on the rock are all balanced.",
+  "context": "tutor: Imagine a seesaw with the rock on one end. For it to stay still, the other end needs to ha / student: Does balance mean the rock isn't being pushed anymore?",
+  "tutor_turn": "Think of it like scales on a balance scale. If it's not tilted either way, the rock isn't being pushed one way or the other. So only balanced forces (like the upward push of the sidewalk) can keep the rock still. Does that help you see it better?"
+ },
+ {
+  "id": "t677_3",
+  "question": "Which of the following had the greatest impact on the outcome of the Civil War?",
+  "gold": "Economic differences between the Union and the Confederacy",
+  "context": "tutor: That's a great question! Yes, slavery definitely played a big role. Let's think about how  / student: I still don't get it, like, who gets to choose which war they want to talk about first?",
+  "tutor_turn": "Think of it like deciding what game to play in the playground. Any game might be fun, but sometimes one game comes with more people or better equipment. How do you think the war would be different if one side had a bigger advantage because of slavery?"
+ },
+ {
+  "id": "t1144_3",
+  "question": "Which of the following best explains how minerals get into stream water?",
+  "gold": "Rainwater dissolves minerals out of the rocks and soil during runoff.",
+  "context": "tutor: Think of it like this: What do you think happens to rain after it falls from the sky and l / student: I'm confused, does it go back into the soil or something?",
+  "tutor_turn": "So, after rain falls, it gets into the ground and what does it begin to do? Does it mix with the soil, or go somewhere else?"
+ },
+ {
+  "id": "t1127_1",
+  "question": "A cyclist rode her bicycle a distance of 5 miles. What is the total distance, in feet, she rode her bicycle?",
+  "gold": "26,400 feet",
+  "context": "student: Like, how is riding a mile different from riding a foot?",
+  "tutor_turn": "Riding a mile and riding a foot are both types of distances, but they're measured in different units. A mile is much longer than a foot. How many feet are in one mile?"
+ },
+ {
+  "id": "t1081_5",
+  "question": "In a science experiment, Corine rounded the mass of a chemical to the nearest hundredth of a gram. The rounded mass of the chemical is 21.65 grams. Which of the following could be the actual mass of the chemical?",
+  "gold": "21.647 grams",
+  "context": "tutor: So, when rounding to the nearest hundredth, you look at the thousandth place. If it's 5 or / student: I'm confused, wouldn't rounding down still make it 21.6 grams?",
+  "tutor_turn": "Right, rounding down would keep it at 21.6 grams. But what if we add a bit more to make it 21.651 grams? Now, where would that dot go to round to 21.65?"
+ },
+ {
+  "id": "t652_5",
+  "question": "A science class has an aquarium in which fish and aquatic plants are growing. How is carbon dioxide directly involved in the survival of organisms in the aquarium?",
+  "gold": "The plants need carbon dioxide to make sugar.",
+  "context": "tutor: Plants make their food through a process called photosynthesis. What do they need for this / student: Wait, so they need CO2 for respiration then? Still confusing though.",
+  "tutor_turn": "Plants can make their own food using energy from sunlight, just like how plants in the sun make their food. What do plants need in order to make this energy-boosting food?"
+ },
+ {
+  "id": "t799_5",
+  "question": "What are the main functions of the human skeletal system?",
+  "gold": "To support the body, protect the organs, produce blood cells, and store calcium",
+  "context": "tutor: Imagine your bones are like the walls of a castle. What do castle walls do? They protect p / student: But aren't bones just where we grow and stuff? Like, what's the point of that armor?",
+  "tutor_turn": "Bones aren't just about growing, they also keep your body upright and let you move around. So, bones are like a protective shield for your body parts, just like a castle keeps the kingdom safe."
+ },
+ {
+  "id": "t252_5",
+  "question": "The largest body in our solar system is",
+  "gold": "the Sun.",
+  "context": "tutor: Oh, I see you're mixing up the solar system family! Let's think about it. If Jupiter is so / student: I'm not sure, like does Pluto have more or less mass? Still confusing.",
+  "tutor_turn": "The Sun isn't one of the planets! It's a star. So what are other big objects in space besides planets and stars?"
+ },
+ {
+  "id": "t1298_1",
+  "question": "When the concentration of oxygen is greater outside a cell than inside the cell, oxygen will move into the cell without the assistance of proteins or additional energy. This movement of oxygen is an example of what process?",
+  "gold": "simple diffusion",
+  "context": "student: I'm stuck on this one.",
+  "tutor_turn": "The question hands you two clues: no proteins involved, and no energy needed. Which of those rules something out immediately?"
+ },
+ {
+  "id": "t926_5",
+  "question": "When NASA communicates with a spacecraft orbiting Earth, the message is first converted to a signal that can be transmitted digitally. Which device is used to convert the message into a digital signal?",
+  "gold": "an encoder",
+  "context": "tutor: Think about when you whisper a message to someone, then shout it. What kind of change happ / student: I still don't get it, do they use speakers then? Confusing.",
+  "tutor_turn": "So, when you whisper a message, it's soft and not very strong. When you shout, it becomes louder. Now think about words changing to numbers or dots and dashes in Morse code. What's needed to change words into these changes?"
+ },
+ {
+  "id": "t425_5",
+  "question": "States\u2019 rights played a major role in all of the following except the",
+  "gold": "Monroe Doctrine.",
+  "context": "tutor: Think of it like this: States' rights are when a state believes it has special powers that / student: I still feel confused about which one isn't really about states' rights though. Like what ",
+  "tutor_turn": "Well, let's look at each one. In the Missouri Compromise, for example, a state wanted to decide its own laws because they thought they should have the right to do that. Can you see that as about states' rights?"
+ },
+ {
+  "id": "t1244_5",
+  "question": "How did the Supreme Court decision in Worcester v. Georgia affect American Indians?",
+  "gold": "The state ignored the ruling and distributed Cherokee lands to white settlers.",
+  "context": "tutor: Because a court ruling only matters if someone enforces it. The Court said one thing; Geor / student: It can be tricky when we consider how different laws and decisions impact us and our histo",
+  "tutor_turn": "Which option describes a ruling that was won and then simply not obeyed?"
+ },
+ {
+  "id": "t1369_5",
+  "question": "The sales tax for an item is $0.47. What is the amount of tax rounded to the nearest dime?",
+  "gold": "$0.50",
+  "context": "tutor: Ten cents. So your answer has to end in a zero in the pennies column - which already tells / student: Rounding to the nearest ten-cent coins means counting only tens instead of hundreds in our",
+  "tutor_turn": "Is $0.47 closer to $0.40 or to $0.50? Compare the gaps and choose."
+ },
+ {
+  "id": "t123_1",
+  "question": "It takes a machine 12 minutes to fill 200 bottles of soda. At this rate, how many minutes will it take the machine to fill 500 bottles of soda?",
+  "gold": "30 minutes",
+  "context": "student: I mean, does it take longer or shorter time? I'm still a bit confused.",
+  "tutor_turn": "It takes 12 minutes for the machine to fill 200 bottles. Now, if we want to find out how long it takes to fill 500 bottles, we can think of it like this: is it more like doubling the time or anything else?"
+ }
+]
