@@ -181,6 +181,22 @@ class HFStudent:
         scores = self.score_choices(question, choices, hint=hint)
         return int(max(range(len(scores)), key=lambda i: scores[i]))
 
+    def feels_ready(self, question, transcript) -> bool:
+        """Does the student think it can answer now?
+
+        Asked as a yes/no log-prob comparison rather than by having the student
+        emit a marker. Told to end its reply with [READY] a 0.5B complied in 1
+        dialogue out of 1,000 - it cannot follow that instruction - but it can
+        still express readiness through the same channel it answers with.
+
+        This consults no gold, so a dialogue ending here means the student
+        believes it understands, which is what a tutor actually has to judge.
+        """
+        yes, no = self.score_choices(
+            "Do you understand this well enough to answer the question now?",
+            ["Yes", "No"], hint=transcript.strip())
+        return yes > no
+
     # ---- second answering channel (OFF by default; see set_answer_mode) ----
 
     FREE_ANSWER_SYSTEM = (

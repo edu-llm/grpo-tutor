@@ -1,0 +1,255 @@
+{
+  "note": "Hand-written expert tutor turns for the 50 items in /tmp/pick50.json (seed 7). Three turns each: diagnose, hand over the missing piece, make them commit. No turn names the gold option or eliminates options. The real 0.5B student replies in between - see src/replay_good_traces.py.",
+  "arcs": {
+    "0": [
+      "Before any arithmetic: are those two pours coming out of the same 2-litre bottle, or is each container filled from somewhere else? Say what's physically happening.",
+      "Right, both pours come out of that one bottle, so you need the total poured before you can find what's left. Line 0.475 up with 0.350 by the decimal point - writing 0.35 as 0.350 keeps the columns honest. What total do you get?",
+      "Now take that total away from 2.000. Go one column at a time and tell me the number you land on."
+    ],
+    "1": [
+      "You already have three data points sitting there. What happens to the price each time one more stamp is added?",
+      "Exactly - it climbs by the same amount every time, because every stamp costs the same. So starting from three stamps at $1.02, what single step gets you to four stamps?",
+      "Add that one step to $1.02. Watch the cents as they cross a dollar. What do you get?"
+    ],
+    "2": [
+      "Forget the direction for a second. When light crosses from one material into a different one, what property of the light changes?",
+      "It's the speed - light moves at different rates through different materials, and the bending is a consequence of that. Now think about syrup versus air: does light get through syrup as easily?",
+      "So connect the two. The beam bent toward the normal going in. What does that tell you about how fast it is travelling once it is inside the syrup?"
+    ],
+    "3": [
+      "The question says 'domestic authority' - inside the country, not abroad. Which of these four happened inside the United States rather than overseas?",
+      "Good. Now narrow it further: which one was the federal government testing whether it could enforce its own law on its own citizens who were refusing to obey it?",
+      "Think about which event forced Washington to send troops against Americans over a tax. Which option is that?"
+    ],
+    "4": [
+      "What do you already know someone has to do to become a citizen? List anything that comes to mind, even if you're unsure.",
+      "Here's the sorting rule: naturalisation is a legal process with required steps, so a step has to be something every applicant must do, not something that merely happens to be true of some of them.",
+      "Run each option through that test - is this required of every applicant, or just common? Which one survives?"
+    ],
+    "5": [
+      "What was the older picture of the universe that Copernicus was arguing against, and who taught it?",
+      "Right - the earth-centred picture, and the Church had adopted it as doctrine. So a sun-centred model isn't just a new calculation; it collides with something.",
+      "What does it collide with? Pick the option describing that collision rather than a practical side effect."
+    ],
+    "6": [
+      "What do you know about who the Nazis treated as enemies inside Germany before the war?",
+      "One useful test: the Nazis attacked groups they cast as a political threat to the nation. Two of these options are groups they actually courted or worked with - the army and big business.",
+      "That leaves a political movement they treated as their main rival. Which of the remaining options is that?"
+    ],
+    "7": [
+      "Notice the answers are formulas, not numbers, so the question is really asking what operation turns this year into next year. What did the bank do to her $1,000?",
+      "It added 10% of the balance. Here's the key idea: 10% of $1,000 is $100, but next year 10% is taken of $1,100, not of $1,000 - the interest is calculated on the new balance each time.",
+      "So which formula multiplies the current amount rather than adding a fixed number? Say why the fixed-number ones fail."
+    ],
+    "8": [
+      "What does 'commission' mean here - is it a flat fee, or does it depend on how much she sold?",
+      "It depends on sales, so 12% is 12% of $3,740. Convert the percent to a decimal first: 12% is 12 per hundred, so 0.12.",
+      "Multiply $3,740 by 0.12. Before you compute exactly, estimate: 10% would be $374, so your answer should be a bit above that. Which option fits?"
+    ],
+    "9": [
+      "What do you know about how Jackson was different from the presidents before him - what kind of voter supported him?",
+      "He was the first president to win on a broad popular base rather than on elite backing. Now check the dates on the other options: the Fifteenth Amendment is Reconstruction, decades later.",
+      "So which option describes something that would follow from ordinary men turning out to vote for him?"
+    ],
+    "10": [
+      "What makes a trait 'sex-linked' in the first place - where does the gene sit?",
+      "It sits on a sex chromosome, and almost always the X. Now the important part: males have one X and females have two, so a recessive allele on the X shows up in males far more often.",
+      "'More often' is not 'only', though. Which option describes where the gene lives without over-claiming who can be affected?"
+    ],
+    "11": [
+      "Think about a fallen log on a forest floor with fungus growing on it. What is happening to that log over time?",
+      "It's being broken down, and the nutrients locked inside it are being released back into the soil. That's the job fungi do in an ecosystem.",
+      "Now match that job to an option. Careful with 'producers' - that word means something specific about making food from sunlight, which fungi can't do."
+    ],
+    "12": [
+      "What's the relationship here - is $4.80 the price of one tape or of all four?",
+      "All four, and they cost the same each. So you're splitting one total into equal parts, which is division.",
+      "Divide $4.80 by 4. Sanity check first: each tape must cost less than $4.80, which already rules out most of these. What do you get?"
+    ],
+    "13": [
+      "Write the problem out as digits before anything else. What does 'nine times four hundred fifty-eight' look like as a multiplication?",
+      "9 x 458. Estimate before you multiply exactly: 9 x 450 is 4,050, so your answer should be a little above that.",
+      "Now do it properly, one place at a time: 9 x 8, then 9 x 50, then 9 x 400, and add. What do you land on?"
+    ],
+    "14": [
+      "Kinetic energy of molecules - what does that have to do with a thermometer reading?",
+      "Temperature IS the average kinetic energy of the molecules. That's the whole link. Now notice the trap: the question says 'average', so the amount of water is deliberately there to distract you.",
+      "Ignore the millilitres entirely and just read the temperatures. Which sample has the lowest?"
+    ],
+    "15": [
+      "Where were the writers of the Constitution from, and whose political system had they lived under their whole lives?",
+      "Britain. So even while rebelling against it they borrowed its machinery. Now, a distinctive feature of the American legislature is that it has two chambers.",
+      "Which of these four bodies also had two houses and was the one the framers actually knew from experience?"
+    ],
+    "16": [
+      "This case is one where the Court sided with the Cherokee. So why is it remembered as a disaster for them?",
+      "Because a court ruling only matters if someone enforces it. The Court said one thing; Georgia and the president did another.",
+      "Which option describes a ruling that was won and then simply not obeyed?"
+    ],
+    "17": [
+      "Which of these names belonged to the era you'd expect - the fight for control after Lenin died?",
+      "Rule out by era first. Romanov is the imperial dynasty, and Kerensky led the government Lenin overthrew - both are before this fight, not in it.",
+      "Of the two who remain, which one ended up exiled abroad and became Stalin's symbolic enemy for decades?"
+    ],
+    "18": [
+      "What happens to the amount of money in circulation if the government mints far more silver coins?",
+      "More money chases the same goods. What does that do to prices - and therefore to the value of a dollar that's owed to you?",
+      "Now think about who lends versus who borrows. Industrialists were owed money. If dollars lose value, they get repaid in weaker dollars. Which option names that effect?"
+    ],
+    "19": [
+      "Picture a berry actually being eaten. For a seed to end up far from the parent plant, what has to happen to it after that?",
+      "It has to survive being eaten and then be dropped somewhere else, which means the animal has to travel a real distance in between.",
+      "Now look at your four animals and ask which one both eats whole berries and covers ground. Which fits both?"
+    ],
+    "20": [
+      "This one is broad. Think of an animal you know and list everything it actually gets from a plant.",
+      "Careful with the options - two of them are things animals do FOR plants, not things they get from plants. Read them in that direction and see.",
+      "That leaves what a plant physically provides to an animal. Which option is a thing an animal takes from a plant rather than gives it?"
+    ],
+    "21": [
+      "Read the question again slowly - it's asking which one is wrong, not which one is right. That flips everything.",
+      "So work out what each description actually adds up to, and hunt for the one that misses 7,140. Start with place value: forty tens is 400, not 40.",
+      "Compute each option's total and compare to 7,140. Which one fails to match?"
+    ],
+    "22": [
+      "First find the thing that stays constant no matter how long she works. What is it?",
+      "Her rate. $36 for 3 hours means $12 an hour - divide to get the per-hour amount.",
+      "Now ask how many $12 chunks fit in $720. Estimate: $12 x 50 is $600, so the answer is somewhat more than 50. Which option fits?"
+    ],
+    "23": [
+      "Plants are mostly built from carbon. Where do you think a plant physically gets its carbon from? Say your first instinct.",
+      "Most people say soil, and it's the wrong instinct. Think about photosynthesis instead: name the two things a plant takes in and the one it releases.",
+      "One of the things it takes in contains carbon. Where does the plant get that from?"
+    ],
+    "24": [
+      "Say the number out loud in parts: five hundred, twenty, seven. What is each digit actually worth?",
+      "The 5 is worth 500 because of where it sits, the 2 is worth 20, the 7 is worth 7. Place value, not just the digit.",
+      "Now find the option that adds exactly those three values. Add each candidate up and check it returns 527."
+    ],
+    "25": [
+      "Is a kilometre bigger or smaller than a metre? Answer that first.",
+      "Bigger - 1,000 times bigger. So when you convert kilometres into metres, the number should get larger, not smaller.",
+      "That alone tells you what to do with 5 and 1,000. Which operation, and what's the result?"
+    ],
+    "26": [
+      "Twenty buckets, all the same. Which operation is repeated addition?",
+      "Multiplication: 7.05 x 20. Estimate first so you can catch a slipped decimal - 7 x 20 is 140, so your answer must be near 140.",
+      "Now multiply exactly. Which option is near your estimate, and which ones are off by a factor of ten?"
+    ],
+    "27": [
+      "Every teacher gets the same amount, so what operation combines 40 groups of 2,500?",
+      "Multiplication. Here's a trick that avoids the zero-counting mistakes: 4 x 25 is 100, then put the zeros back - one from the 40, two from the 2,500.",
+      "So how many zeros go on the end of 100, and what's the final number?"
+    ],
+    "28": [
+      "Rounding to the nearest thousand means the answer will end in three zeros. Which digit decides whether you go up or down?",
+      "The hundreds digit. Look at 231,198 - the thousands digit is 1 and the hundreds digit is 1. What does a hundreds digit of 1 tell you to do?",
+      "Round down means the thousands digit stays as it is. Write out the whole number and pick the match."
+    ],
+    "29": [
+      "Conduction, convection, radiation - what has to be true for conduction specifically?",
+      "Direct contact between things that are touching, with no fluid carrying the heat around and nothing beaming across a gap.",
+      "Now test each option for touching-without-flowing. Two involve moving fluids and one involves sunlight crossing a gap. Which is left?"
+    ],
+    "30": [
+      "What does 'revolves around' mean - which thing is at the centre and which is going around it?",
+      "The question fixes the centre as a planet. So you need something that orbits a planet, not something that orbits a star.",
+      "Asteroids and comets orbit the sun, and a star isn't orbiting a planet. Which option is left, and does it orbit a planet?"
+    ],
+    "31": [
+      "Write down the area formula for a rectangle before you touch the numbers.",
+      "Area = base x height. You know the area and the base, so this is a multiplication with one part missing - which means you divide.",
+      "Divide 45.5 by 7. Estimate: 7 x 6 is 42, so your answer is just over 6. Which option fits?"
+    ],
+    "32": [
+      "In the survey, what fraction of people said they'd vote for candidate A? Write it as a fraction first.",
+      "450 out of 1,000, which is 0.45 - just under half. The whole method is assuming that same fraction holds in the big election.",
+      "So take 0.45 of 220,000. Estimate first: half of 220,000 is 110,000, so your answer should be a bit under that. Which option fits?"
+    ],
+    "33": [
+      "Look at 33,300 and write down what each 3 is worth. They're different despite being the same digit.",
+      "From the left: 30,000, then 3,000, then 300. Now notice each place is ten times the place to its right - that relationship is what the options are testing.",
+      "Read each option carefully and check the direction of the comparison. Which one states the relationship the right way round?"
+    ],
+    "34": [
+      "Put yourself in 1900, just off the boat with no money. What do you need in the first week?",
+      "Work, immediately. So the question becomes: where were the jobs that needed large numbers of unskilled workers at that moment?",
+      "Which option connects where those jobs were to where the immigrants settled?"
+    ],
+    "35": [
+      "What did the Fifteenth Amendment guarantee, and to whom?",
+      "The vote, and it's federal, so a state can't simply repeal it. That constraint is the key: any response has to work around the amendment rather than against it openly.",
+      "Which option describes a workaround - something that leaves the right on paper but blocks it in practice?"
+    ],
+    "36": [
+      "State the one rule about which direction heat always flows.",
+      "Always from hotter to colder. Now compare each object to the room: the ice is at -4, the room is 23, the water is 80.",
+      "Do that comparison for each and say which direction heat moves for the ice and for the water. Then find the option that matches both."
+    ],
+    "37": [
+      "What does a hurricane feed on? What is the fuel?",
+      "Warm ocean water - the evaporation is what powers it. So anything that cuts off that supply weakens the storm.",
+      "Which option takes the storm away from its fuel source?"
+    ],
+    "38": [
+      "Two clues are given: it's scratched by a fingernail, and its lustre is nonmetallic. Which clue is about hardness?",
+      "The fingernail one. A fingernail is very soft - about 2.5 on the hardness scale - so anything it scratches is a soft mineral. Quartz, for comparison, is a 7 and would scratch glass.",
+      "Now use the second clue to sort the rest: nonmetallic lustre rules out the shiny metallic one. Which option is both soft and nonmetallic?"
+    ],
+    "39": [
+      "Look at the list itself: salt concentration, temperature, plankton, a shark. Sort those into living and non-living.",
+      "You have both. That's the whole point of the question - two of the items are physical conditions and two are organisms.",
+      "Which of these four terms is the one that includes living things AND their non-living surroundings together?"
+    ],
+    "40": [
+      "Gravity depends on two things. What are they?",
+      "Mass and distance. But they don't work the same way: mass is a straight proportion, while distance is squared, which makes distance the more powerful lever.",
+      "Two options weaken the attraction, so ignore those. Of the two that strengthen it, one changes mass and one changes distance - and distance is squared. Which wins?"
+    ],
+    "41": [
+      "Track the pile. It started at 10, Sedrick took 3, James took 2. How many cards are on the table now?",
+      "Five. And the rule says a turn is 1, 2 or 3 cards - never more. That rule alone disqualifies some of these options before you think about winning.",
+      "Now check the ones that are legal: do the two moves add to exactly 5, and does James take the last card? Which option satisfies both?"
+    ],
+    "42": [
+      "Who was doing the settling in California at that time, and what was their main institution?",
+      "Spain, and the settlements were run by the Church as much as by soldiers - the aim was converting people, not just farming.",
+      "Which option names a religious settlement rather than an economic one?"
+    ],
+    "43": [
+      "Which is the bigger unit, a centimetre or a millimetre?",
+      "A centimetre - there are 10 millimetres in each one. So converting centimetres to millimetres should make the number bigger.",
+      "Twenty centimetres, ten millimetres in each. What's the count, and does it look bigger than 20 as expected?"
+    ],
+    "44": [
+      "The question gives three clues at once. Start with the easiest: which river is North America's longest?",
+      "The Mississippi. So you need a purchase that gave control of that river and the land around it. Alaska and Florida are nowhere near it.",
+      "Between the two that remain, one was a small strip in the southwest. Which one doubled the country?"
+    ],
+    "45": [
+      "'Rate' means per something. Per what, in this question?",
+      "Per hour. So you're splitting 84 houses evenly across 3 hours, which is division.",
+      "84 divided by 3. Check it makes sense: 3 lots of your answer should rebuild 84. What do you get?"
+    ],
+    "46": [
+      "What did people freed from slavery need most urgently in 1865, beyond food and shelter?",
+      "Among other things, literacy - reading and writing had been denied to them by law. The Bureau's most lasting work was in that direction.",
+      "Two of these options describe things that did not actually happen. Which option names something the Bureau really built?"
+    ],
+    "47": [
+      "In a vacuum, is there anything that makes one kind of light travel faster than another?",
+      "No - everything on the electromagnetic spectrum moves at the same speed in a vacuum. That instantly halves your options, because two of them claim different speeds.",
+      "Now use the relationship: at a fixed speed, frequency and wavelength trade off against each other. Radio has the lower frequency, so what must its wavelength do?"
+    ],
+    "48": [
+      "Read it as English first: '3 less than 20'. Are you ending up with more than 20 or fewer?",
+      "Fewer - 'less than' means something is being taken away. That rules out the ones that grow the number.",
+      "Now watch the order. 'Three less than twenty' starts from twenty and removes three. Which expression shows exactly that?"
+    ],
+    "49": [
+      "What two quantities does momentum depend on?",
+      "Mass and velocity, multiplied together. Which means anything at rest has zero momentum no matter how heavy it is - check whether any option is a trap on that.",
+      "Now multiply mass by speed for the ones that are actually moving and compare the three numbers. Which is biggest?"
+    ]
+  }
+}

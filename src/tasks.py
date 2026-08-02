@@ -63,8 +63,8 @@ TEACHER_SYSTEM = (
     "You are a patient tutor working through a problem WITH a middle-school student.\n"
     "Your goal is to teach, not to answer. In each turn do whatever helps most:\n"
     "explain the underlying idea, give a small worked example from a similar\n"
-    "situation, ask a question that makes them think, or CORRECT a MISCONCEPTION.\n"
-    "Give a direct hint ONLY if they are truly stuck.\n"
+    "situation, ask a question that makes them think, or CORRECT a MISCONCEPTION, or provide some background knowledge they don't have.\n"
+    "Give a direct hint ONLY if they are truly stuck, but make sure to RESPOND to their last message.\n"
     "Rules:\n"
     "1. NEVER reveal the answer. DO NOT name, quote, or rule out any option.\n"
     "2. Keep each turn to 2-3 sentences so it stays a conversation.\n"
@@ -120,7 +120,49 @@ def dialogue_prompt(problem, transcript: str, tokenizer=None,
     return f"{system}\n\n{user}"
 
 
-def student_opening_view(problem) -> str:
+STUDENT_READY = "[READY]"
+
+_STUDENT_READY_RE = re.compile(r"[*_`]*\[\s*ready\s*\][*_`]*", re.IGNORECASE)
+
+READY_RULE = (
+    "\nIf the tutor's last message actually cleared it up and you think you could "
+    "pick an answer now, end your reply with [READY] on the same line. Only say it "
+    "when something genuinely clicked - not to end the conversation."
+)
+
+
+def strip_student_ready(text: str) -> tuple[str, bool]:
+    """Split a student turn into (what the tutor sees, did the student stop?).
+
+    The marker must come off before the transcript is built, for the same reason
+    the teacher's does: `choose()` scores the transcript, so a stray control token
+    becomes part of what the student is reading back to itself.
+    """
+    cleaned = _STUDENT_READY_RE.sub(" ", text)
+    return re.sub(r"[ \t]+", " ", cleaned).strip(), bool(_STUDENT_READY_RE.search(text))
+
+
+def student_state_line(problem, state: dict | None) -> str:
+    """One line telling the student who it is and what it currently believes.
+
+    Without this the student opens with undirected confusion ("I don't get it"),
+    which gives the tutor nothing to teach into. The belief is not invented: it is
+    the option `choose()` actually picks for this item, and every training item was
+    screened on that pick being wrong - so it is a real, named misconception the
+    tutor can work against.
+    """
+    if not state:
+        return ""
+    bits = []
+    if state.get("grade"):
+        bits.append(f"You are in grade {state['grade']}.")
+    if state.get("believes"):
+        bits.append(f'Right now you think the answer is "{state["believes"]}", '
+                    "but you could not explain why.")
+    return (" ".join(bits) + "\n\n") if bits else ""
+
+
+def student_opening_view(problem, state: dict | None = None) -> str:
     """The student's FIRST message, before the tutor has said anything.
 
     Letting the student open changes what the tutor is doing. Cold-opening with
@@ -129,12 +171,14 @@ def student_opening_view(problem) -> str:
     one of the leak modes. Responding to a stated confusion gives it something
     specific to teach into.
     """
-    return (f"Question you're stuck on:\n{problem['question']}\n\n"
+    return (student_state_line(problem, state)
+            + f"Question you're stuck on:\n{problem['question']}\n\n"
             "Your tutor just sat down with you. Say what is confusing you about "
             "this question, in one short sentence.")
 
 
-def student_dialogue_view(problem, transcript: str) -> str:
+def student_dialogue_view(problem, transcript: str, state: dict | None = None,
+                          ready: bool = False) -> str:
     """What the student sees when it is their turn to SPEAK.
 
     Deliberately WITHOUT the answer options. Showing them here let the student
@@ -143,8 +187,11 @@ def student_dialogue_view(problem, transcript: str) -> str:
     correct - paying the teacher for the student's knowledge. `choose()` still
     gets the options, because picking an answer requires them.
     """
-    return (f"Question you're stuck on:\n{problem['question']}\n\n"
-            f"Conversation so far:\n{transcript.strip()}\n\nYour reply:")
+    return (student_state_line(problem, state)
+            + f"Question you're stuck on:\n{problem['question']}\n\n"
+            f"Conversation so far:\n{transcript.strip()}"
+            + (READY_RULE if ready else "")
+            + "\n\nYour reply:")
 
 
 def teacher_prompt(problem, tokenizer=None) -> str:

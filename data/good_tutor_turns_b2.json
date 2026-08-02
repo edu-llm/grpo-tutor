@@ -1,0 +1,255 @@
+{
+  "note": "Batch 2, items 50-99 of /tmp/pick100.json (seed 11). Same discipline: never name the answer, never rule options out - hand the student the test and let them apply it.",
+  "arcs": {
+    "50": [
+      "You've been given a frequency and a speed, and asked for a wavelength. Do you remember the equation linking those three?",
+      "Speed equals frequency times wavelength. You have the speed and the frequency, so wavelength is what's left when you rearrange - divide the speed by the frequency.",
+      "Before dividing, estimate: 340 divided by about 1300 is well under one. So the answer is a fraction of a metre. Now compute it."
+    ],
+    "51": [
+      "Break the word down. What does 'inquisition' come from - what does it mean to inquire into?",
+      "To question or investigate. This was an institution that investigated people's beliefs, run by the Church with the crown's backing, and it punished those it judged wrong.",
+      "Which option describes a court investigating belief? Read each one and ask whether it is about religion or about money and territory."
+    ],
+    "52": [
+      "Both formulas divide by distance squared, so that part is shared. Think about mass and charge instead: how many kinds of mass are there, and how many kinds of charge?",
+      "One kind of mass, but two kinds of charge - positive and negative. That difference has a consequence for the direction of the force.",
+      "Two like charges push apart, opposite charges pull together. Does gravity ever push? Which option captures that asymmetry?"
+    ],
+    "53": [
+      "There's no shortcut here - you substitute 3.4 into each one and see which statement survives. Start with A: what is 3 times 3.4?",
+      "10.2. Now, is 10.2 less than 10.2? Careful - a strict 'less than' is not satisfied by being equal.",
+      "Work through the rest the same way, minding which symbols allow equality and which don't. Which one comes out true?"
+    ],
+    "54": [
+      "What has to be true before people can stop moving around and stay in one place?",
+      "A food supply that stays put. Hunting and gathering makes you follow the food; growing it means the food comes to you.",
+      "Which option names that change? The others are things that tend to arrive after settlement, not before it."
+    ],
+    "55": [
+      "Read the sum aloud in place-value terms: one thousand, six hundreds, eight ones. How many tens?",
+      "None - and that's the whole trap. A missing place still needs a digit holding its spot, and that digit is zero.",
+      "Write the digits in order: thousands, hundreds, tens, ones. Which option matches what you wrote?"
+    ],
+    "56": [
+      "The tree gained a metre of solid wood. Where do you think that material physically came from?",
+      "Almost everyone says the soil, and it's the wrong instinct - the soil barely loses any mass as a tree grows. Think about photosynthesis: what does the plant take in?",
+      "One of the things it takes in carries carbon. Where does the tree get that from?"
+    ],
+    "57": [
+      "Two conversions hide in this one. First: how many quarters are in $3.25?",
+      "13 quarters. Each one buys 60 seconds, so multiply to get the total time in seconds.",
+      "Now convert seconds to minutes by dividing by 60. Notice a shortcut - one quarter is exactly one minute, so the count of quarters is already the answer in minutes."
+    ],
+    "58": [
+      "How many marbles are white, out of how many altogether?",
+      "One out of ten. Now place that on the scale: 'certain' means it must happen, 'impossible' means it can't, and the middle two are for whether it's more or less than a coin flip.",
+      "One in ten - is that better or worse than an even chance? Which word fits?"
+    ],
+    "59": [
+      "Read the units carefully: pounds per square inch. What does 'per square inch' tell you about how the pressure adds up over a bigger area?",
+      "Each square inch gets 15 pounds. So 30 square inches each get their own 15 pounds - that's repeated addition, which is multiplication.",
+      "Multiply 15 by 30. Sanity check: the answer must be much bigger than 15, not smaller."
+    ],
+    "60": [
+      "What is your body doing to sugar when it 'digests' it in a cell - what is it after?",
+      "Energy. And getting energy out of sugar means breaking it apart, which leaves waste products behind. You breathe one of them out constantly.",
+      "What gas do you exhale? Two of these options are things only plants deal with, so think about what an animal cell actually releases."
+    ],
+    "61": [
+      "Lenin was a Marxist. In Marxist theory, was the revolution supposed to stop at one country's border?",
+      "No - it was meant to spread, with Russia as the first spark rather than the whole fire.",
+      "Which option describes that hope of spreading? Check the dates on the others too: some describe things that hadn't happened yet in 1917."
+    ],
+    "62": [
+      "In the feudal system, who worked the land, and could they leave if they wanted to?",
+      "They could not - that's the defining feature. They weren't slaves exactly, but they came with the land when it changed hands.",
+      "Which of these four groups was in that position? The others could travel, fight, or hold office."
+    ],
+    "63": [
+      "Snow is water in which state, and liquid water is which state?",
+      "Solid, then liquid. So something has to make the snow change state, and only one thing drives that change.",
+      "What has to happen to the snow's temperature for it to melt? Which option says that?"
+    ],
+    "64": [
+      "The ratio is 2 parts fruit to 3 parts nuts. How many parts are in one whole batch?",
+      "Five parts. That's the step people skip - the total is 2 plus 3, not just 3. So each part is 30 pounds divided by 5.",
+      "Work out the size of one part, then take the number of parts that are fruit. What do you get?"
+    ],
+    "65": [
+      "Who does Social Security pay, and when in their life do they receive it?",
+      "Older people, after they stop working. It was built for the situation where a person can no longer earn but still has to live.",
+      "Which option describes income for people who have retired?"
+    ],
+    "66": [
+      "First, how much has the student already spent on walnuts? That part is fixed.",
+      "3 pounds at $5 is $15, which is why 15 appears in some of the options. Then cashews add $7 for each pound, which is the 7c term.",
+      "Now the direction: he has $25 and cannot go over it. Should the total be at least $25, or at most? Pick the option with the right starting number and the right direction."
+    ],
+    "67": [
+      "What does photosynthesis actually produce? Name the product the plant makes for itself.",
+      "Sugar - glucose. That's the point of the process; oxygen is a by-product.",
+      "So if algae live inside the coral and make sugar, what does the coral get out of the arrangement? Which option describes food rather than something else?"
+    ],
+    "68": [
+      "Take the clues one at a time. What does 'it can roll' rule in - what shape does a rolling object need?",
+      "A curved surface. Now the harder clue: two faces. A face is a flat surface, so count the flat ends on each rolling shape you can think of.",
+      "Which shape has exactly two flat ends, no corners, and still rolls?"
+    ],
+    "69": [
+      "The Cold War is called 'cold' for a reason. What does that tell you it was not?",
+      "Not direct fighting between the two of them. So the competition happened somewhere else - through allies, aid, influence over third countries.",
+      "Which option describes competing for influence rather than fighting directly?"
+    ],
+    "70": [
+      "550 words in 25 minutes. What operation gives you a per-minute rate?",
+      "Division. 550 divided by 25. Estimate: 20 words a minute would give 500 in that time, which isn't quite enough.",
+      "So the answer is a bit above 20. Compute it exactly and pick the matching option."
+    ],
+    "71": [
+      "What tells you a chemical reaction has happened rather than just a change of state?",
+      "A new substance exists afterwards, and you usually can't get the old one back. Melting and freezing and dissolving are all reversible - the substance is still there.",
+      "Test each option: could you recover exactly what you started with? Which one produces something genuinely new?"
+    ],
+    "72": [
+      "It says cost per OUNCE but gives you pounds. What has to happen first?",
+      "Convert. There are 16 ounces in a pound, so 12 pounds is 12 times 16 ounces.",
+      "Now divide $5.76 by that number of ounces. Estimate: it'll be small - a few cents. Which option is in that range?"
+    ],
+    "73": [
+      "In a four-digit number, which positions are the ones place and the hundreds place? Point to them.",
+      "The ones is the last digit; the hundreds is the second from the left in a four-digit number. So you're comparing the last digit with the second one.",
+      "Check each number: is its last digit the same as its second digit? Which one matches?"
+    ],
+    "74": [
+      "Find these four on the periodic table. Are they on the left-hand side, or over to the right?",
+      "The right-hand side, which is where the nonmetals sit. Now check the other options: they'd have to share a column or a property, and these four don't.",
+      "Which option describes the group they all belong to?"
+    ],
+    "75": [
+      "Japan borrowed a lot from China. Think about the most basic tool a culture can borrow - the thing you'd need before you could borrow anything else in writing.",
+      "Characters. Japanese adopted Chinese characters and built its script around them, which is why the two look related on the page.",
+      "Which option names that borrowing? The others developed in Japan itself."
+    ],
+    "76": [
+      "Rounding to a whole number means the decimal part disappears. Which digit decides whether 205 stays or becomes 206?",
+      "The first digit after the decimal point - the 8. Everything after it is irrelevant to this decision.",
+      "Is 8 in the round-up half or the round-down half? Apply it and pick your answer."
+    ],
+    "77": [
+      "Two accounts, two rules. What's the difference between simple and compound interest?",
+      "Simple pays 4% of the original $2,500 every year, the same amount each time. Compound pays 4% of whatever the balance has grown to, so it earns slightly more.",
+      "Work out each balance after 3 years, then add them. Compound must be a little larger than simple - use that to check your answer looks right."
+    ],
+    "78": [
+      "You have to evaluate all four. Is there one you can do instantly without multiplying anything out?",
+      "Anything multiplied by zero is zero, no matter what else is in the product. Zero is certainly less than 10.",
+      "Check the rest to be sure only one qualifies, then say which expression has a value under 10."
+    ],
+    "79": [
+      "The UN was founded right after a catastrophic war. What would its founders most want to prevent, and how?",
+      "Another war - and their idea was that if countries argued in a room together, they might not have to fight.",
+      "Which option describes settling disputes by talking rather than by force?"
+    ],
+    "80": [
+      "The Harlem Renaissance was an explosion of writing, music and art. What were those writers celebrating?",
+      "Their own culture and history, presented as something worth taking seriously - not as a problem to be solved.",
+      "Which option describes building pride rather than protest, schooling, or literacy programmes?"
+    ],
+    "81": [
+      "Checks and balances means power is divided so no one part can dominate. Which ancient government split power between consuls, a senate and assemblies?",
+      "Rome, before the emperors. The framers read Roman history closely and worried about exactly the failure it suffered.",
+      "Which option names that system? Note that a monarchy and an aristocracy concentrate power rather than dividing it."
+    ],
+    "82": [
+      "Two boxes, and you want how many altogether. Which operation?",
+      "Addition. Line them up by place value: ones under ones, tens under tens.",
+      "Add 438 and 375, watching the carry from the ones column. Estimate first - roughly 440 plus 380 is about 820."
+    ],
+    "83": [
+      "Which digits are the tens and the hundreds in a four-digit number? Count from the right.",
+      "The ones is last, the tens is second from the right, the hundreds is third from the right. You want a 4 in the second and third positions from the right.",
+      "Check each option's middle two digits. Which one has 4 in both of those places?"
+    ],
+    "84": [
+      "How many cans are cola, and how many cans are there in total?",
+      "2 out of 12. Probability is that fraction - and fractions should be simplified, so divide both numbers by 2.",
+      "What does 2 out of 12 reduce to? Express it as a 1 in something."
+    ],
+    "85": [
+      "What would make her survey misleading? Think about who she'd be leaving out.",
+      "Any group that shares a taste. A sports team, or people who already agree with her, would all skew the result the same direction.",
+      "Which option reaches across the whole school rather than one self-selected group?"
+    ],
+    "86": [
+      "Britain had a treaty obligation in 1914. Which small country's neutrality had it promised to protect?",
+      "Belgium. Germany marched through it to reach France, and that gave Britain both a legal reason and a public one.",
+      "Which option names that invasion? Check the dates on the others - one of them happens years later."
+    ],
+    "87": [
+      "Careful - it asks how much MORE she pays, not how much she pays.",
+      "So you only need the extra bit: the price rose by $0.11 on each of 20 gallons.",
+      "Multiply the increase by the number of gallons. If you get something near $46, you've computed the whole new bill instead of the difference."
+    ],
+    "88": [
+      "In y = 12x, which letter is bigger - and by what factor?",
+      "y is twelve times x. So you need a story where one quantity is twelve times another, not one where twelve is added.",
+      "Read each option and ask: is the relationship multiplication by 12, and is it y that's the larger one? Both parts have to be right."
+    ],
+    "89": [
+      "This is a long chain, so track it in pieces. What's the total drop in that first hour plus the seven hours after?",
+      "5 down, then 2 down seven times, which is 14 more - so 19 degrees of falling in total. Now handle the rises separately.",
+      "Add the two rises, then compare that against the 19 of falling. Which is bigger, and by how much? That difference, with its direction, is your answer."
+    ],
+    "90": [
+      "Hooker and Williams disagreed with Massachusetts' leaders. In the 1630s, what were their practical options for living the way they wanted?",
+      "Not many - you couldn't outvote the leadership, and there were no political parties. But there was a great deal of unsettled land nearby.",
+      "Which option describes what they did with that land? Connecticut and Rhode Island both begin this way."
+    ],
+    "91": [
+      "Is gravity pulling on the rock right now? And is the sidewalk pushing back up on it?",
+      "Both, at once. So it isn't true that nothing is acting on it - forces are present, they just aren't winning against each other.",
+      "When forces are present but nothing moves, what word describes their relationship? Which option uses it?"
+    ],
+    "92": [
+      "A dime is how many cents? So rounding to the nearest dime means rounding to the nearest what?",
+      "Ten cents. So your answer has to end in a zero in the pennies column - which already tells you something about two of these options.",
+      "Is $0.47 closer to $0.40 or to $0.50? Compare the gaps and choose."
+    ],
+    "93": [
+      "Erosion and deposition are opposites. Which one carves material away, and which one drops it somewhere?",
+      "Erosion carves, deposition drops. Now think about a river reaching the sea: it slows down, and slow water can't carry sediment any more.",
+      "Which option correctly pairs a landform with the process that makes it? Check each pairing rather than each landform."
+    ],
+    "94": [
+      "1935 - what was the American public's memory of the last European war they'd joined?",
+      "Costly and, to many, pointless. That mood is the reason Congress acted.",
+      "Which option describes that mood? Two of the others describe events that hadn't happened yet in 1935."
+    ],
+    "95": [
+      "What does 'inherited' mean? Where does an inherited trait come from?",
+      "From the parents, through genes. So it's something the fish is born with, as opposed to something that happened to it or something it learned.",
+      "Sort the six observations into born-with versus happened-to-it. Being sick and swimming for food fall on the learned or acquired side. Which option lists only born-with traits?"
+    ],
+    "96": [
+      "She's driving two days. Do you need each day separately, or just the total distance?",
+      "Just the total - add the two distances first, then convert once.",
+      "Now divide the total by 28 miles per gallon. Estimate: 420 miles at roughly 30 to the gallon is about 14. Which option is nearest?"
+    ],
+    "97": [
+      "What did the United States want in Asia in the early 1900s - trade, or territory?",
+      "Trade, and specifically the ability to trade everywhere rather than being shut out. That was the point of the Open Door policy.",
+      "Japan building an exclusive empire would block exactly that. Which option names the American goal it conflicted with?"
+    ],
+    "98": [
+      "8 x 2 - what does multiplication mean in a story? What has to be repeating?",
+      "Equal groups. So the story needs 8 groups with 2 in each, or 2 groups with 8 in each - and the question must ask for the total.",
+      "Check each option for equal groups. One is sharing out, one is adding, one is taking away. Which one has groups?"
+    ],
+    "99": [
+      "Magnets don't pull on everything. Which of these materials would a magnet grab at all?",
+      "Only certain metals - iron and steel among them. Paper and rubber aren't attracted no matter how light they are.",
+      "Now between the two the magnet can actually pull, which is easier to move: the lighter one or the heavier one?"
+    ]
+  }
+}

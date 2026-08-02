@@ -205,6 +205,18 @@ class VLLMEngine:
         self._epoch = int(epoch)
         self._n_calls = 0
 
+    def load_adapter(self, path: str):
+        """Point the engine at a LoRA adapter already saved on disk.
+
+        `sync_weights` takes a live trainer model mid-run. This takes a directory,
+        which is what a generation-only job needs - without it such a job silently
+        samples from the BASE model and calls the output a policy trace.
+        """
+        if not os.path.isdir(path):
+            raise SystemExit(f"adapter directory not found: {path}")
+        self._version += 1
+        self._lora_req = self._LoRARequest(f"teacher-{self._version}", self._version, path)
+
     def sync_weights(self, source):
         """Hand vLLM the trainer's fresh LoRA adapter.
 
