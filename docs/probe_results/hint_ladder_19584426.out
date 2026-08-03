@@ -1,0 +1,39 @@
+started 2026-08-03T16:14:04-04:00 on node2436, job 19584426
+
+############ Qwen/Qwen2.5-0.5B-Instruct ############
+542 items, 542 annotated, 272 with all five rungs
+loading Qwen/Qwen2.5-0.5B-Instruct in-process
+
+=== hint ladder, Qwen/Qwen2.5-0.5B-Instruct (n=272, P(gold)) ===
+
+  nothing                0.238
+  unit named             0.276  gain +0.0382 +/- 0.0062  = +6.2 SE
+  misconception named    0.199  gain -0.0395 +/- 0.0072  = -5.5 SE
+  real dialogue          0.217  gain -0.0216 +/- 0.0060  = -3.6 SE
+  answer stated          0.601  gain +0.3627 +/- 0.0129  = +28.2 SE
+
+  -> THE FORMAT WORKS, THE DIALOGUES DO NOT. A bare sentence moves the
+     student where a whole tutoring dialogue does not, so the channel
+     is open and the teacher's output is what is weak. Fix the teacher,
+     not the setup.
+
+wrote runs/hint_ladder_Qwen2.5-0.5B-Instruct_19584426.json
+
+############ Qwen/Qwen2.5-3B-Instruct ############
+542 items, 542 annotated, 272 with all five rungs
+loading Qwen/Qwen2.5-3B-Instruct in-process
+
+=== hint ladder, Qwen/Qwen2.5-3B-Instruct (n=272, P(gold)) ===
+
+  nothing                0.354
+  unit named             0.395  gain +0.0404 +/- 0.0075  = +5.4 SE
+  misconception named    0.283  gain -0.0719 +/- 0.0110  = -6.5 SE
+  real dialogue          0.305  gain -0.0498 +/- 0.0095  = -5.3 SE
+  answer stated          0.752  gain +0.3974 +/- 0.0149  = +26.6 SE
+
+  -> THE FORMAT WORKS, THE DIALOGUES DO NOT. A bare sentence moves the
+     student where a whole tutoring dialogue does not, so the channel
+     is open and the teacher's output is what is weak. Fix the teacher,
+     not the setup.
+
+wrote runs/hint_ladder_Qwen2.5-3B-Instruct_19584426.json

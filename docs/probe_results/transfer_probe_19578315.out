@@ -1,0 +1,76 @@
+542 items, 542 annotated, dialogues for 308 items
+125 pairs, 81 distinct targets, 47 units, similarity 0.821-1.000
+
+  multiplying decimals -> multiplying decimals by whole numbers (sim 0.856)
+    taught on: Which of the following equations is true?
+    tested on: Dion ran 3.75 kilometers each day to prepare for a race. What was the number of kilomete
+
+  writing linear inequalities from word problems -> writing and solving linear inequalities from word problems (sim 0.927)
+    taught on: Helen had $330 in her savings account when Vince opened a savings account with zero doll
+    tested on: Tasha sells gift boxes and cookies at her bakery. • Gift boxes sell for $26.00 each. • C
+
+  classifying quadrilaterals by their properties -> classifying quadrilaterals by their properties (sim 1.000)
+    taught on: A class is studying the attributes of shapes. One student drew a rhombus. Which of the f
+    tested on: Which term does not describe a square?
+
+  multiplying decimals -> multiplying decimals by whole numbers (sim 0.856)
+    taught on: Which of the following equations is true?
+    tested on: Simplify: 2(2.036) – 2.268
+
+  solving multi-step word problems with addition and multiplication -> solving two-step word problems with addition and division (sim 0.832)
+    taught on: In one week, an airplane pilot flew 1134 miles on Tuesday and 1475 miles on Thursday. If
+    tested on: A theater sold $1,048 worth of tickets on Saturday and $424 worth of tickets on Sunday. 
+
+  solving unit-rate word problems -> solving unit-rate problems with unit conversions (sim 0.832)
+    taught on: A car gets 24 miles per gallon of gasoline (mi/gal). How many gallons of gasoline would 
+    tested on: Marcus spent $3.25 to wash his car. If one quarter operates the car wash for 60 seconds,
+
+  identifying the source of carbon in plant biomass -> identifying the source of carbon in plant biomass (sim 1.000)
+    taught on: A student planted an oak tree that was three meters tall. The tree was exposed to sunlig
+    tested on: Plants grow in many different shapes and sizes. Much of their shape depends on an intern
+
+  solving direct variation problems -> solving direct variation problems (sim 1.000)
+    taught on: It takes a machine 12 minutes to fill 200 bottles of soda. At this rate, how many minute
+    tested on: The distance a spring stretches varies directly with the force applied to it. If a 7-pou
+
+  solving direct variation problems -> solving direct variation problems (sim 1.000)
+    taught on: Jerry read a 200-page book in 10 hours. At that rate, how long will it take him to read 
+    tested on: The distance a spring stretches varies directly with the force applied to it. If a 7-pou
+
+  identifying place value in multi-digit whole numbers -> identifying place value in multi-digit whole numbers (sim 1.000)
+    taught on: Which number has a 4 in the tens place and a 4 in the hundreds place?
+    tested on: The population of the city where Michelle was born is 145,826. What is the value of the 
+loading Qwen/Qwen2.5-0.5B-Instruct in-process
+
+=== transfer ===
+
+  solved (binary)  (n=125)
+    baseline 0.256   treated 0.264   swapped 0.248
+    gain        +0.0080 +/- 0.0350  = +0.2 SE
+    specificity +0.0160 +/- 0.0340  = +0.5 SE
+    -> no unit-specific transfer at this n
+
+  P(gold) (continuous)  (n=125)
+    baseline 0.259   treated 0.263   swapped 0.263
+    gain        +0.0039 +/- 0.0049  = +0.8 SE
+    specificity +0.0001 +/- 0.0050  = +0.0 SE
+    -> no unit-specific transfer at this n
+
+=== contamination check: same pair, clean vs leaked source dialogue ===
+  n=52, P(gold), paired 1 SE on the difference = 0.0091
+  baseline           0.267
+  clean source       0.264   gain -0.0028
+  leaked source      0.277   gain +0.0098
+
+  -> CONTAMINATED. Leaking about A should be worthless on B, and it
+     is not. The pairs share more than a knowledge unit; treat the
+     headline as unproven until the pairing is tightened.
+
+=== positive control: target's own answer, stated outright ===
+  n=81, P(gold)
+  baseline        0.259
+  answer given    0.517   gain +0.2577 +/- 0.0200
+
+  -> responsive. The channel registers a maximal hint, so a null above is about the dialogues.
+
+wrote runs/transfer_probe_19578315.json
